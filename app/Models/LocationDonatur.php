@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class LocationDonatur extends Model
+{
+    protected $table = 'location_donatur';
+
+    protected $fillable = [
+        'province_id',
+        'name',
+        'address',
+        'zipcode',
+        'latitude',
+        'longitude',
+    ];
+
+    public function events_donatur()
+    {
+        return $this->hasMany(EventsDonatur::class, 'location_id');
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Provinces::class, 'province_id');
+    }
+}

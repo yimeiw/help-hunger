@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens;
+
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'province_id',
+        'city_id',
+        'name',
+        'username',
+        'phone',
+        'email',
+        'password',
+        'role',
+        'gender',
+        'date_of_birth',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'profile_photo_url',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    public function eventVolunteersDetails()
+    {
+        return $this->hasMany(EventsVolunteersDetail::class, 'volunteer_id');
+    }
+
+    public function eventDonaturDetails()
+    {
+        return $this->hasMany(EventsDonationDetail::class, 'donation_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'volunteer_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin'; 
+    }
+
+    public function isVolunteer()
+    {
+        return $this->role === 'volunteer';
+    }
+
+    public function isDonatur()
+    {
+        return $this->role === 'donatur';
+    }
+
+    // ✅ sebagai volunteer
+    public function volunteeredEvents()
+    {
+        return $this->belongsToMany(EventsVolunteers::class, 'events_volunteers_detail', 'volunteer_id',     'event_id')->withPivot('status')
+                   ->withTimestamps();
+    }
+
+    public function donatedEvents()
+    {
+        return $this->belongsToMany(EventsDonatur::class, 'events_donation_details', 'donation_id',     'event_id')->withPivot('donation_target')
+                   ->withTimestamps();
+    }
+
+    // ✅ sebagai donatur
+    public function donations()
+    {
+        return $this->hasMany(Donation::class, 'donatur_id');
+    }
+}
