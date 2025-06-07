@@ -36,7 +36,7 @@
                 <x-dropdown align="right" width="48" contentClasses="bg-greenbg" dropdownClasses=" shadow-3xl">
                     <x-slot name="trigger">
                         <span class="inline-flex">
-                            <button type="button" class="inline-flex items-center  font-bold text-creamhh text-sm leading-4 font-bold text-base transition duration-300 ease-out -mb-px -me-0 {{ request()->routeIs('guest.partner') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                            <button type="button" class="inline-flex items-center font-bold text-creamhh text-base leading-4 font-bold text-base transition duration-300 ease-out -mb-px -me-0 {{ request()->routeIs('guest.partner') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                 Our Partners
                                 <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -46,13 +46,13 @@
                     </x-slot>
 
                     <x-slot name="content" class="bg-greenbg scroll-smooth">
-                        <x-dropdown-link href="{{ route('guest.partner')}}#community" class="text-right font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                        <x-dropdown-link href="{{ route('guest.partner')}}#community" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
                             Community
                         </x-dropdown-link>
-                        <x-dropdown-link href="{{ route('guest.partner')}}#ngo" class="text-right font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                        <x-dropdown-link href="{{ route('guest.partner')}}#ngo" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
                             NGO
                         </x-dropdown-link>
-                        <x-dropdown-link href="{{ route('guest.partner')}}#orphanage" class="text-right font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                        <x-dropdown-link href="{{ route('guest.partner')}}#orphanage" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
                             Orphanage
                         </x-dropdown-link>
                     </x-slot>

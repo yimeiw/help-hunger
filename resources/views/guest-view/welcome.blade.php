@@ -1,10 +1,10 @@
 <x-guest-layout>
     @section('title', 'Welcome')
     <script src="https://unpkg.com/alpinejs" defer></script>
-    <body class="flex items-center lg:justify-center min-h-screen flex-col scroll-smooth">
+    <body class="flex items-center lg:justify-center justify-center min-h-screen flex-col scroll-smooth">
         <div class="w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0 mt-6">
             <main class="flex flex-col w-auto">
-                <div class="flex flex-row w-full max-w-[1200px] m-7 rounded-lg overflow-hidden">           
+                <div class="flex flex-row w-auto m-7 rounded-lg overflow-hidden">           
                     <div class="flex flex-col">
                         <div class="bg-greenbg">
                             <div class="flex bg-all rounded-br-lg w-[584px] h-[125px] justify-center items-center w-full">
@@ -35,17 +35,17 @@
                     </div>
 
                     <div class="flex flex-row justify-center items-center rounded-tl-lg rounded-tr-lg rounded-br-lg gap-6 bg-greenbg w-full">
-                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-40 h-50 p-6">
+                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg lg:w-52 lg:h-52 p-6">
                             <p class=" font-light text-redb text-xs">“Being a volunteer at HelpHunger isn’t just about sharing food — it’s about sharing hope. One smile from them makes all the effort worth it.”</p>
                             <p class=" font-semibold text-redb text-xs mt-6"> — Andi, HelpHunger Volunteer</p>
                         </div>
 
-                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-40 h-50 p-5">
+                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg lg:w-52 lg:h-52 p-5">
                             <p class=" font-light text-redb text-xs">“I never imagined a simple donation could have such a big impact. HelpHunger showed me that even the smallest act of kindness can save someone’s day.”</p>
                             <p class=" font-semibold text-redb text-xs mt-6"> — Sinta, Regular Donor</p>
                         </div>
 
-                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-40 h-50 p-6">
+                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg lg:w-52 lg:h-52 p-6">
                             <p class=" font-light text-redb text-xs">“Partnering with HelpHunger has strengthened our aid distribution. We no longer feel like we’re fighting hunger alone.”</p>
                             <p class=" font-semibold text-redb text-xs mt-6"> — Artha Graha Peduli Foundation, NGO Partner</p>
                         </div>
@@ -53,13 +53,13 @@
                 </div>
 
 
-                <div class="flex justify-center items-center">
-                    <a href="#services" class="flex justify-center items-center  font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-xl w-56 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                <div class="flex justify-center items-center lg:w-auto">
+                    <a href="#services" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-xl w-56 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                         Start HelpHunger
                     </a>
                 </div>
 
-                <div class="flex flex-row gap-8 w-full max-w-[1200px] m-7 rounded-lg overflow-hidden mt-16">
+                <div class="flex flex-col lg:flex-row gap-8 lg:w-full lg:h-full m-7 rounded-lg overflow-hidden mt-16">
                     <!-- Slider -->
                     <div id="default-carousel" class="relative bg-greenbg rounded-lg w-[684px] h-[502px] " data-carousel="slide">
                         <!-- Carousel wrapper -->
