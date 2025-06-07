@@ -26,8 +26,10 @@ Route::get('/register', [RegisterUserController::class, 'index'])->name('registe
 Route::post('/register', [RegisterUserController::class, 'register'])->name('register');
 Route::get('/register/role', [RegisterRoleController::class, 'index'])->name('register.role');
 Route::post('/register/role', [RegisterRoleController::class, 'registerRole'])->name('register.role');
-Route::get('/register/address', [RegisterAddressController::class, 'index'])->name('register.address');
-Route::post('/register/address', [RegisterAddressController::class, 'registerAddress'])->name('register.address');
+Route::get('/register', [RegisterAddressController::class, 'index'])->name('register.address');
+Route::post('/register', [RegisterAddressController::class, 'registerAddress'])->name('register.address');
+Route::get('/register/cities/{province}', [RegisterAddressController::class, 'getCities'])->name('getCities');
+
 
 Route::middleware([
     'auth:sanctum',
