@@ -5,15 +5,22 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\RegisterUserController;
 use App\Http\Controllers\RegisterRoleController;
 use App\Http\Controllers\RegisterAddressController;
+use App\Http\Controllers\DashboardController;
 
-Route::get('/guest/welcome', [GuestController::class, 'indexHome'])->name('guest.welcome');
+
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect('/dashboard/dashboard');
-    }
-    return redirect('/guest/welcome');
+    return Auth::check() ? redirect()->route('dashboard') : redirect('/guest/welcome');
 });
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Dashboard Routes
+Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.dashboard-admin');
+Route::get('/dashboard/volunteer', [DashboardController::class, 'volunteer'])->name('dashboard.dashboard-volunteer');
+Route::get('/dashboard/donatur', [DashboardController::class, 'donatur'])->name('dashboard.dashboard-donatur');
+
+// Guest Routes
+Route::get('/guest/welcome', [GuestController::class, 'indexHome'])->name('guest.welcome');
 Route::get('/guest/about', [GuestController::class, 'indexAbout'])->name('guest.about');
 Route::get('/guest/locations', [GuestController::class, 'indexLocation'])->name('guest.locations.index');
 Route::post('/guest/locations/search', [GuestController::class, 'searchLocation'])->name('guest.locations.search');
@@ -28,7 +35,7 @@ Route::get('/register/role', [RegisterRoleController::class, 'index'])->name('re
 Route::post('/register/role', [RegisterRoleController::class, 'registerRole'])->name('register.role');
 Route::get('/register/address', [RegisterAddressController::class, 'index'])->name('register.address');
 Route::post('/register/address', [RegisterAddressController::class, 'registerAddress'])->name('register.address');
-Route::get('/register/cities/{province}', [RegisterAddressController::class, 'getCities'])->name('getCities');
+Route::get('/register/cities/{provinceId}', [RegisterAddressController::class, 'getCities'])->name('getCities');
 
 
 Route::middleware([

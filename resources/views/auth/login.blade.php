@@ -32,7 +32,7 @@
                 <div class="block mt-4">
                     <label for="remember_me" class="flex items-center">
                         <x-checkbox id="remember_me" name="remember" />
-                        <span class="ms-2 text-xs text-creamhh">{{ __('Remember me') }}</span>
+                        <span class="ms-2 text-xs text-creamhh peer-checked:text-redb">{{ __('Remember me') }}</span>
                     </label>
                 </div>
             </div>
