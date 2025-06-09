@@ -18,16 +18,16 @@ class RegisterAddressController extends Controller
     {
         $request->validate([
             'gender' => 'required|string|max:10',
-            'dob' => 'required|date',
+            'date_of_birth' => 'required|date',
             'province' => 'required|string|max:100',
             'city' => 'required|string|max:100',
         ]);
 
         $user = auth()->user();
         $user->gender = $request->gender;
-        $user->dob = $request->dob;
+        $user->date_of_birth = $request->date_of_birth;
         $user->province_id = $request->province; 
-        $user->city = $request->city;
+        $user->city_id = $request->city;
         $user->save();
 
         return redirect()->route('dashboard');
@@ -35,7 +35,7 @@ class RegisterAddressController extends Controller
 
     public function getCities($provinceId)
     {
-        $cities = Cities::where('province_id', $provinceId)->get(['id', 'name']);
+        $cities = Cities::where('province_id', $provinceId)->get(['id', 'cities_name']);
         return response()->json($cities);
     }
 }

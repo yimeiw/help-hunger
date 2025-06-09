@@ -29,6 +29,7 @@ export default {
                 'blackAuth': '#2C2C2C',
                 'greenAuth': '#29642A',
                 'greyAuth': '#B5B5B5',
+                'greyCheck': 'A4A4A4',
             },
             boxShadow: {
                 'quadrupleNonHover': '3px 3px 0px rgb(0, 0, 0, 0.25), 2px 2px 0px rgb(255, 240, 183, 1), 1px 1px 0px rgb(255, 240, 183, 1), 4px 4px 0px rgb(144, 43, 41, 1)',
