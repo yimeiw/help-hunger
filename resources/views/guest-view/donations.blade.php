@@ -41,7 +41,7 @@
             </div>
 
             {{-- Sisanya: tampilkan dalam 3 kolom per baris --}}
-            <div class="grid grid-cols-3 gap-6 ml-36 mr-36">
+            <div class="grid grid-cols-3 gap-6 ml-36 mr-36 overflow-x-auto">
                 @foreach ($events->skip(2)->take(3) as $event)
                     <a href="{{ route('register') }}"  class="flex flex-col bg-greenbg rounded-lg p-8 h-full justify-between hover:bg-greenpastel transition duration-300 ease-in-out">
                         <div>
