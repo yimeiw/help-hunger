@@ -1,7 +1,7 @@
 <x-guest-layout>
     @section('title', 'Donations')
     <body>
-        <div class="flex text-center m-12 px-96">
+        <div class="flex items-center justify-center text-center m-12 px-96">
             <p class="text-redb font-bold text-3xl">ONE DONATION, COUNTLESS IMPACT!</p>
         </div>
         <div class="space-y-8 mb-10">
