@@ -30,7 +30,16 @@ class RegisterAddressController extends Controller
         $user->city_id = $request->city;
         $user->save();
 
-        return redirect()->route('dashboard');
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->route('dashboard.dashboard-admin');
+            case 'volunteer':
+                return redirect()->route('dashboard.dashboard-volunteer');
+            case 'donatur':
+                return redirect()->route('dashboard.dashboard-donatur');
+            default:
+                return redirect()->route('guest.welcome')->with('error', 'Invalid role');;
+        }
     }
 
     public function getCities($provinceId)
