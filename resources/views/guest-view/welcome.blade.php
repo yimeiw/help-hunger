@@ -1,31 +1,32 @@
 <x-guest-layout>
     @section('title', 'Welcome to HelpHunger')
-    <script src="https://unpkg.com/alpinejs" defer></script>
-    <body class="flex items-center lg:justify-center justify-center min-h-screen flex-col scroll-smooth">
+
+    
+    <div class="flex items-center lg:justify-center justify-center min-h-screen flex-col scroll-smooth">
         <div class="w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0 mt-6">
             <main class="flex flex-col w-auto">
                 <div class="flex flex-row w-auto m-7 rounded-lg overflow-hidden">           
                     <div class="flex flex-col">
                         <div class="bg-greenbg">
-                            <div class="flex bg-all rounded-br-lg w-[584px] h-[125px] justify-center items-center w-full">
-                                <p class=" font-bold text-redb text-4xl m-16">A WAY TO HELP OTHERS AND REDUCE HUNGER</p>
+                            <div class="flex bg-all rounded-br-lg justify-center items-center w-full h-32">
+                                <p class=" font-bold text-redb text-3xl m-10 lg:text-3xl lg:m-10 xl:text-4xl xl:m-16">A WAY TO HELP OTHERS AND REDUCE HUNGER</p>
                             </div>
                         </div>
 
-                        <div class="flex flex-row rounded-tl-lg rounded-bl-lg p-11 gap-12 bg-greenbg">
-                            <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-[142px] h-[104px]">
+                        <div class="flex flex-row rounded-tl-lg rounded-bl-lg p-8 lg:p-11 gap-8 bg-greenbg">
+                            <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-32 h-24 lg:w-32 lg:h-24 xl:w-40 xl:h-32">
                                 <img src="{{ asset('/assets/default-icon-donations.svg') }}" alt="" class="w-10 h-10">
                                 <p class=" font-bold text-lg text-redb">25.000+</p>
                                 <p class=" font-bold text-xs text-redb">Donations</p>
                             </div>
 
-                            <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-[142px] h-[104px]">
+                            <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-32 h-24 lg:w-32 lg:h-24 xl:w-40 xl:h-32">
                                 <img src="{{ asset('/assets/default-icon-community.svg') }}" alt="" class="w-10 h-10">
                                 <p class=" font-bold text-lg text-redb">1.200+</p>
                                 <p class=" font-bold text-xs text-redb">Communities</p>
                             </div>
 
-                            <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-[142px] h-[104px]">
+                            <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-32 h-24 lg:w-32 lg:h-24 xl:w-40 xl:h-32">
                                 <img src="{{ asset('/assets/default-icon-volunteer.svg') }}" alt="" class="w-10 h-10">
                                 <p class=" font-bold text-lg text-redb">5.000+</p>
                                 <p class=" font-bold text-xs text-redb">Volunteers</p>
@@ -34,18 +35,18 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-row justify-center items-center rounded-tl-lg rounded-tr-lg rounded-br-lg gap-6 bg-greenbg w-full">
-                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg lg:w-52 lg:h-52 p-6">
+                    <div class="flex flex-row justify-center items-center rounded-tl-lg rounded-tr-lg rounded-br-lg gap-4 md:gap-4 lg:gap-4 xl:gap-8 bg-greenbg w-full">
+                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-48 h-52 lg:w-48 lg:h-48 xl:w-52 xl:h-52 p-6">
                             <p class=" font-light text-redb text-xs">“Being a volunteer at HelpHunger isn’t just about sharing food — it’s about sharing hope. One smile from them makes all the effort worth it.”</p>
                             <p class=" font-semibold text-redb text-xs mt-6"> — Andi, HelpHunger Volunteer</p>
                         </div>
 
-                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg lg:w-52 lg:h-52 p-5">
+                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-48 h-52 lg:w-48 lg:h-48 xl:w-52 xl:h-52 p-5">
                             <p class=" font-light text-redb text-xs">“I never imagined a simple donation could have such a big impact. HelpHunger showed me that even the smallest act of kindness can save someone’s day.”</p>
                             <p class=" font-semibold text-redb text-xs mt-6"> — Sinta, Regular Donor</p>
                         </div>
 
-                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg lg:w-52 lg:h-52 p-6">
+                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-48 h-52 lg:w-48 lg:h-48 xl:w-52 xl:h-52 p-6">
                             <p class=" font-light text-redb text-xs">“Partnering with HelpHunger has strengthened our aid distribution. We no longer feel like we’re fighting hunger alone.”</p>
                             <p class=" font-semibold text-redb text-xs mt-6"> — Artha Graha Peduli Foundation, NGO Partner</p>
                         </div>
@@ -102,44 +103,52 @@
 
                     <!-- View More -->
                      <div class="flex flex-col lg:w-auto lg:h-auto gap-6">
-                         <div class="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 gap-6 lg:min-w-[240px] ">
-                             @foreach ($eventsDonation as $event)
-                                 <div class="relative lg:h-auto rounded-lg bg-greenbg hover:bg-greenpastel transition duration-300 ease-in-out flex flex-col justify-between p-4">
-                                     <div>
-                                         <p class="text-base font-bold text-creamcard">{{ $event->event_name }}</p>
-                                         <p class="text-base font-bold text-redb">Rp{{ number_format($event->total_donation_amount, 0, ',', '.') }}</p>
+                        <!-- Donation -->
+                        <div class="grid grid-cols-3 gap-6 lg:min-w-[240px] ">
+                            @foreach ($eventsDonation as $event)
+                                <div class="relative lg:h-auto rounded-lg bg-greenbg hover:bg-greenpastel transition duration-300 ease-in-out flex flex-col justify-between p-4">
+                                    <div>
+                                        <p class="text-base font-bold text-creamcard">{{ $event->event_name }}</p>
+                                        <p class="text-base font-bold text-redb">Rp{{ number_format($event->total_donation_amount, 0, ',', '.') }}</p>
  
                                          <!-- Progress Bar -->
-                                         @php
-                                             $target = $event->total_donation_target ?? 0; 
-                                             $donationCount = $event->donation_count ?? 0;
-                                             $progress = $target > 0 ? min(100, ($donationCount / $target) * 100) : 0;
-                                         @endphp
+                                        @php
+                                            $target = $event->total_donation_target ?? 0; 
+                                            $donationCount = $event->donation_count ?? 0;
+                                            $progress = $target > 0 ? min(100, ($donationCount / $target) * 100) : 0;
+                                        @endphp
  
-                                         <div class="w-full bg-creamcard rounded-full h-4 overflow-hidden mt-2">
-                                             @if ($donationCount > 0)
-                                                 <div class="bg-redb h-4 rounded-full transition-all duration-500 ease-in-out" style="width: {{ $progress }}%"></div>
-                                             @endif
-                                         </div>
+                                        <div class="w-full bg-creamcard rounded-full h-4 overflow-hidden mt-2">
+                                            @if ($donationCount > 0)
+                                                <div class="bg-redb h-4 rounded-full transition-all duration-500 ease-in-out" style="width: {{ $progress }}%"></div>
+                                            @endif
+                                        </div>
  
-                                         <p class="text-sm font-regular text-creamcard mt-2">{{ $event->donation_count }} donation</p>
-                                     </div>
+                                        <p class="text-sm font-regular text-creamcard mt-2">{{ $event->donation_count }} donation</p>
+                                    </div>
  
-                                     <div class="flex justify-center items-center mt-4">
-                                         <a href="{{ route('register') }}" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
-                                     </div>
-                                 </div>
-                             @endforeach
+                                    <div class="flex justify-center items-center mt-4">
+                                        <a href="{{ route('register') }}" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
+                                    </div>
+                                </div>
+                            @endforeach
                              
-                             <div class="flex items-end">
-                                 <a href="{{ route('guest.donations') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
-                                     View More
-                                     <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
-                                 </a>
-                             </div>
-                         </div>
+                            <div class="flex items-end">
+                                <a href="{{ route('guest.donations') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                                    View More
+                                    <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
+                                </a>
+                            </div>
+                        </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-3 flex-row-reverse gap-6">
+                            <div class="flex justify-end items-end ml-6">
+                                <a href="{{ route('guest.events') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                                    View More
+                                    <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
+                                </a>
+                            </div>
+                            
                             @foreach ($eventsVolunteers as $event)
                             <div class="relative lg:h-auto rounded-lg bg-greenbg hover:bg-greenpastel transition duration-300 ease-in-out flex flex-col justify-between p-4">
                                 <div>
@@ -166,12 +175,7 @@
                             </div>
                             @endforeach
                             
-                            <div class="flex justify-end items-end ml-6">
-                                <a href="{{ route('guest.events') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
-                                    View More
-                                    <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
-                                </a>
-                            </div>
+                            
                             
                         </div>
                     </div>
@@ -284,6 +288,6 @@
         @endpush
 
         @stack('scripts')
-    </body>
+    </div>
 
 </x-guest-layout>
