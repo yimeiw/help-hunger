@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-app-layout>
     @section('title', 'About')
     <div>
         <img src="{{ asset('/assets/logo-about.svg') }}" alt="" class="w-80 h-64 mx-auto">
@@ -57,4 +57,4 @@
             <p class="font-regular text-lg">— <span class="font-bold text-lg">Budi</span>, daily laborer, Jakarta</p>
         </div>
     </div>
-</x-guest-layout>
+</x-app-layout>

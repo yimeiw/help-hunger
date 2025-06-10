@@ -6,36 +6,35 @@ use App\Http\Controllers\RegisterUserController;
 use App\Http\Controllers\RegisterRoleController;
 use App\Http\Controllers\RegisterAddressController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\VolunteerDashboardController;
+use App\Http\Controllers\DonaturDashboardController;
 
 
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : redirect('/guest/welcome');
-});
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-// Dashboard Routes
-Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.dashboard-admin');
-Route::get('/dashboard/volunteer', [DashboardController::class, 'volunteer'])->name('dashboard.dashboard-volunteer');
-Route::get('/dashboard/donatur', [DashboardController::class, 'donatur'])->name('dashboard.dashboard-donatur');
+    return redirect()->route('guest.welcome'); // Selalu redirect ke guest.welcome
+})->name('home');
 
 // Guest Routes
-Route::get('/guest/welcome', [GuestController::class, 'indexHome'])->name('guest.welcome');
-Route::get('/guest/about', [GuestController::class, 'indexAbout'])->name('guest.about');
-Route::get('/guest/locations', [GuestController::class, 'indexLocation'])->name('guest.locations.index');
-Route::post('/guest/locations/search', [GuestController::class, 'searchLocation'])->name('guest.locations.search');
-Route::get('/guest/events', [GuestController::class, 'indexEvents'])->name('guest.events');
-Route::get('/guest/donations', [GuestController::class, 'indexDonations'])->name('guest.donations');
-Route::get('/guest/our-partner', [GuestController::class, 'indexPartner'])->name('guest.partner');
+Route::prefix('guest')->name('guest.')->group(function () { // Mengelompokkan rute guest
+    Route::get('/welcome', [GuestController::class, 'indexHome'])->name('welcome');
+    Route::get('/about', [GuestController::class, 'indexAbout'])->name('about');
+    Route::get('/locations', [GuestController::class, 'indexLocation'])->name('locations.index');
+    Route::post('/locations/search', [GuestController::class, 'searchLocation'])->name('locations.search');
+    Route::get('/events', [GuestController::class, 'indexEvents'])->name('events');
+    Route::get('/donations', [GuestController::class, 'indexDonations'])->name('donations');
+    Route::get('/our-partner', [GuestController::class, 'indexPartner'])->name('partner');
+});
 
 // Registration Routes
-Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
-Route::post('/register', [RegisterUserController::class, 'register'])->name('register');
-Route::get('/register/role', [RegisterRoleController::class, 'index'])->name('register.role');
-Route::post('/register/role', [RegisterRoleController::class, 'registerRole'])->name('register.role');
-Route::get('/register/address', [RegisterAddressController::class, 'index'])->name('register.address');
-Route::post('/register/address', [RegisterAddressController::class, 'registerAddress'])->name('register.address');
-Route::get('/register/cities/{provinceId}', [RegisterAddressController::class, 'getCities'])->name('getCities');
+Route::group([], function () { // Mengelompokkan rute registrasi
+    Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
+    Route::post('/register', [RegisterUserController::class, 'register']); // Nama rute 'register' sudah cukup untuk GET
+    Route::get('/register/role', [RegisterRoleController::class, 'index'])->name('register.role');
+    Route::post('/register/role', [RegisterRoleController::class, 'registerRole']);
+    Route::get('/register/address', [RegisterAddressController::class, 'index'])->name('register.address');
+    Route::post('/register/address', [RegisterAddressController::class, 'registerAddress']);
+    Route::get('/register/cities/{provinceId}', [RegisterAddressController::class, 'getCities'])->name('getCities');
+});
 
 
 Route::middleware([
@@ -43,7 +42,24 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard/dashboard', function () {
-        return view('dashboard.dashboard');
-    })->name('dashboard');
+    // Rute dashboard umum, mungkin akan mengarahkan ke dashboard spesifik peran
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Admin
+    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
+    });
+
+    // Volunteer
+    Route::prefix('volunteer')->name('volunteer.')->middleware('role:volunteer')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'volunteer'])->name('dashboard');
+        Route::get('/about', [VolunteerDashboardController::class, 'about'])->name('about.show');
+        Route::get('/events', [VolunteerDashboardController::class, 'events'])->name('events.show'); 
+        Route::get('/events/register', [VolunteerDashboardController::class, 'eventsRegister'])->name('events.create');
+    });
+
+    // Donatur
+    Route::prefix('donatur')->name('donatur.')->middleware('role:donatur')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'donatur'])->name('dashboard'); 
+    });
 });

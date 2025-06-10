@@ -1,6 +1,6 @@
 <x-guest-layout>
     @section('title', 'Event')
-    <body>
+    <div>
         <div class="flex justify-center items-center text-center m-12 px-96">
             <p class="text-redb font-bold text-3xl">CALL TO ACTION VOLUNTEERS!</p>
         </div>
@@ -120,5 +120,5 @@
         <div class="flex items-center justify-center ml-8 mr-8 mb-14 mt-4">
             <hr class="border-t-2 border-redb w-full">
         </div>
-    </body>
+    </div>
 </x-guest-layout>
