@@ -1,5 +1,5 @@
 <x-guest-layout>
-    @section('title', 'About')
+    @section('title', 'About HelpHunger')
     <body>
         <img src="{{ asset('/assets/logo-about.svg') }}" alt="" class="w-80 h-64 mx-auto">
         <div class="flex items-center justify-center pl-8 pr-8 pb-8 pt-4">

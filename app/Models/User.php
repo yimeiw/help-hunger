@@ -9,6 +9,10 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+use App\Models\Provinces;
+use App\Models\Cities;
 
 class User extends Authenticatable
 {
@@ -74,12 +78,12 @@ class User extends Authenticatable
 
     public function province()
     {
-        return $this->belongsTo(Province::class);
+        return $this->belongsTo(Provinces::class, 'province_id');
     }
 
     public function city()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(Cities::class, 'city_id');
     }
 
     public function eventVolunteersDetails()
