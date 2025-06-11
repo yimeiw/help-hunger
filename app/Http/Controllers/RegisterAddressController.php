@@ -8,7 +8,7 @@ use App\Models\Cities;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Session; // Import Session
+use Illuminate\Support\Facades\Session;
 
 class RegisterAddressController extends Controller
 {
@@ -18,11 +18,16 @@ class RegisterAddressController extends Controller
             return redirect()->route('register');
         }
         $provinces = Provinces::all();
-        return view('auth.register-address', compact('provinces'));
+        $registrationData = Session::get('registration_data'); // Get registration data
+        return view('auth.register-address', compact('provinces', 'registrationData'));
     }
 
     public function registerAddress(Request $request)
     {
+        $registrationData = Session::get('registration_data');
+
+        // If in prefill mode, we only validate gender, date_of_birth if they were not pre-filled
+        // Or if you want to allow changing them. For simplicity, we'll always validate.
         $request->validate([
             'gender'        => 'required|string|max:10',
             'date_of_birth' => 'required|date',
@@ -30,14 +35,11 @@ class RegisterAddressController extends Controller
             'city'          => 'required|string|max:100',
         ]);
 
-        $registrationData = Session::get('registration_data');
-
         $registrationData['gender'] = $request->gender;
         $registrationData['date_of_birth'] = $request->date_of_birth;
         $registrationData['province_id'] = $request->province;
         $registrationData['city_id'] = $request->city;
 
-        
         $user = User::create([
             'name'          => $registrationData['name'],
             'username'      => $registrationData['username'],

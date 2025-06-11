@@ -124,10 +124,40 @@
  
                                         <p class="text-sm font-regular text-creamcard mt-2">{{ $event->donation_count }} donation</p>
                                     </div>
- 
-                                    <div class="flex justify-center items-center mt-4">
-                                        <a href="{{ route('register') }}" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
-                                    </div>
+
+
+                                    @auth
+                                        @php
+                                            $loggedInUser = Auth::user();
+                                            $isDonaturLoggedInAndActive = false;
+
+                                            // Get the currently active role from the session
+                                            $currentActiveRole = session('current_active_role');
+
+                                            if ($loggedInUser && $currentActiveRole === 'donatur') {
+                                                $isDonaturLoggedInAndActive = true;
+                                            }
+                                        @endphp
+
+                                        @if($isDonaturLoggedInAndActive)
+                                            {{-- If the user is logged in AND their current active session role is 'donatur', direct to the donation page --}}
+                                            <div class="flex justify-center items-center mt-4">
+                                                <a href="#" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
+                                            </div>
+                                        @else
+                                            {{-- If the user is not logged in as 'donatur' (either not logged in, or logged in with a different active role) --}}
+                                            <div class="flex flex-col justify-center items-center mt-4 text-center">
+                                                @if ($loggedInUser) {{-- User is logged in but not as donatur --}}
+                                                    <p class="text-redb text-xs mb-2">You are logged in, but not currently as a donatur. Please login again with the 'donatur' role to donate.</p>
+                                                    <form action="{{ route('logout') }}" method="POST" class="inline-block">
+                                                        @csrf
+                                                        <input type="hidden" name="intended_url_after_login" value="{{ route('donatur.donations.show') }}">
+                                                        <button type="submit" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Login as Donatur</button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endauth
                                 </div>
                             @endforeach
                              

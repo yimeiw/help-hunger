@@ -61,5 +61,6 @@ Route::middleware([
     // Donatur
     Route::prefix('donatur')->name('donatur.')->middleware('role:donatur')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'donatur'])->name('dashboard'); 
+        Route::get('/donations', [VolunteerDashboardController::class, 'events'])->name('donations.show'); 
     });
 });

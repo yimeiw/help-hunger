@@ -1,5 +1,5 @@
 <header class="font-[poppins] min-w-full not-has-[nav]:hidden bg-greenbg">
-    <nav class="flex flex-wrap items-center gap-24 md:gap-8 lg:gap-24 xl:gap-24">
+    <nav class="flex flex-wrap items-center gap-24 md:gap-8 lg:gap-32 xl:gap-38">
         <a href="{{ route('volunteer.dashboard') }}" class="m-4 ms-6">
             <svg class="w-40 md:w-32 lg:w-40 xl:w-52" width="162" height="76" viewBox="0 0 162 76" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <rect x="0.730225" width="160.539" height="76" fill="url(#pattern0_820_4209)"/>
@@ -13,7 +13,7 @@
 
         </a>
 
-        <div class="flex items-center gap-24 md:gap-8 lg:gap-20 xl:gap-28 w-auto">
+        <div class="flex items-center gap-24 md:gap-8 lg:gap-32 xl:gap-42 w-auto">
             @if(Auth::user()->role === 'admin')
                 <a href="{{ route('guest.about') }}">
                     <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
@@ -166,7 +166,7 @@
                 </svg>
         
             </div> 
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:items-center">
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                     <div class="ms-3 relative">

@@ -9,6 +9,7 @@ use App\Models\Volunteer;
 use App\Models\EventsVolunteers;
 use App\Models\EventsDonatur;
 use App\Models\Partner;
+use Illuminate\Support\Facades\Auth; 
 
 class DashboardController extends Controller
 {
@@ -34,10 +35,15 @@ class DashboardController extends Controller
 
     public function volunteer()
     {
+        $loggedInUserEmail = Auth::user()->email;
+        $donaturUser = User::where('email', $loggedInUserEmail)
+                             ->where('role', 'donatur')
+                             ->first();
+
         $eventsDonation = EventsDonatur::with(['partner', 'location', 'donations'])->take(2)->get();
         $eventsVolunteers = EventsVolunteers::with(['partner', 'location', 'volunteers'])->take(2)->get();
         $eventsPartner = Partner::all();
-        return view('volunteer.dashboard', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner'));
+        return view('volunteer.dashboard', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner', 'donaturUser'));
     }
 
     public function donatur()

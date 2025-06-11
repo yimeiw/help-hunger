@@ -19,6 +19,7 @@ class RegisterUserController extends Controller
 
     public function register(Request $request)
     {
+        
         $request->validate([
             'name'     => 'required|string|max:255',
             'username' => 'required|string|max:255',
@@ -32,7 +33,7 @@ class RegisterUserController extends Controller
         
         if ($existingUsers->count() >= 2) {
             return back()->withErrors([
-                'email' => 'Email ini sudah terdaftar sebagai Volunteer dan Donatur. Tidak bisa mendaftar lagi.'
+                'email' => 'This email already registered as Volunteer and Donatur. Please use another email.'
             ]);
         }
 
@@ -47,7 +48,29 @@ class RegisterUserController extends Controller
             ]);
         }
 
-        // Simpan data di Session untuk tahap selanjutnya (pilih role)
+        // --- NEW LOGIC START ---
+        // Check if the email exists with one account
+        if ($existingUsers->count() == 1) {
+            $existingUser = $existingUsers->first();
+            Session::put('registration_data', [
+                'name'              => $existingUser->name,
+                'username'          => $existingUser->username,
+                'phone'             => $existingUser->phone,
+                'email'             => $existingUser->email,
+                'password'          => $existingUser->password, // Storing hashed password
+                'gender'            => $existingUser->gender,
+                'date_of_birth'     => $existingUser->date_of_birth,
+                'province_id'       => $existingUser->province_id,
+                'city_id'           => $existingUser->city_id,
+                'existing_role'     => $existingUser->role, // Store the existing role
+                'prefill_mode'      => true, // Flag to indicate pre-filled data
+            ]);
+            return redirect()->route('register.role'); // Skip directly to role selection
+        }
+        // --- NEW LOGIC END ---
+
+
+        // Simpan data di Session untuk tahap selanjutnya (pilih role) - ORIGINAL LOGIC
         Session::put('registration_data', [
             'name'     => $request->name,
             'username' => $request->username,

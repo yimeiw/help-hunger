@@ -16,7 +16,12 @@ class RegisterRoleController extends Controller
         if (!Session::has('registration_data')) {
             return redirect()->route('register');
         }
-        return view('auth.register-role');
+
+        $registrationData = Session::get('registration_data');
+        $prefillMode = $registrationData['prefill_mode'] ?? false;
+        $existingRole = $registrationData['existing_role'] ?? null;
+
+        return view('auth.register-role', compact('prefillMode', 'existingRole', 'registrationData'));
     }
 
     public function registerRole(Request $request)
@@ -35,11 +40,19 @@ class RegisterRoleController extends Controller
         // Jika sudah punya role yang sama, tolak!
         if (in_array($request->role, $existingRoles)) {
             return back()->withErrors([
-                'role' => 'Anda sudah terdaftar sebagai ' . ucfirst($request->role) . '. Pilih peran lain atau gunakan email berbeda.'
+                'role' => 'You already registered as ' . ucfirst($request->role) . '. Choose another role or use another email.'
             ]);
         }
+        
         $registrationData['role'] = $request->role;
         Session::put('registration_data', $registrationData);
+
+        // If in prefill mode, we can directly go to address confirmation/finalization
+        // as other data (like address) is already in session.
+        if (isset($registrationData['prefill_mode']) && $registrationData['prefill_mode'] === true) {
+            // We'll proceed to the final step in RegisterAddressController to create the user
+            return redirect()->route('register.address');
+        }
 
         return redirect()->route('register.address');
     }
