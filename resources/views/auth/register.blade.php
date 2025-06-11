@@ -1,13 +1,22 @@
 <x-auth-layout>
-    <a href="{{ route('guest.welcome') }}" class="flex justify-end m-6">
-        <img src="{{ asset('/assets/close-button.svg') }}" alt="" class="w-8 h-8">
-    </a>
+     @section('title', 'Register Account')
+    <div class="flex justify-between items-center">
+        <a href="#" onclick="history.back(); return false;" class="flex justify-end m-6">
+            <img src="{{ asset('/assets/back-button.svg') }}" alt="" class="w-10 h-10">
+        </a>
+        <a href="{{ route('guest.welcome') }}" onclick="resetFormsAndNavigate(event);" class="flex justify-end m-6">
+            <img src="{{ asset('/assets/close-button.svg') }}" alt="" class="w-8 h-8">
+        </a>
+    </div>
     <x-authentication-card>
         
         <form method="POST" action="{{ route('register') }}">
             <x-slot name="logo">
                 <x-authentication-card-logo />
             </x-slot>
+    
+            <x-validation-errors class="mb-4" />
+            @csrf
 
             <div class="flex flex-row gap-8">
                 <div>
@@ -72,10 +81,7 @@
                 </div>
             @endif
 
-            <x-validation-errors class="mt-3" />
-            @csrf
-
-            <div class="flex flex-col items-center justify-end mt-2">
+            <div class="flex flex-col items-center justify-end mt-4">
                 <x-button class="ms-4">
                     {{ __('Continue') }}
                 </x-button>

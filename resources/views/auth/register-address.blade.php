@@ -1,10 +1,10 @@
 <x-auth-layout>
     @section('title', 'Register Account')
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex flex-row justify-between items-center">
         <a href="#" onclick="history.back(); return false;" class="flex justify-end m-6">
-            <img src="{{ asset('/assets/back-button.svg') }}" alt="" class="w-10 h-10">
-        </a>
-        
+                <img src="{{ asset('/assets/back-button.svg') }}" alt="" class="w-10 h-10">
+            </a>
+    
         <a href="{{ route('guest.welcome') }}" onclick="resetFormsAndNavigate(event);" class="flex justify-end m-6">
             <img src="{{ asset('/assets/close-button.svg') }}" alt="" class="w-8 h-8">
         </a>
@@ -183,7 +183,6 @@
             });
         });
 
-
         function resetFormsAndNavigate(event) {
             // Mencegah navigasi default terlebih dahulu
             event.preventDefault(); 
@@ -197,6 +196,7 @@
             // Setelah mereset form, arahkan ke halaman guest.welcome
             window.location.href = "{{ route('guest.welcome') }}";
         }
+
 
     </script>
 
