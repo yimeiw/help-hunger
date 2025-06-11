@@ -1,15 +1,13 @@
-<x-guest-layout>
-    @section('title', 'Welcome to HelpHunger')
-
-    
+<x-app-layout>
+    @section('title', 'Dashboard Volunteer')
     <div class="flex items-center lg:justify-center justify-center min-h-screen flex-col scroll-smooth">
         <div class="w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0 mt-6">
             <main class="flex flex-col w-auto">
                 <div class="flex flex-row w-auto m-7 rounded-lg overflow-hidden">           
                     <div class="flex flex-col">
                         <div class="bg-greenbg">
-                            <div class="flex bg-all rounded-br-lg w-[584px] h-[125px] justify-center items-center w-full">
-                                <p class=" font-bold text-redb text-4xl m-16">A WAY TO HELP OTHERS AND REDUCE HUNGER</p>
+                            <div class="flex bg-all rounded-br-lg justify-center items-center w-full h-32">
+                                <p class=" font-bold text-redb text-3xl m-10 lg:text-3xl lg:m-10 xl:text-4xl xl:m-16">A WAY TO HELP OTHERS AND REDUCE HUNGER</p>
                             </div>
                         </div>
 
@@ -35,8 +33,8 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-row justify-center items-center rounded-tl-lg rounded-tr-lg rounded-br-lg gap-6 bg-greenbg w-full">
-                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg lg:w-52 lg:h-52 p-6">
+                    <div class="flex flex-row justify-center items-center rounded-tl-lg rounded-tr-lg rounded-br-lg gap-4 md:gap-4 lg:gap-4 xl:gap-8 bg-greenbg w-full">
+                        <div class="flex flex-col justify-center items-center bg-creamcard rounded-lg w-48 h-52 lg:w-48 lg:h-48 xl:w-52 xl:h-52 p-6">
                             <p class=" font-light text-redb text-xs">“Being a volunteer at HelpHunger isn’t just about sharing food — it’s about sharing hope. One smile from them makes all the effort worth it.”</p>
                             <p class=" font-semibold text-redb text-xs mt-6"> — Andi, HelpHunger Volunteer</p>
                         </div>
@@ -55,37 +53,37 @@
 
 
                 <div class="flex justify-center items-center lg:w-auto">
-                    <a href="#services" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-xl w-56 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
-                        Start HelpHunger
+                    <a href="#" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-xl w-56 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                        Start Volunteer
                     </a>
                 </div>
 
                 <div class="flex flex-col lg:flex-row gap-8 m-7 rounded-lg overflow-hidden">
                     <!-- Slider -->
-                    <div id="default-carousel" class="relative bg-greenbg rounded-lg w-full min-h-[300px]" data-carousel="slide">
+                    <div id="default-carousel" class="relative bg-greenbg rounded-lg w-[884px] min-h-[500px] " data-carousel="slide">
                         <!-- Carousel wrapper -->
                         <div class="relative w-full overflow-hidden rounded-lg min-h-[450px] flex justify-center items-center">
                             <!-- Item 1 -->
                             <a href="{{ route('guest.events') }}" class="absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center" data-carousel-item>
-                                <p class="text-creamhh font-bold text-lg px-6 pt-14 mb-4">One day of your time = dozens of full stomachs!</p>
+                                <p class="text-creamhh font-bold text-lg mb-4">One day of your time = dozens of full stomachs!</p>
                                 <img src="{{ asset('/assets/slider-image-1.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
                             </a>
 
                             <!-- Item 2 -->
                             <a href="{{ route('guest.donations') }}" class="absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center" data-carousel-item>
-                                <p class="text-creamhh font-bold text-lg px-6 pt-14 mb-4">#1 Food Donation Connecting Platform in Indonesia</p>
+                                <p class="text-creamhh font-bold text-lg px-6 pt-14">#1 Food Donation Connecting Platform in Indonesia</p>
                                 <img src="{{ asset('/assets/slider-image-2.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
                             </a>
 
                             <!-- Item 3 -->
                             <a href="{{ route('guest.partner') }}" class="absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center" data-carousel-item>
-                                <p class="text-creamhh font-bold text-lg px-6 pt-14 mb-4">With HelpHunger, your social efforts reach even more people in need!</p>
+                                <p class="text-creamhh font-bold text-lg px-6 pt-14">With HelpHunger, your social efforts reach even more people in need!</p>
                                 <img src="{{ asset('/assets/slider-image-3.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
                             </a>
 
                         </div>
                         <!-- Slider indicators -->
-                        <div class="absolute pt-4 flex space-x-3 rtl:space-x-reverse left-1/2 -translate-x-1/2">
+                        <div class="absolute bottom-4 flex space-x-3 rtl:space-x-reverse left-1/2 -translate-x-1/2">
                             <button type="button" aria-current="true" aria-label="Slide 1" data-carousel-slide-to="0" class="w-6 h-6 flex items-center justify-center">
                                 <img src="{{ asset('/assets/indicator-unactive.svg') }}" alt="Indicator 1">
                             </button>
@@ -103,12 +101,13 @@
 
                     <!-- View More -->
                      <div class="flex flex-col lg:w-auto lg:h-auto gap-6">
-                         <div class="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-3 gap-6 lg:min-w-[240px] ">
-                             @foreach ($eventsDonation as $event)
-                                 <div class="relative lg:h-auto rounded-lg bg-greenbg hover:bg-greenpastel transition duration-300 ease-in-out flex flex-col justify-between p-4">
-                                     <div>
-                                         <p class="text-base font-bold text-creamcard">{{ $event->event_name }}</p>
-                                         <p class="text-base font-bold text-redb">Rp{{ number_format($event->total_donation_amount, 0, ',', '.') }}</p>
+                        <!-- Donation -->
+                        <div class="grid grid-cols-3 gap-6 lg:min-w-[240px] ">
+                            @foreach ($eventsDonation as $event)
+                                <div class="relative lg:h-auto rounded-lg bg-greenbg hover:bg-greenpastel transition duration-300 ease-in-out flex flex-col justify-between p-4">
+                                    <div>
+                                        <p class="text-base font-bold text-creamcard">{{ $event->event_name }}</p>
+                                        <p class="text-base font-bold text-redb">Rp{{ number_format($event->total_donation_amount, 0, ',', '.') }}</p>
  
                                          <!-- Progress Bar -->
                                         @php
@@ -125,10 +124,40 @@
  
                                         <p class="text-sm font-regular text-creamcard mt-2">{{ $event->donation_count }} donation</p>
                                     </div>
- 
-                                    <div class="flex justify-center items-center mt-4">
-                                        <a href="{{ route('register') }}" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
-                                    </div>
+
+
+                                    @auth
+                                        @php
+                                            $loggedInUser = Auth::user();
+                                            $isDonaturLoggedInAndActive = false;
+
+                                            // Get the currently active role from the session
+                                            $currentActiveRole = session('current_active_role');
+
+                                            if ($loggedInUser && $currentActiveRole === 'donatur') {
+                                                $isDonaturLoggedInAndActive = true;
+                                            }
+                                        @endphp
+
+                                        @if($isDonaturLoggedInAndActive)
+                                            {{-- If the user is logged in AND their current active session role is 'donatur', direct to the donation page --}}
+                                            <div class="flex justify-center items-center mt-4">
+                                                <a href="#" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
+                                            </div>
+                                        @else
+                                            {{-- If the user is not logged in as 'donatur' (either not logged in, or logged in with a different active role) --}}
+                                            <div class="flex flex-col justify-center items-center mt-4 text-center">
+                                                @if ($loggedInUser) {{-- User is logged in but not as donatur --}}
+                                                    <p class="text-redb text-xs mb-2">You are logged in, but not currently as a donatur. Please login again with the 'donatur' role to donate.</p>
+                                                    <form action="{{ route('logout') }}" method="POST" class="inline-block">
+                                                        @csrf
+                                                        <input type="hidden" name="intended_url_after_login" value="{{ route('donatur.donations.show') }}">
+                                                        <button type="submit" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Login as Donatur</button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endauth
                                 </div>
                             @endforeach
                              
@@ -140,7 +169,14 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 sm:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-3 flex-row-reverse gap-6">
+                            <div class="flex justify-end items-end ml-6">
+                                <a href="{{ route('guest.events') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                                    View More
+                                    <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
+                                </a>
+                            </div>
+                            
                             @foreach ($eventsVolunteers as $event)
                             <div class="relative lg:h-auto rounded-lg bg-greenbg hover:bg-greenpastel transition duration-300 ease-in-out flex flex-col justify-between p-4">
                                 <div>
@@ -167,12 +203,7 @@
                             </div>
                             @endforeach
                             
-                            <div class="flex justify-end items-end ml-6">
-                                <a href="{{ route('guest.events') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
-                                    View More
-                                    <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
-                                </a>
-                            </div>
+                            
                             
                         </div>
                     </div>
@@ -181,7 +212,7 @@
 
                 <!-- Our Services -->
                 <div id="services" class="flex flex-col items-center justify-center">
-                    <p class="font-bold text-redb text-[32px] p-6">Our Services</p>
+                    <p class="font-bold text-redb text-xl p-6">Our Services</p>
 
                     <div class="flex flex-row gap-8 bg-greenbg rounded-lg w-auto h-auto p-12">
                         <a href="{{ route('guest.events') }}" class="group relative flex flex-col justify-center items-center bg-creamcard w-[150px] h-[205px] p-6 rounded-lg shadow-quadrupleNonHover hover:bg-redb transition duration-300 ease-in-out">
@@ -218,7 +249,7 @@
 
                 <!-- Partners -->
                  <div class="flex flex-col items-center justify-center mb-8">
-                    <p class="font-bold text-redb text-[32px] p-6 mt-4">Our Partners</p>
+                    <p class="font-bold text-redb text-xl p-6 mt-4">Our Partners</p>
 
                     <div class="flex flex-row justify-center items-center gap-5 bg-greenbg rounded-lg max-w-[1200px] h-auto p-12">
                         @foreach ($eventsPartner as $partner)
@@ -247,8 +278,8 @@
                                         <img src="{{ asset('/assets/ngo-partner.svg') }}" alt="" class="object-contain max-h-full">
                                     </div>
 
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out backdrop-blur-sm bg-redb/90 rounded-lg">
-                                        <p class="text-creamcard font-bold text-base mb-3">{{ $partner->partner_name }}</p>
+                                    <div class="absolute inset-0 flex flex-col gap-4 items-center justify-center px-4 text-center opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out backdrop-blur-sm bg-redb/90 rounded-lg">
+                                        <p class="text-creamcard font-bold text-base">{{ $partner->partner_name }}</p>
                                         <img src="{{ asset('/assets/next-button.svg') }}" alt="">
                                     </div>
                                 </a>
@@ -263,8 +294,8 @@
                                         <img src="{{ asset('/assets/orphanage-partner.svg') }}" alt="" class="object-contain max-h-full">
                                     </div>
 
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out backdrop-blur-sm bg-redb/90 rounded-lg">
-                                        <p class="text-creamcard font-bold text-sm">{{ $partner->partner_name }}</p>
+                                    <div class="absolute inset-0 flex flex-col gap-4 items-center justify-center px-4 text-center opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out backdrop-blur-sm bg-redb/90 rounded-lg">
+                                        <p class="text-creamcard font-bold text-base">{{ $partner->partner_name }}</p>
                                         <img src="{{ asset('/assets/next-button.svg') }}" alt="">
                                     </div>
                                 </a>
@@ -276,7 +307,7 @@
             </main>
         </div>
 
-         @push('scripts')
+        @push('scripts')
         <script>
             window.addEventListener('load', function () {
                 document.title = "HelpHunger: A Way to Help Others and Reduce Hunger";
@@ -286,5 +317,4 @@
 
         @stack('scripts')
     </div>
-
-</x-guest-layout>
+</x-app-layout>

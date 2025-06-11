@@ -1,5 +1,5 @@
-<x-guest-layout>
-    @section('title', 'Event')
+<x-app-layout>
+    @section('title', 'Events')
     <div>
         <div class="flex justify-center items-center text-center m-12 px-96">
             <p class="text-redb font-bold text-3xl">CALL TO ACTION VOLUNTEERS!</p>
@@ -8,7 +8,7 @@
             {{-- Baris pertama: 2 event --}}
             <div class="grid grid-cols-2 gap-6 mr-24 ml-24 ">
                 @foreach ($events->take(2) as $event)
-                    <a href="{{ route('register') }}" class="flex flex-col bg-greenbg rounded-lg p-8 hover:bg-greenpastel transition duration-300 ease-in-out">
+                    <a href="{{ route('volunteer.events.create', ['event' => $event->id]) }}" class="flex flex-col bg-greenbg rounded-lg p-8 hover:bg-greenpastel transition duration-300 ease-in-out">
                         <div class="flex items-center justify-center mb-4">
                             @if ($event->image_path)
                                 <img src="{{ asset('/' . $event->image_path) }}" alt="Event Image" class="w-full h-64 object-cover rounded-lg">
@@ -45,7 +45,7 @@
             {{-- Sisanya: tampilkan dalam 3 kolom per baris --}}
             <div class="grid grid-cols-3 gap-6 ml-36 mr-36">
                 @foreach ($events->skip(2)->take(3) as $event)
-                    <a href="{{ route('register') }}" class="flex flex-col bg-greenbg rounded-lg p-8 h-full justify-between hover:bg-greenpastel transition duration-300 ease-in-out">
+                    <a href="#" class="flex flex-col bg-greenbg rounded-lg p-8 h-full justify-between hover:bg-greenpastel transition duration-300 ease-in-out">
                         <div>
                             {{-- Gambar --}}
                             <div class="flex items-center justify-center mb-4">
@@ -121,4 +121,4 @@
             <hr class="border-t-2 border-redb w-full">
         </div>
     </div>
-</x-guest-layout>
+</x-app-layout>

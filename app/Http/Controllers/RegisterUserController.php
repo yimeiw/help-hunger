@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Session;
 
 class RegisterUserController extends Controller
 {
@@ -17,27 +18,67 @@ class RegisterUserController extends Controller
 
     public function register(Request $request)
     {
-        try {
-            $validatedData = $request->validate([
-                'name'     => 'required|string|max:255',
-                'username' => 'required|string|max:255|unique:users,username',
-                'phone'    => 'required|string|digits_between:10,15|unique:users,phone|regex:/^[0-9]+$/',
-                'email'    => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users'],
-                'password' => 'required|min:8|confirmed',
+        
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'username' => 'required|string|max:255',
+            'phone'    => 'required|string|digits_between:10,15|regex:/^08[0-9]+$/',
+            'email'    => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        // Cek apakah email sudah punya 2 akun (volunteer + donatur)
+        $existingUsers = User::where('email', $request->email)->get();
+        
+        if ($existingUsers->count() >= 2) {
+            return back()->withErrors([
+                'email' => 'This email already registered as Volunteer and Donatur. Please use another email.'
             ]);
-
-            // Ini akan dijalankan HANYA jika validasi berhasil
-            // dd($validatedData, $request->session()->all()); // Hapus atau komen baris ini setelah debugging
-
-            $validatedData['password'] = Hash::make($validatedData['password']);
-            $request->session()->put('registration_data', $validatedData);
-
-            return redirect()->route('register.role');
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // Jika validasi gagal, ini akan menangkap pengecualian
-            // dd($e->errors()); // Hapus atau komen baris ini setelah debugging
-            throw $e; // Lempar kembali exception agar redirect back with errors tetap terjadi
         }
+
+        // Validasi unik untuk username berdasarkan email
+        $usernameConflict = User::where('username', $request->username)
+            ->where('email', '!=', $request->email)
+            ->exists();
+
+        if ($usernameConflict) {
+            return back()->withErrors([
+                'username' => 'Username ini sudah digunakan oleh pengguna lain.'
+            ]);
+        }
+
+        // --- NEW LOGIC START ---
+        // Check if the email exists with one account
+        if ($existingUsers->count() == 1) {
+            $existingUser = $existingUsers->first();
+            Session::put('registration_data', [
+                'name'              => $existingUser->name,
+                'username'          => $existingUser->username,
+                'phone'             => $existingUser->phone,
+                'email'             => $existingUser->email,
+                'password'          => $existingUser->password, // Storing hashed password
+                'gender'            => $existingUser->gender,
+                'date_of_birth'     => $existingUser->date_of_birth,
+                'province_id'       => $existingUser->province_id,
+                'city_id'           => $existingUser->city_id,
+                'existing_role'     => $existingUser->role, // Store the existing role
+                'prefill_mode'      => true, // Flag to indicate pre-filled data
+            ]);
+            return redirect()->route('register.role'); // Skip directly to role selection
+        }
+        // --- NEW LOGIC END ---
+
+
+        // Simpan data di Session untuk tahap selanjutnya (pilih role) - ORIGINAL LOGIC
+        Session::put('registration_data', [
+            'name'     => $request->name,
+            'username' => $request->username,
+            'phone'    => $request->phone,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return redirect()->route('register.role');
     }
+
 }

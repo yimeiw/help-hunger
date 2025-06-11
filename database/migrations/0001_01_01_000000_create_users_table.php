@@ -16,13 +16,13 @@ return new class extends Migration
             $table->foreignId('province_id')->nullable()->constrained('provinces')->onDelete('cascade');
             $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('cascade');
             $table->string('name');
-            $table->string('username')->unique();
-            $table->string('phone')->unique();
-            $table->string('email')->unique();
+            $table->string('username');
+            $table->string('phone');
+            $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'volunteer', 'donatur'])->default('volunteer');
-            $table->enum('gender', ['male', 'female'])->nullable();
+            $table->enum('gender', ['Male', 'Female'])->nullable();
             $table->datetime('date_of_birth')->nullable();
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();

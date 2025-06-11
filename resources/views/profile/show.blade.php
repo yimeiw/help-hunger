@@ -32,7 +32,16 @@
             <div class="mt-10 sm:mt-0">
                 @livewire('profile.logout-other-browser-sessions-form')
             </div>
+            
+            <x-section-border />
 
+            <form method="POST" action="{{ route('logout') }}" x-data>
+                @csrf
+                    <a href="{{ route('logout') }}"
+                        @click.prevent="$root.submit();">
+                            {{ __('Log Out') }}
+                    </a>
+            </form>
             @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
                 <x-section-border />
 
@@ -40,6 +49,8 @@
                     @livewire('profile.delete-user-form')
                 </div>
             @endif
+
+
         </div>
     </div>
 </x-app-layout>
