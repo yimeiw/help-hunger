@@ -11,11 +11,9 @@ use App\Models\Partner;
 
 class DonaturDashboardController extends Controller
 {
-
-    
     public function donations()
     {
         $events = EventsDonatur::with(['partner', 'location', 'donations'])->get();
-        return view('donatur.donation.show', compact('events'));
+        return view('donatur.donations.show', compact('events'));
     }
 }

@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Session;
 
+
 class RegisterUserController extends Controller
 {
-     public function index() // <--- Metode ini ada
+    public function index()
     {
         return view('auth.register');
     }
