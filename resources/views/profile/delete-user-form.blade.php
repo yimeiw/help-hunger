@@ -8,14 +8,14 @@
     </x-slot>
 
     <x-slot name="content">
-        <div class="max-w-xl text-sm text-gray-600">
+        <div class="max-w-xl text-sm text-creamcard">
             {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
         </div>
 
         <div class="mt-5">
-            <x-danger-button wire:click="confirmUserDeletion" wire:loading.attr="disabled">
+            <x-button wire:click="confirmUserDeletion" wire:loading.attr="disabled">
                 {{ __('Delete Account') }}
-            </x-danger-button>
+            </x-button>
         </div>
 
         <!-- Delete User Confirmation Modal -->
@@ -40,13 +40,13 @@
             </x-slot>
 
             <x-slot name="footer">
-                <x-secondary-button wire:click="$toggle('confirmingUserDeletion')" wire:loading.attr="disabled">
+                <x-button wire:click="$toggle('confirmingUserDeletion')" wire:loading.attr="disabled">
                     {{ __('Cancel') }}
-                </x-secondary-button>
+                </x-button>
 
-                <x-danger-button class="ms-3" wire:click="deleteUser" wire:loading.attr="disabled">
+                <x-button class="ms-3" wire:click="deleteUser" wire:loading.attr="disabled">
                     {{ __('Delete Account') }}
-                </x-danger-button>
+                </x-button>
             </x-slot>
         </x-dialog-modal>
     </x-slot>

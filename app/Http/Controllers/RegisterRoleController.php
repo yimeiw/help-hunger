@@ -47,6 +47,7 @@ class RegisterRoleController extends Controller
         $registrationData['role'] = $request->role;
         Session::put('registration_data', $registrationData);
 
+        Session::save();
         // If in prefill mode, we can directly go to address confirmation/finalization
         // as other data (like address) is already in session.
         if (isset($registrationData['prefill_mode']) && $registrationData['prefill_mode'] === true) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Donatur;
+use App\Models\Donation;
 use App\Models\Volunteer;
 use App\Models\EventsVolunteers;
 use App\Models\EventsDonatur;
@@ -30,7 +31,66 @@ class DashboardController extends Controller
 
     public function admin()
     {
-        return view('admin.dashboard');
+        // 1. Total Donasi Terkumpul (jika ada kolom amount di tabel donations)
+        // Asumsi ada kolom 'amount' di tabel 'donations' atau 'events_donation_details'
+        // Jika donasi dihitung per event, Anda mungkin perlu menyesuaikannya
+        $totalDonationAmount = Donation::sum('amount'); // Sesuaikan 'amount' dengan kolom yang menyimpan jumlah donasi
+        // Atau jika dari events_donation_details:
+        // $totalDonationAmount = EventsDonationDetails::sum('donation_target');
+
+
+        // 2. Jumlah Pengguna
+        $totalUsers = User::count();
+        $totalVolunteers = User::where('role', 'volunteer')->count();
+        $totalDonaturs = User::where('role', 'donatur')->count();
+        $totalAdmins = User::where('role', 'admin')->count(); // Jika ada peran admin di tabel users
+
+        // 3. Jumlah Event
+        $totalEvents = EventsVolunteers::count(); // Atau EventsDonatur::count() jika terpisah
+        $upcomingEvents = EventsVolunteers::where('start_date', '>', now())->count(); // Sesuaikan nama kolom tanggal
+        $activeEvents = EventsVolunteers::where('start_date', '<=', now())
+                                        ->where('end_date', '>=', now())
+                                        ->count(); // Sesuaikan nama kolom tanggal
+        $completedEvents = EventsVolunteers::where('end_date', '<', now())->count(); // Sesuaikan nama kolom tanggal
+
+        // 4. Jumlah Partner
+        $totalPartners = Partner::count();
+
+        // Data yang akan dikirim ke view
+        $statistics = [
+            'totalDonationAmount' => $totalDonationAmount,
+            'totalUsers' => $totalUsers,
+            'totalVolunteers' => $totalVolunteers,
+            'totalDonaturs' => $totalDonaturs,
+            'totalAdmins' => $totalAdmins,
+            'totalEvents' => $totalEvents,
+            'upcomingEvents' => $upcomingEvents,
+            'activeEvents' => $activeEvents,
+            'completedEvents' => $completedEvents,
+            'totalPartners' => $totalPartners,
+        ];
+
+        return view('admin.dashboard', compact('statistics'));
+    }
+
+    public function location(){
+        return view('admin.location');
+    }
+
+    public function report() {
+        return view('admin.report');
+    }
+
+    public function manage() {
+        return view('admin.manage');
+    }
+
+    public function manageUser() {
+        return view('admin.manage.manage-user');
+    }
+
+    public function manageEvent() {
+        return view('admin.manage.manage-event');
     }
 
     public function volunteer()
