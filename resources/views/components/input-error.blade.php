@@ -1,5 +1,11 @@
-@props(['for'])
+@if ($errors->any())
+    <div {{ $attributes }}>
+        <div class="font-sm text-red-600 text-center">{{ __('Whoops! Something went wrong.') }}</div>
 
-@error($for)
-    <p {{ $attributes->merge(['class' => 'text-sm text-red-600']) }}>{{ $message }}</p>
-@enderror
+        <ul class="mt-2 list-disc list-inside text-xs text-red-600 text-center">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif

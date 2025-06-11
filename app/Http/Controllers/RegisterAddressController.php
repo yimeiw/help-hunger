@@ -12,14 +12,16 @@ use Illuminate\Support\Facades\Session;
 
 class RegisterAddressController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        if (!Session::has('registration_data')) {
+        if (!$request->session()->has('registration_data') || !isset($request->session()->get('registration_data')['role'])) {
             return redirect()->route('register');
         }
         $provinces = Provinces::all();
-        $registrationData = Session::get('registration_data'); // Get registration data
-        return view('auth.register-address', compact('provinces', 'registrationData'));
+
+        $oldData = $request->session()->get('registration_data');
+
+        return view('auth.register-address', compact('provinces', 'oldData'));
     }
 
     public function registerAddress(Request $request)

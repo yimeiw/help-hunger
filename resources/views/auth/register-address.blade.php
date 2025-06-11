@@ -1,7 +1,14 @@
 <x-auth-layout>
-    <a href="{{ route('guest.welcome') }}" class="flex justify-end m-6">
-        <img src="{{ asset('/assets/close-button.svg') }}" alt="" class="w-8 h-8">
-    </a>
+    @section('title', 'Register Account')
+    <div class="flex justify-between items-center mb-4">
+        <a href="#" onclick="history.back(); return false;" class="flex justify-end m-6">
+            <img src="{{ asset('/assets/back-button.svg') }}" alt="" class="w-10 h-10">
+        </a>
+        
+        <a href="{{ route('guest.welcome') }}" onclick="resetFormsAndNavigate(event);" class="flex justify-end m-6">
+            <img src="{{ asset('/assets/close-button.svg') }}" alt="" class="w-8 h-8">
+        </a>
+    </div>
     <x-authentication-card>
         <x-slot name="logo">
             <x-authentication-card-logo />
@@ -176,6 +183,20 @@
             });
         });
 
+
+        function resetFormsAndNavigate(event) {
+            // Mencegah navigasi default terlebih dahulu
+            event.preventDefault(); 
+        
+            // Temukan semua form di halaman dan reset
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.reset(); // Mereset semua input di dalam form
+            });
+        
+            // Setelah mereset form, arahkan ke halaman guest.welcome
+            window.location.href = "{{ route('guest.welcome') }}";
+        }
 
     </script>
 

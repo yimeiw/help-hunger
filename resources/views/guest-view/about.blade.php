@@ -1,6 +1,6 @@
 <x-guest-layout>
-    @section('title', 'About')
-    <div>
+    @section('title', 'About HelpHunger')
+    <body>
         <img src="{{ asset('/assets/logo-about.svg') }}" alt="" class="w-80 h-64 mx-auto">
         <div class="flex items-center justify-center pl-8 pr-8 pb-8 pt-4">
             <hr class="border-t-2 border-redb w-full">
@@ -56,5 +56,5 @@
             <p class="font-regular text-lg pb-4">"I used to worry about what to eat each day. Since I found out about HelpHunger, I can easily find the nearest public kitchen using my phone. Thank you so much to everyone who has shared—it's been a huge help for those of us struggling."</p>
             <p class="font-regular text-lg">— <span class="font-bold text-lg">Budi</span>, daily laborer, Jakarta</p>
         </div>
-    </div>
+    </body>
 </x-guest-layout>
