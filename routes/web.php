@@ -42,7 +42,25 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard/dashboard', function () {
-        return view('dashboard.dashboard');
-    })->name('dashboard');
+    // Rute dashboard umum, mungkin akan mengarahkan ke dashboard spesifik peran
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Admin
+    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
+    });
+
+    // Volunteer ini yang diubah
+    Route::prefix('volunteer')->name('volunteer.')->middleware('role:volunteer')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'volunteer'])->name('dashboard');
+        Route::get('/about', [VolunteerDashboardController::class, 'about'])->name('about.show');
+        Route::get('/events', [VolunteerDashboardController::class, 'events'])->name('events.show'); 
+        Route::get('/events/register', [VolunteerDashboardController::class, 'eventsRegister'])->name('events.create');
+    });
+
+    // Donatur
+    Route::prefix('donatur')->name('donatur.')->middleware('role:donatur')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'donatur'])->name('dashboard'); 
+        Route::get('/donations', [VolunteerDashboardController::class, 'events'])->name('donations.show'); 
+    });
 });
