@@ -14,7 +14,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\View\View; 
+use Carbon\Carbon; 
+use Illuminate\Http\RedirectResponse;
 
 class VolunteerDashboardController extends Controller
 {
@@ -141,10 +143,116 @@ class VolunteerDashboardController extends Controller
         }
     }
 
-    public function details()
+    public function details(Request $request): View
     {
-        $partners = Partner::all();
-        return view('volunteer.details.show', compact('partners'));
+        $volunteerId = Auth::id();
+        $filter = $request->query('filter', 'all');
+        $now = Carbon::now();
+        // dd($now->toDateString());
+
+        // Debugging: Lihat nilai $now dan $now->toDateString()
+        // dd('Current Carbon date:', $now, 'Current date string:', $now->toDateString());
+
+        $query = EventsVolunteersDetail::with(['volunteer', 'event.location', 'event.partner'])
+            ->where('volunteer_id', $volunteerId);
+
+        // Menerapkan filter berdasarkan parameter 'filter'
+        if ($filter == 'upcoming') {
+            $query->whereHas('event', function ($q) use ($now) {
+                // Debugging: Tambahkan dd() di sini untuk melihat query yang dihasilkan
+                $q->whereDate('start_date', '>', $now->toDateString());
+                // dd($q->toSql(), $q->getBindings());
+            });
+        } elseif ($filter == 'ongoing') {
+            $query->whereHas('event', function ($q) use ($now) {
+                // Debugging: Tambahkan dd() di sini
+                $q->whereDate('start_date', '<=', $now->toDateString())
+                ->whereDate('end_date', '>=', $now->toDateString())->where('status', 'accepted');
+                // dd($q->toSql(), $q->getBindings());
+            });
+        } elseif ($filter == 'done') {
+            $query->whereHas('event', function ($q) use ($now) {
+                // Debugging: Tambahkan dd() di sini
+                $q->whereDate('end_date', '<', $now->toDateString())->where('status', ['accepted', 'rejected']);
+                // dd($q->toSql(), $q->getBindings());
+            });
+        }
+
+        $eventsDetail = $query->get();
+
+        // Debugging: Lihat hasil akhir query setelah filter
+        // dd($eventsDetail);
+
+        return view('volunteer.details.show', compact('eventsDetail', 'filter'));
+    }
+
+    public function detailsEvents(Request $request): View // Gunakan type hinting untuk Request dan View
+    {
+        // Ambil semua event (mungkin untuk daftar di sidebar atau di tempat lain)
+        $events = EventsVolunteers::with(['partner', 'location'])->get();
+
+        $selectedEvent = null;
+        $volunteerParticipationStatus = null; // Variabel baru untuk menyimpan status partisipasi
+
+        $volunteerId = Auth::id();
+
+        // Mengambil detail partisipasi relawan
+        // Jika Anda ingin menampilkan daftar event partisipasi untuk pengguna ini,
+        // eventDetails ini sudah benar sebagai query builder.
+        $eventDetailsQuery = EventsVolunteersDetail::with(['volunteer', 'event.location', 'event.partner'])
+            ->where('volunteer_id', $volunteerId);
+
+        // Eksekusi query untuk mendapatkan semua event partisipasi (jika diperlukan di view)
+        $eventDetails = $eventDetailsQuery->get();
+
+
+        if ($request->has('event')) {
+            // Temukan event yang dipilih berdasarkan ID dari request
+            $selectedEvent = EventsVolunteers::with(['location', 'partner'])->find($request->event);
+
+            if ($selectedEvent) { // Pastikan event ditemukan
+                // --- Logika Pemisahan Deskripsi ---
+                $description = $selectedEvent->event_description;
+                $paragraphs = preg_split('/(\r?\n){2,}/', $description, 2);
+                $selectedEvent->first_paragraph = $paragraphs[0];
+                $selectedEvent->remaining_description = isset($paragraphs[1]) && trim($paragraphs[1]) !== '' ? $paragraphs[1] : null;
+
+                // --- Ambil Status Partisipasi untuk selectedEvent ini ---
+                // Kita mencari record EventsVolunteersDetail yang spesifik
+                // untuk event yang dipilih DAN volunteer yang login
+                $participationRecord = EventsVolunteersDetail::where('event_id', $selectedEvent->id)
+                                                             ->where('volunteer_id', $volunteerId)
+                                                             ->first();
+
+                // Jika record partisipasi ditemukan, ambil statusnya
+                if ($participationRecord) {
+                    $volunteerParticipationStatus = $participationRecord->status;
+                }
+            }
+        }
+
+        // Kirim semua variabel yang diperlukan ke view
+        return view('volunteer.details.details', compact('events', 'eventDetails', 'selectedEvent', 'volunteerParticipationStatus'));
+    }
+
+        public function cancelParticipation(Request $request, EventsVolunteers $event): RedirectResponse
+    {
+        $volunteerId = Auth::id();
+
+        // Cari record partisipasi yang sesuai
+        $participationRecord = EventsVolunteersDetail::where('event_id', $event->id)
+                                                     ->where('volunteer_id', $volunteerId)
+                                                     ->first();
+
+        // Jika record partisipasi ditemukan, hapus
+        if ($participationRecord) {
+            $participationRecord->delete();
+            // Berikan pesan sukses ke user
+            return redirect()->route('volunteer.details.show')->with('success', 'Partisipasi Anda dalam event ' . $event->event_name . ' berhasil dibatalkan.');
+        }
+
+        // Jika tidak ditemukan (misalnya sudah dibatalkan atau tidak pernah terdaftar)
+        return redirect()->route('volunteer.details.show')->with('error', 'Anda tidak terdaftar untuk event ini, atau partisipasi sudah dibatalkan.');
     }
 
     public function partner()

@@ -84,8 +84,9 @@ Route::middleware([
         Route::get('/locations', [VolunteerDashboardController::class, 'locations'])->name('locations.show');
         Route::post('/locations/search', [VolunteerDashboardController::class, 'searchLocations'])->name('locations.search');
         Route::get('/details', [VolunteerDashboardController::class, 'details'])->name('details.show');
+        Route::get('/details/events', [VolunteerDashboardController::class, 'detailsEvents'])->name('details.details');
+        Route::delete('/volunteer/cancel-participation/{event}', [VolunteerDashboardController::class, 'cancelParticipation'])->name('cancel_participation');
         Route::get('/our-partner', [VolunteerDashboardController::class, 'partner'])->name('partner.show');
-
 
     });
 

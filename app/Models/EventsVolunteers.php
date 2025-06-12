@@ -18,6 +18,11 @@ class EventsVolunteers extends Model
         'image_path',
     ];
 
+    protected $casts = [
+        'start_date' => 'date', // atau 'datetime' jika ada waktu
+        'end_date' => 'date',   // atau 'datetime' jika ada waktu
+    ];    
+
     public function partner()
     {
         return $this->belongsTo(Partner::class);

@@ -13,11 +13,36 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- Styles -->
         @livewireStyles
     </head>
     <body class="antialiased">
+
+        @if(session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            </script>
+        @endif
+
+        @if(session('error'))
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    showConfirmButton: true,
+                });
+            </script>
+        @endif
+
         <div class="min-h-screen font-[poppins] bg-all">
             @livewire('navigation-menu')
 
@@ -33,5 +58,7 @@
         @stack('modals')
 
         @livewireScripts
+
+        @stack('scripts')
     </body>
 </html>
