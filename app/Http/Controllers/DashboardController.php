@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\EventsDonationDetails;
 use App\Models\EventsVolunteersDetail;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class DashboardController extends Controller
 {
@@ -82,17 +83,25 @@ class DashboardController extends Controller
 
     public function report(Request $request)
     {
+         // Inisialisasi variabel waktu dan collection
+        $now = Carbon::now();
+        $monthlyDonations = collect(); // Kumpulkan data donasi per bulan
+
         // --- Laporan Donasi per Bulan ---
         // Mendapatkan data donasi untuk 12 bulan terakhir
-        $monthlyDonations = Donation::selectRaw('strftime("%Y-%m", created_at) as month, SUM(amount) as total_amount') // Untuk SQLite
-                                    // ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(amount) as total_amount') // Untuk MySQL
-                                    ->where('created_at', '>=', Carbon::now()->subMonths(12))
-                                    ->groupBy('month')
-                                    ->orderBy('month')
-                                    ->get();
+        for ($i = 11; $i >= 0; $i--) {
+            $month = $now->copy()->subMonths($i);
+            $label = $month->format('M Y');
 
-        $donationMonths = $monthlyDonations->pluck('month')->toArray();
-        $donationAmounts = $monthlyDonations->pluck('total_amount')->toArray();
+            $total = Donation::whereYear('created_at', $month->year)
+                ->whereMonth('created_at', $month->month)
+                ->sum('amount');
+
+            $monthlyDonations->push([
+                'label' => $label,
+                'total' => $total,
+            ]);
+        }
 
         // --- Laporan Jumlah Pengguna per Role ---
         $userRoles = User::selectRaw('role, COUNT(*) as count')
@@ -116,8 +125,8 @@ class DashboardController extends Controller
         // Data yang akan dikirim ke view laporan
         $reportData = [
             'monthlyDonations' => [
-                'labels' => $donationMonths,
-                'data' => $donationAmounts
+                'labels' => $monthlyDonations->pluck('label'),
+                'data' => $monthlyDonations->pluck('total'),
             ],
             'userRoles' => [
                 'labels' => $roleNames,
