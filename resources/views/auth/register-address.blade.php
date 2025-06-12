@@ -1,6 +1,7 @@
 <x-auth-layout>
     @section('title', 'Register Account')
     <div class="flex flex-row justify-between items-center">
+    <div class="flex flex-row justify-between items-center">
         <a href="#" onclick="history.back(); return false;" class="flex justify-end m-6">
                 <img src="{{ asset('/assets/back-button.svg') }}" alt="" class="w-10 h-10">
             </a>
@@ -40,7 +41,19 @@
 
                     <div class="mb-4">
                         <x-label for="date_of_birth" value="{{ __('Date of Birth') }}"/>
-                        <x-input id="date_of_birth" class="block mt-1 w-48 text-redb font-bold" type="date" name="date_of_birth" :value="old('date_of_birth')" required autocomplete="date_of_birth"/>
+                        
+                        <!-- Div wrapper dengan shadow yang sama seperti dropdown -->
+                        <div class="relative w-48 bg-creamcard rounded-md shadow-quadrupleNonHover overflow-hidden"
+                            
+                            <!-- Input date tanpa shadow, karena shadow sudah ada di wrapper -->
+                            <x-input id="date_of_birth" 
+                                    class="w-full pr-3 px-4 py-2 bg-transparent text-xs font-bold text-redb leading-5 text-blackAuth rounded-md border-0 focus:ring-0 focus:outline-none" 
+                                    type="date" 
+                                    name="date_of_birth" 
+                                    :value="$oldData['date_of_birth'] ?? old('date_of_birth')" 
+                                    required 
+                                    autocomplete="date_of_birth"/>
+                        </div>
                     </div>
 
                     <!-- Province -->

@@ -79,6 +79,8 @@ class RegisterUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        Session::save();
+
         return redirect()->route('register.role');
     }
 

@@ -1,8 +1,6 @@
-
 <x-guest-layout>
     @section('title', 'Welcome to HelpHunger')
 
-    
     <div class="flex items-center lg:justify-center justify-center min-h-screen flex-col scroll-smooth">
         <div class="w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0 mt-6">
             <main class="flex flex-col w-auto">
@@ -267,8 +265,8 @@
                                         <img src="{{ asset('/assets/orphanage-partner.svg') }}" alt="" class="object-contain max-h-full">
                                     </div>
 
-                                    <div class="absolute inset-0 flex flex-col gap-4 items-center justify-center px-4 text-center opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out backdrop-blur-sm bg-redb/90 rounded-lg">
-                                        <p class="text-creamcard font-bold text-base">{{ $partner->partner_name }}</p>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center opacity-0 group-hover:opacity-100 transition duration-300 ease-in-out backdrop-blur-sm bg-redb/90 rounded-lg">
+                                        <p class="text-creamcard font-bold text-sm">{{ $partner->partner_name }}</p>
                                         <img src="{{ asset('/assets/next-button.svg') }}" alt="">
                                     </div>
                                 </a>

@@ -1,5 +1,5 @@
 <x-form-section submit="updateProfileInformation">
-    <x-slot name="title">
+    <x-slot name="title" class="text-lg font-semibold text-redb">
         {{ __('Profile Information') }}
     </x-slot>
 
