@@ -16,7 +16,7 @@
                 </a>
             </div>
     
-            <div class="flex flex-wrap justify-center items-center gap-4 md:gap-12 lg:gap-24 xl:gap-52">
+            <div class="flex flex-wrap justify-center items-center gap-4 md:gap-12 lg:gap-24 xl:gap-42">
                 @if(Auth::user()->role === 'admin')
                     <a href="{{ route('admin.location') }}" class="flex">
                         <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base

@@ -1,4 +1,5 @@
 <x-auth-layout>
+@section('title', 'Login Account')
     <a href="{{ route('guest.welcome') }}" class="flex justify-end m-6">
         <img src="{{ asset('/assets/close-button.svg') }}" alt="" class="w-8 h-8">
     </a>
@@ -6,8 +7,6 @@
         <x-slot name="logo">
             <x-authentication-card-logo />
         </x-slot>
-
-        <x-validation-errors class="mb-4" />
 
         @session('status')
             <div class="mb-4 font-medium text-sm text-green-600">

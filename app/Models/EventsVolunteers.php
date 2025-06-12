@@ -40,5 +40,9 @@ class EventsVolunteers extends Model
         return $this->volunteers()->count();
     }
 
+    public function eventsVolunteersDetails()
+    {
+        return $this->hasMany(EventsVolunteersDetail::class, 'event_id');
+    }
 
 }
