@@ -79,6 +79,14 @@ Route::middleware([
         Route::get('/about', [VolunteerDashboardController::class, 'about'])->name('about.show');
         Route::get('/events', [VolunteerDashboardController::class, 'events'])->name('events.show'); 
         Route::get('/events/register', [VolunteerDashboardController::class, 'eventsRegister'])->name('events.create');
+        Route::get('/events/register/landing', [VolunteerDashboardController::class, 'eventsRegisterLanding'])->name('events.landing');
+        Route::post('/events/register/store', [VolunteerDashboardController::class, 'eventsRegisterStore'])->name('events.store');
+        Route::get('/locations', [VolunteerDashboardController::class, 'locations'])->name('locations.show');
+        Route::post('/locations/search', [VolunteerDashboardController::class, 'searchLocations'])->name('locations.search');
+        Route::get('/details', [VolunteerDashboardController::class, 'details'])->name('details.show');
+        Route::get('/our-partner', [VolunteerDashboardController::class, 'partner'])->name('partner.show');
+
+
     });
 
     // Donatur

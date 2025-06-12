@@ -40,7 +40,7 @@ class DashboardController extends Controller
 
 
         // 2. Jumlah Pengguna
-        $totalUsers = User::count();
+        $totalUsers = User::where('role', '!=', 'admin')->count();
         $totalVolunteers = User::where('role', 'volunteer')->count();
         $totalDonaturs = User::where('role', 'donatur')->count();
         $totalAdmins = User::where('role', 'admin')->count(); // Jika ada peran admin di tabel users
@@ -113,5 +113,7 @@ class DashboardController extends Controller
         $eventsPartner = Partner::all();
         return view('donatur.dashboard', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner')); 
     }
+
+    
 
 }

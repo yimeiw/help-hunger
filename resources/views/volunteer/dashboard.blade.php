@@ -53,7 +53,7 @@
 
 
                 <div class="flex justify-center items-center lg:w-auto">
-                    <a href="#" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-xl w-56 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                    <a href="{{ route('volunteer.events.show') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-xl w-56 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                         Start Volunteer
                     </a>
                 </div>
@@ -198,7 +198,7 @@
                                 </div>
                                 
                                 <div class="flex justify-center items-center mt-4">
-                                    <a href="{{ route('guest.events') }}" class="px-4 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Volunteer</a>
+                                    <a href="{{ route('volunteer.events.create', ['event' => $event->id]) }}" class="px-4 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Volunteer</a>
                                 </div>
                             </div>
                             @endforeach

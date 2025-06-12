@@ -43,44 +43,46 @@
             </div>
 
             {{-- Sisanya: tampilkan dalam 3 kolom per baris --}}
-            <div class="grid grid-cols-3 gap-6 ml-36 mr-36">
-                @foreach ($events->skip(2)->take(3) as $event)
-                    <a href="#" class="flex flex-col bg-greenbg rounded-lg p-8 h-full justify-between hover:bg-greenpastel transition duration-300 ease-in-out">
-                        <div>
-                            {{-- Gambar --}}
-                            <div class="flex items-center justify-center mb-4">
-                                @if ($event->image_path)
-                                    <img src="{{ asset('/' . $event->image_path) }}" alt="Event Image" class="w-64 h-32 object-cover rounded-lg">
+            <div class="ml-36 mr-36">
+                <div class="flex gap-6 overflow-x-scroll scrollbar-hide pb-4">
+                    @foreach ($events->skip(2) as $event)
+                        <a href="{{ route('volunteer.events.create', ['event' => $event->id]) }}" class="flex-shrink-0 w-80 flex flex-col bg-greenbg rounded-lg p-8 h-90 justify-between hover:bg-greenpastel transition duration-300 ease-in-out">
+                            <div>
+                                {{-- Gambar --}}
+                                <div class="flex items-center justify-center mb-4">
+                                    @if ($event->image_path)
+                                        <img src="{{ asset('/' . $event->image_path) }}" alt="Event Image" class="w-64 h-32 object-cover rounded-lg">
+                                    @else
+                                        <img src="{{ asset('/assets/default-icon-community.svg') }}" alt="Default Event Image" class="w-32 h-32 object-cover rounded-lg">
+                                    @endif
+                                </div>
+
+                                {{-- Konten utama --}}
+                                <p class="text-creamcard font-bold text-base mb-2">{{ $event->event_name }}</p>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <img src="{{ asset('assets/location-icon.svg') }}" alt="" class="w-4 h-4">
+                                    <p class="font-regular text-creamcard">{{ $event->location->name }}</p>
+                                </div>
+
+                                <div class="flex items-center gap-2 text-xs">
+                                    <img src="{{ asset('assets/calendar-icon.svg') }}" alt="" class="w-4 h-4">
+                                    <p class="font-regular text-creamcard">{{ $event->start_date }} — {{ $event->start_date }}</p>
+                                </div>
+
+                                <p class="font-regular text-creamcard text-xs mt-1">by {{ $event->partner->partner_name }}</p>
+                            </div>
+
+                            {{-- Volunteer count selalu di bawah --}}
+                            <div class="flex justify-end mt-4 text-redb font-bold text-base">
+                                @if ($event->volunteer_count > 1)
+                                    <p>{{ $event->volunteer_count }} volunteers</p>
                                 @else
-                                    <img src="{{ asset('/assets/default-icon-community.svg') }}" alt="Default Event Image" class="w-32 h-32 object-cover rounded-lg">
+                                    <p>{{ $event->volunteer_count }} volunteer</p>
                                 @endif
                             </div>
-
-                            {{-- Konten utama --}}
-                            <p class="text-creamcard font-bold text-base mb-2">{{ $event->event_name }}</p>
-                            <div class="flex items-center gap-2">
-                                <img src="{{ asset('assets/location-icon.svg') }}" alt="" class="w-4 h-4">
-                                <p class="font-regular text-creamcard">{{ $event->location->name }}</p>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <img src="{{ asset('assets/calendar-icon.svg') }}" alt="" class="w-4 h-4">
-                                <p class="font-regular text-creamcard">{{ $event->start_date }} — {{ $event->start_date }}</p>
-                            </div>
-
-                            <p class="font-regular text-creamcard">by {{ $event->partner->partner_name }}</p>
-                        </div>
-
-                        {{-- Volunteer count selalu di bawah --}}
-                        <div class="flex justify-end mt-4 text-redb font-bold text-base">
-                            @if ($event->volunteer_count > 1)
-                                <p>{{ $event->volunteer_count }} volunteers</p>
-                            @else
-                                <p>{{ $event->volunteer_count }} volunteer</p>
-                            @endif
-                        </div>
-                    </a>
-                @endforeach
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </div>
 
