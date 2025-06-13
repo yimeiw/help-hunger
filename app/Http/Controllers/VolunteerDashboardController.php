@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View; 
 use Carbon\Carbon; 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class VolunteerDashboardController extends Controller
 {
@@ -167,13 +169,13 @@ class VolunteerDashboardController extends Controller
             $query->whereHas('event', function ($q) use ($now) {
                 // Debugging: Tambahkan dd() di sini
                 $q->whereDate('start_date', '<=', $now->toDateString())
-                ->whereDate('end_date', '>=', $now->toDateString())->where('status', 'accepted');
+                ->whereDate('end_date', '>=', $now->toDateString());
                 // dd($q->toSql(), $q->getBindings());
             });
         } elseif ($filter == 'done') {
             $query->whereHas('event', function ($q) use ($now) {
                 // Debugging: Tambahkan dd() di sini
-                $q->whereDate('end_date', '<', $now->toDateString())->where('status', ['accepted', 'rejected']);
+                $q->whereDate('end_date', '<', $now->toDateString());
                 // dd($q->toSql(), $q->getBindings());
             });
         }
@@ -186,45 +188,67 @@ class VolunteerDashboardController extends Controller
         return view('volunteer.details.show', compact('eventsDetail', 'filter'));
     }
 
-    public function detailsEvents(Request $request): View // Gunakan type hinting untuk Request dan View
+    public function detailsEvents(Request $request): View
     {
         // Ambil semua event (mungkin untuk daftar di sidebar atau di tempat lain)
+        // Variabel $events ini mungkin tidak digunakan langsung di view details.details,
+        // tapi jika memang ada kebutuhan lain, biarkan saja.
         $events = EventsVolunteers::with(['partner', 'location'])->get();
 
         $selectedEvent = null;
-        $volunteerParticipationStatus = null; // Variabel baru untuk menyimpan status partisipasi
+        $volunteerParticipationStatus = null;
 
         $volunteerId = Auth::id();
 
-        // Mengambil detail partisipasi relawan
-        // Jika Anda ingin menampilkan daftar event partisipasi untuk pengguna ini,
-        // eventDetails ini sudah benar sebagai query builder.
+        // Mengambil detail partisipasi relawan untuk user yang login
+        // Eager load relasi 'volunteer', 'event.location', dan 'event.partner'
         $eventDetailsQuery = EventsVolunteersDetail::with(['volunteer', 'event.location', 'event.partner'])
             ->where('volunteer_id', $volunteerId);
 
-        // Eksekusi query untuk mendapatkan semua event partisipasi (jika diperlukan di view)
+        // Eksekusi query untuk mendapatkan semua event partisipasi user ini
         $eventDetails = $eventDetailsQuery->get();
 
+        $now = Carbon::now(); // Dapatkan waktu sekarang
 
+        // --- BAGIAN PENTING: Loop melalui setiap detail partisipasi untuk menambahkan properti yang dihitung ---
+        foreach ($eventDetails as $detail) {
+            // Periksa apakah event sudah selesai
+            // Pastikan event memiliki end_date dan di-cast sebagai Carbon instance di model EventsVolunteers
+            $detail->eventIsDone = Carbon::parse($detail->event->end_date)->isPast();
+
+            // Tentukan apakah sertifikat bisa diunduh
+            $detail->canDownloadCertificate = ($detail->status === 'accepted' && $detail->eventIsDone);
+        }
+        // --- AKHIR BAGIAN PENTING ---
+
+
+        // --- Logika untuk selectedEvent (jika ada event tertentu yang dipilih/dilihat detailnya) ---
+        // Logika ini relevan jika view details.details juga menampilkan detail event spesifik
+        // yang dipilih melalui query parameter 'event'.
         if ($request->has('event')) {
-            // Temukan event yang dipilih berdasarkan ID dari request
             $selectedEvent = EventsVolunteers::with(['location', 'partner'])->find($request->event);
 
-            if ($selectedEvent) { // Pastikan event ditemukan
-                // --- Logika Pemisahan Deskripsi ---
+            if ($selectedEvent) {
+                // Pastikan end_date di-cast ke Carbon instance
+                if (!($selectedEvent->end_date instanceof Carbon)) {
+                    $selectedEvent->end_date = Carbon::parse($selectedEvent->end_date);
+                }
+
+                // Hitung total relawan untuk selectedEvent ini
+                $totalVolunteers = EventsVolunteersDetail::where('event_id', $selectedEvent->id)->count();
+                $selectedEvent->total_volunteers_count = $totalVolunteers;
+
+                // Logika Pemisahan Deskripsi
                 $description = $selectedEvent->event_description;
                 $paragraphs = preg_split('/(\r?\n){2,}/', $description, 2);
                 $selectedEvent->first_paragraph = $paragraphs[0];
                 $selectedEvent->remaining_description = isset($paragraphs[1]) && trim($paragraphs[1]) !== '' ? $paragraphs[1] : null;
 
-                // --- Ambil Status Partisipasi untuk selectedEvent ini ---
-                // Kita mencari record EventsVolunteersDetail yang spesifik
-                // untuk event yang dipilih DAN volunteer yang login
+                // Ambil Status Partisipasi untuk selectedEvent ini
                 $participationRecord = EventsVolunteersDetail::where('event_id', $selectedEvent->id)
                                                              ->where('volunteer_id', $volunteerId)
                                                              ->first();
 
-                // Jika record partisipasi ditemukan, ambil statusnya
                 if ($participationRecord) {
                     $volunteerParticipationStatus = $participationRecord->status;
                 }
@@ -232,10 +256,11 @@ class VolunteerDashboardController extends Controller
         }
 
         // Kirim semua variabel yang diperlukan ke view
-        return view('volunteer.details.details', compact('events', 'eventDetails', 'selectedEvent', 'volunteerParticipationStatus'));
+        return view('volunteer.details.details', compact('events', 'eventDetails', 'selectedEvent', 'volunteerParticipationStatus', 'now'));
     }
 
-        public function cancelParticipation(Request $request, EventsVolunteers $event): RedirectResponse
+
+    public function cancelParticipation(Request $request, EventsVolunteers $event): RedirectResponse
     {
         $volunteerId = Auth::id();
 
@@ -248,16 +273,94 @@ class VolunteerDashboardController extends Controller
         if ($participationRecord) {
             $participationRecord->delete();
             // Berikan pesan sukses ke user
-            return redirect()->route('volunteer.details.show')->with('success', 'Partisipasi Anda dalam event ' . $event->event_name . ' berhasil dibatalkan.');
+            return redirect()->route('volunteer.details.show')->with('success', 'Your participation in the event has been' . $event->event_name . ' successfully canceled.');
         }
 
         // Jika tidak ditemukan (misalnya sudah dibatalkan atau tidak pernah terdaftar)
-        return redirect()->route('volunteer.details.show')->with('error', 'Anda tidak terdaftar untuk event ini, atau partisipasi sudah dibatalkan.');
+        return redirect()->route('volunteer.details.show')->with('error', 'You are not registered for this event, or your participation has been cancelled.');
     }
 
     public function partner()
     {
         $partners = Partner::all();
         return view('volunteer.partner.show', compact('partners'));
+    }
+
+    public function notifications()
+    {
+        $volunteerId = Auth::id();
+        $now = Carbon::now();
+        $notifications = Notification::where('volunteer_id', $volunteerId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Tandai semua notifikasi sebagai dibaca
+        Notification::where('volunteer_id', $volunteerId)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return view('volunteer.notification.show', compact('notifications', 'now'));
+    }
+
+    public function downloadCertificate($detailId)
+    {
+        $authenticatedUser = Auth::user();
+
+        if (!$authenticatedUser) {
+            return redirect()->route('login')->with('error', 'Please log in to download your certificate.');
+        }
+
+        // Cari detail registrasi event
+        $eventsDetail = EventsVolunteersDetail::where('id', $detailId)
+                                            ->where('volunteer_id', $authenticatedUser->id)
+                                            ->firstOrFail(); // Pastikan hanya pengguna yang bersangkutan yang bisa mengunduh
+
+        // Pastikan statusnya 'accepted' dan event sudah selesai
+        if ($eventsDetail->status !== 'accepted' || now()->lt($eventsDetail->event->end_date)) {
+            return redirect()->back()->with('error', 'Certificate is not available for download yet.');
+        }
+
+        // Cek apakah sertifikat sudah ada
+        if ($eventsDetail->certificate_path && Storage::disk('public')->exists($eventsDetail->certificate_path)) {
+            return Storage::disk('public')->download($eventsDetail->certificate_path);
+        }
+
+        // Jika sertifikat belum ada, generate
+        try {
+            $eventName = $eventsDetail->event->event_name;
+            $volunteerName = $authenticatedUser->name; // Asumsi nama volunteer ada di model User
+            $startDate = \Carbon\Carbon::parse($eventsDetail->event->start_date)->format('d F Y');
+            $endDate = \Carbon\Carbon::parse($eventsDetail->event->end_date)->format('d F Y');
+            $issueDate = now()->format('d F Y');
+
+            $data = [
+                'volunteerName' => $volunteerName,
+                'eventName' => $eventName,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'issueDate' => $issueDate,
+            ];
+
+            $pdf = PDF::loadView('certifications.volunteer.show', $data);
+
+            // Tentukan nama file
+            $fileName = 'certificate_' . str_replace(' ', '_', $volunteerName) . '_' . str_replace(' ', '_', $eventName) . '.pdf';
+            $filePath = 'certificates/' . $fileName;
+
+            // Simpan PDF ke storage
+            Storage::disk('public')->put($filePath, $pdf->output());
+
+            // Update path sertifikat di database
+            $eventsDetail->certificate_path = $filePath;
+            $eventsDetail->save();
+
+            // Unduh file PDF
+            return Storage::disk('public')->download($filePath);
+
+        } catch (\Exception $e) {
+            Log::error('Error generating certificate: ' . $e->getMessage(), ['detail_id' => $detailId, 'user_id' => $authenticatedUser->id]);
+            // dd($e->getMessage(), $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Failed to generate certificate. Please try again later.');
+        }
     }
 }

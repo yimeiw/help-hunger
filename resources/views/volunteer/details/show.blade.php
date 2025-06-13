@@ -71,7 +71,7 @@
                                 <p class="font-bold mb-2 text-base">{{ $detail->event->event_name ?? 'N/A' }}</p>
                                 
                                 {{-- Status --}}
-                                <p class="mb-1">Status Partisipasi: 
+                                <p class="mb-1">Participation Status: 
                                     @if($detail->status == 'pending')
                                         <span class="text-yellow-300 font-bold">{{ ucfirst($detail->status) }}</span>
                                     @elseif($detail->status == 'accepted')

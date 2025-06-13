@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained('events_volunteers')->onDelete('cascade');
             $table->foreignId('volunteer_id')->constrained('users')->onDelete('cascade');
             $table->enum('status', ['accepted', 'rejected', 'pending'])->default('pending');
+            $table->string('certificate_path')->nullable();
             $table->timestamps();
         });
     }

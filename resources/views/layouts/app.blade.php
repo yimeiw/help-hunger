@@ -18,6 +18,7 @@
         <!-- Styles -->
         @livewireStyles
     </head>
+
     <body class="antialiased">
 
         @if(session('success'))

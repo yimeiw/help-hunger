@@ -10,9 +10,10 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 use App\Models\Provinces;
 use App\Models\Cities;
+use App\Models\EventsVolunteersDetail; // Import model pivot
+
 
 class User extends Authenticatable
 {

@@ -16,16 +16,8 @@ class EventsVolunteersDetailSeeder extends Seeder
         EventsVolunteersDetail::insert([
             [
                 'event_id' => 1,
-                'volunteer_id' => 4,
-                'status' => 'pending',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-
-            [
-                'event_id' => 1,
                 'volunteer_id' => 5,
-                'status' => 'pending',
+                'status' => 'accepted',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -41,7 +33,7 @@ class EventsVolunteersDetailSeeder extends Seeder
             [
                 'event_id' => 3,
                 'volunteer_id' => 4,
-                'status' => 'pending',
+                'status' => 'accepted',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

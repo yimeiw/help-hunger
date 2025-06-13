@@ -90,7 +90,8 @@ Route::middleware([
         Route::get('/details/events', [VolunteerDashboardController::class, 'detailsEvents'])->name('details.details');
         Route::delete('/volunteer/cancel-participation/{event}', [VolunteerDashboardController::class, 'cancelParticipation'])->name('cancel_participation');
         Route::get('/our-partner', [VolunteerDashboardController::class, 'partner'])->name('partner.show');
-
+        Route::get('/notification', [VolunteerDashboardController::class, 'notifications'])->name('notification.show');
+        Route::get('/volunteer/certificate/download/{detailId}', [VolunteerDashboardController::class, 'downloadCertificate'])->name('certificate.download');
     });
 
     // Donatur

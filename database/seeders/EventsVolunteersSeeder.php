@@ -17,7 +17,7 @@ class EventsVolunteersSeeder extends Seeder
             [
                 'event_name' => 'Relawan "Makan Siang Gratis"',
                 'event_description' => 'Program ini bertujuan menyediakan makan siang bergizi bagi anak-anak sekolah dasar dari keluarga kurang mampu. Relawan akan membantu dalam persiapan, pengemasan, dan distribusi makanan, serta memberikan edukasi mengenai pentingnya gizi seimbang.',
-                'start_date' => '2025-06-23',
+                'start_date' => '2025-06-16',
                 'end_date' => '2025-08-23',
                 'partner_id' => 3,
                 'location_id' => 1,
