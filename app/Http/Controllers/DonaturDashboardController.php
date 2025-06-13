@@ -27,7 +27,7 @@ class DonaturDashboardController extends Controller
     }
     
     public function locations(){
-        return view('donatur.location.show');
+        return view('donatur.locations.show');
     }
     
     public function searchLocations()

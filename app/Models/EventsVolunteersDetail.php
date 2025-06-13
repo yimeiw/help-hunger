@@ -10,7 +10,6 @@ class EventsVolunteersDetail extends Model
     protected $fillable = [
         'event_id',
         'volunteer_id',
-        'status',
     ];
     public function event()
     {

@@ -73,7 +73,8 @@
                         </div>
                     @endif
                 </div>
-
+                
+                <!-- Tambah case ongoing -->
                 @php
                     // Memastikan $selectedEvent->end_date adalah objek Carbon untuk perbandingan
                     // Jika tidak, parse secara manual
@@ -84,8 +85,7 @@
                     $eventIsDone = $eventEndDate->lt($now); // Gunakan $eventEndDate yang sudah dipastikan Carbon
                 @endphp
 
-                {{-- Tombol Cancel untuk status pending atau accepted (belum selesai) --}}
-                @if (($volunteerParticipationStatus == 'pending' || $volunteerParticipationStatus == 'accepted') && !$eventIsDone)
+                @if (!$eventIsDone)
                     <div class="flex justify-center items-center mt-10">
                         <form id="cancelParticipationForm" action="{{ route('volunteer.cancel_participation', ['event' => $selectedEvent->id]) }}" method="POST">
                             @csrf
@@ -95,13 +95,8 @@
                             </button>
                         </form>
                     </div>
-                {{-- Pesan jika status rejected --}}
-                @elseif ($volunteerParticipationStatus == 'rejected')
-                    <div class="flex justify-center items-center mt-10">
-                        <p class="text-redb font-bold">Your participation has been rejected.</p>
-                    </div>
-                {{-- Tombol Download Certificate jika status accepted DAN event sudah selesai --}}
-                @elseif ($volunteerParticipationStatus == 'accepted' && $eventIsDone)
+                {{-- Tombol Download Certificate jika event sudah selesai --}}
+                @elseif ($eventIsDone)
                     <div class="flex justify-center items-center mt-10">
                         {{-- **PERBAIKAN DI SINI:** Ambil EventsVolunteersDetail yang spesifik untuk event ini --}}
                         @php

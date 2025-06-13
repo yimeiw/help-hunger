@@ -69,19 +69,6 @@
                             {{-- Details Section --}}
                             <div class="flex flex-col text-creamcard text-xs text-justify flex-grow">
                                 <p class="font-bold mb-2 text-base">{{ $detail->event->event_name ?? 'N/A' }}</p>
-                                
-                                {{-- Status --}}
-                                <p class="mb-1">Participation Status: 
-                                    @if($detail->status == 'pending')
-                                        <span class="text-yellow-300 font-bold">{{ ucfirst($detail->status) }}</span>
-                                    @elseif($detail->status == 'accepted')
-                                        <span class="text-green-300 font-bold">{{ ucfirst($detail->status) }}</span>
-                                    @elseif($detail->status == 'rejected')
-                                        <span class="text-red-300 font-bold">{{ ucfirst($detail->status) }}</span>
-                                    @else
-                                        <span class="font-bold">{{ ucfirst($detail->status ?? 'N/A') }}</span>
-                                    @endif
-                                </p>
 
                                 {{-- Location --}}
                                 <div class="flex gap-2 text-xs mb-1 items-center">

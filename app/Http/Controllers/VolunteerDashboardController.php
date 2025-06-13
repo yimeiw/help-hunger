@@ -122,7 +122,6 @@ class VolunteerDashboardController extends Controller
             $eventsDetail = new EventsVolunteersDetail();
             $eventsDetail->event_id = $event->id;
             $eventsDetail->volunteer_id = $authenticatedUser->id;
-            $eventsDetail->status = 'pending';
             $eventsDetail->save();
 
             $notification = new Notification();
@@ -217,7 +216,7 @@ class VolunteerDashboardController extends Controller
             $detail->eventIsDone = Carbon::parse($detail->event->end_date)->isPast();
 
             // Tentukan apakah sertifikat bisa diunduh
-            $detail->canDownloadCertificate = ($detail->status === 'accepted' && $detail->eventIsDone);
+            $detail->canDownloadCertificate = ($detail->eventIsDone);
         }
         // --- AKHIR BAGIAN PENTING ---
 
@@ -244,19 +243,11 @@ class VolunteerDashboardController extends Controller
                 $selectedEvent->first_paragraph = $paragraphs[0];
                 $selectedEvent->remaining_description = isset($paragraphs[1]) && trim($paragraphs[1]) !== '' ? $paragraphs[1] : null;
 
-                // Ambil Status Partisipasi untuk selectedEvent ini
-                $participationRecord = EventsVolunteersDetail::where('event_id', $selectedEvent->id)
-                                                             ->where('volunteer_id', $volunteerId)
-                                                             ->first();
-
-                if ($participationRecord) {
-                    $volunteerParticipationStatus = $participationRecord->status;
-                }
             }
         }
 
         // Kirim semua variabel yang diperlukan ke view
-        return view('volunteer.details.details', compact('events', 'eventDetails', 'selectedEvent', 'volunteerParticipationStatus', 'now'));
+        return view('volunteer.details.details', compact('events', 'eventDetails', 'selectedEvent', 'now'));
     }
 
 

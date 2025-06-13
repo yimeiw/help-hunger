@@ -8,7 +8,7 @@
     @section('title', 'Search Location')
     <body>
         <div class="flex flex-row gap-96 items-center m-8">
-            <a href="{{ route('guest.locations.index') }}" class="mr-10 ml-10">
+            <a href="{{ route('donatur.locations.show') }}" class="mr-10 ml-10">
                 <img src="{{ asset('/assets/back-button.svg') }}" alt="" class="w-10 h-10">
             </a>
             <p class="font-bold text-xl text-redb text-center">List of Nearby Activities</p>

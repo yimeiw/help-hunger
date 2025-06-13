@@ -13,6 +13,7 @@ class EventsDonatur extends Model
         'event_description',
         'start_date',
         'end_date',
+        'status',
         'partner_id',
         'location_id',
         'image_path',

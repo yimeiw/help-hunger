@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('partner', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('province_id')->nullable()->constrained('provinces')->onDelete('cascade');
+            $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('cascade');
             $table->enum('type', ['community', 'ngo', 'orphanage'])->default('community');
             $table->string('partner_name');
+            $table->string('partner_email')->unique();
+            $table->string('password');
             $table->string('partner_link');
             $table->timestamps();
         });
