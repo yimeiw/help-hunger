@@ -7,7 +7,7 @@
 
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-greenbg overflow-hidden shadow-xl sm:rounded-lg p-6">
+            <div class="bg-greenbg shadow-xl sm:rounded-lg p-6">
 
                 {{-- Notifikasi Sukses/Error --}}
                 @if (session('success'))
@@ -22,7 +22,7 @@
                 @endif
 
                 {{-- Filter Berdasarkan Peran --}}
-                <div class="mb-4">
+                <div class="overflow-visible relative mb-4">
                     <form method="GET" action="{{ route('admin.manage-user') }}">
                         <div class="flex justify-between items-center mb-4">
                             <label class="flex items-center block text-[24px] font-bold text-creamcard">List Of User</label>
@@ -37,15 +37,15 @@
                                         </button>
                                     </div>
                                 </x-slot>
-    
+
                                 <x-slot name="content">
                                     <input type="hidden" name="role" id="role-input">
-                                    <div class="w-48 max-h-48 overflow-y-auto flex flex-col space-y-1 text-xs text-redb font-bold bg-creamcard shadow-quadrupleNonHover rounded-lg" id="role-list">
-                                        <button type="button" class="px-4 py-2 text-left role-btn" data-role="">All User</button>
-                                        <button type="button" class="px-4 py-2 text-left role-btn" data-role="volunteer">Volunteer</button>
-                                        <button type="button" class="px-4 py-2 text-left role-btn" data-role="donatur">Donatur</button>
-                                        <button type="button" class="px-4 py-2 text-left role-btn" data-role="partner">Partner</button>
-                                        <button type="button" class="px-4 py-2 text-left role-btn" data-role="admin">Admin</button>
+                                    <div class="absolute z-50 w-48 max-h-48 overflow-y-auto flex flex-col space-y-1 text-xs text-redb font-bold bg-creamcard shadow-quadrupleNonHover rounded-lg" id="role-list">
+                                        <button type="button" class="px-4 py-2 text-left hover:text-greenbg role-btn" data-role="All User">All User</button>
+                                        <button type="button" class="px-4 py-2 text-left hover:text-greenbg role-btn" data-role="volunteer">Volunteer</button>
+                                        <button type="button" class="px-4 py-2 text-left hover:text-greenbg role-btn" data-role="donatur">Donatur</button>
+                                        <button type="button" class="px-4 py-2 text-left hover:text-greenbg role-btn" data-role="partner">Partner</button>
+                                        <button type="button" class="px-4 py-2 text-left hover:text-greenbg role-btn" data-role="admin">Admin</button>
                                     </div>
                                 </x-slot>
                             </x-dropdown-register>
@@ -53,90 +53,115 @@
                     </form>
                 </div>
 
-
-                {{-- Tabel Pengguna --}}
+                {{-- Tabel Pengguna / Partner --}}
                 <div class="overflow-x-auto bg-creadmcard rounded-lg shadow-md">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-creamhh">
                             <tr>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-redb uppercase tracking-wider">Email</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-redb uppercase tracking-wider">Name</th>
-                                <th class="px-6 py-3 text-center text-xs font-bold text-redb uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-redb uppercase tracking-wider">Role/Type</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-redb uppercase tracking-wider">Registration Date</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-redb uppercase tracking-wider">Total Activity</th>
                                 <th class="px-6 py-3 text-center text-xs font-bold text-redb uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-creamcard divide-y divide-gray-200">
-                            @forelse ($users as $user)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blackAuth">{{ $user->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-blackAuth">{{ $user->email }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-blackAuth">{{ ucfirst($user->role) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-blackAuth">{{ $user->created_at->format('d M Y') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-blackAuth">
-                                        @if($user->isVolunteer())
-                                            {{ $user->total_volunteered_activities }} (Event)
-                                        @elseif($user->isDonatur())
-                                            {{ $user->total_donated_activities }} (Donation)
-                                        @else
-                                            N/A
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                        @php
-                                            $deleteRoute = match($user->role) {
-                                                'volunteer' => route('admin.manage.user.volunteer.delete', $user->id),
-                                                'donatur' => route('admin.manage.user.donatur.delete', $user->id),
-                                                'partner' => route('admin.manage.user.partner.delete', $user->id),
-                                                default => null
-                                            };
-                                        @endphp
-
-                                        @if ($deleteRoute)
-                                            <form method="POST" action="{{ $deleteRoute }}" class="inline-block" onsubmit="return confirm('Are you sure to delete this user?');">
+                            @if ($role === 'partner' && isset($partners))
+                                @forelse ($partners as $partner)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">{{ $partner->email }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">{{ $partner->partner_name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">{{ ucfirst($partner->type) }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">{{ $partner->created_at->format('d M Y') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">N/A</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                            <form method="POST" action="{{ route('admin.manage.user.partner.delete', $partner->id) }}" class="inline-block" onsubmit="return confirm('Are you sure to delete this partner?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
                                             </form>
-                                        @else
-                                            <span class="text-gray-400">Can't Delete</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No users found for this role.</td>
-                                </tr>
-                            @endforelse
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No partners found.</td>
+                                    </tr>
+                                @endforelse
+                            @else
+                                @forelse ($users as $user)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-left">{{ $user->name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">{{ $user->email }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">{{ ucfirst($user->role) }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">{{ $user->created_at->format('d M Y') }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blackAuth text-center">
+                                            @if($user->isVolunteer())
+                                                {{ $user->total_volunteered_activities }} (Event)
+                                            @elseif($user->isDonatur())
+                                                {{ $user->total_donated_activities }} (Donation)
+                                            @else
+                                                N/A
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                            @php
+                                                $deleteRoute = match($user->role) {
+                                                    'volunteer' => route('admin.manage.user.volunteer.delete', $user->id),
+                                                    'donatur' => route('admin.manage.user.donatur.delete', $user->id),
+                                                    'admin' => null,
+                                                    default => null
+                                                };
+                                            @endphp
+
+                                            @if ($deleteRoute)
+                                                <form method="POST" action="{{ $deleteRoute }}" class="inline-block" onsubmit="return confirm('Are you sure to delete this user?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                                </form>
+                                            @else
+                                                <span class="text-gray-400">Can't Delete</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No users found for this role.</td>
+                                    </tr>
+                                @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>
 
                 {{-- Pagination --}}
                 <div class="mt-4">
-                    {{ $users->links() }}
+                    @if ($role === 'partner' && isset($partners))
+                        {{ $partners->links() }}
+                    @else
+                        {{ $users->links() }}
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const roleButtons = document.querySelectorAll('.role-btn');
-        const roleText = document.getElementById('role-text');
-        const roleInput = document.getElementById('role-input');
-        const form = roleInput.closest('form');
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleButtons = document.querySelectorAll('.role-btn');
+            const roleText = document.getElementById('role-text');
+            const roleInput = document.getElementById('role-input');
+            const form = roleInput.closest('form');
 
-        roleButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const selectedRole = button.getAttribute('data-role');
-                roleText.textContent = selectedRole ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1) : 'All User';
-                roleInput.value = selectedRole;
-                form.submit();
+            roleButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const selectedRole = button.getAttribute('data-role');
+                    roleText.textContent = selectedRole ? selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1) : 'All User';
+                    roleInput.value = selectedRole;
+                    form.submit();
+                });
             });
         });
-    });
-</script>
-
+    </script>
 </x-app-layout>

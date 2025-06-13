@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LocationVolunteers extends Model
 {
@@ -25,6 +26,11 @@ class LocationVolunteers extends Model
     public function province()
     {
         return $this->belongsTo(Provinces::class, 'province_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(Cities::class, 'city_id');
     }
 
 

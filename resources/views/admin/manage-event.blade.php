@@ -90,7 +90,7 @@
         {{-- Kartu Event --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($events as $event)
-                <div class="bg-greenbg p-4 rounded-lg shadow-md">
+                <div class="lg:h-auto bg-greenbg p-4 rounded-lg shadow-md">
                     <h3 class="text-lg font-semibold text-creamcard mb-2">{{ $event->event_name }}</h3>
                     <p class="text-sm text-gray-600 mb-2">{{ $event->description }}</p>
                     <p class="text-sm text-creamhh"><strong class="text-creamcard">Location:</strong> {{ $event->location->name ?? '-' }}</p>
@@ -99,7 +99,7 @@
                     <p class="text-sm text-creamhh"><strong class="text-creamcard">Date:</strong> {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($event->end_date)->format('d M Y') }}</p>
                     <p class="text-sm text-creamhh"><strong class="text-creamcard">Target Volunteer:</strong> {{ $event->target_volunteers }}</p>
                     @else
-                    <p class="text-sm text-creamhh"><strong class="text-creamcard">Target Donation:</strong> IDR {{ number_format($event->target_amount, 0, ',', '.') }}</p>
+                    <p class="text-sm text-creamhh"><strong class="text-creamcard">Target Donation:</strong> {{ number_format($event->target_amount, 0, ',', '.') }}</p>
                     @endif
                     <p class="text-sm text-creamhh"><strong class="text-creamcard">by </strong> {{ $event->partner->partner_name ?? '-' }}</p>
                     
