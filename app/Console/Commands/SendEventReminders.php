@@ -86,7 +86,7 @@ class SendEventReminders extends Command
             }
             
             // Cek apakah relawan ini sudah menerima notifikasi jenis ini untuk event ini hari ini
-            $alreadyNotified = CustomNotification::where('volunteer_id', $volunteer->id)
+            $alreadyNotified = CustomNotification::where('user_id', $volunteer->id)
                                                  ->where('title', $title) // Cek berdasarkan judul
                                                  ->whereDate('created_at', $today)
                                                  ->exists();
@@ -94,7 +94,7 @@ class SendEventReminders extends Command
             if (!$alreadyNotified) { 
                 try {
                     $customNotification = new CustomNotification();
-                    $customNotification->volunteer_id = $volunteer->id;
+                    $customNotification->user_id = $volunteer->id;
                     $customNotification->title = $title;
                     $customNotification->message = $message;
                     $customNotification->is_read = false; // Default belum dibaca

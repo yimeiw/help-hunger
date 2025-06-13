@@ -107,20 +107,26 @@
                 @elseif(Auth::user()->role === 'donatur')
                     <a href="{{ route('donatur.about.show') }}">
                         <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
-                                {{ request()->routeIs('guest.about') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                {{ request()->routeIs('donatur.about.show') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                             About
                         </p>
                     </a>
                     <a href="{{ route('donatur.locations.show') }}" class="flex">
                         <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
-                                {{ request()->routeIs('guest.locations.index') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                {{ request()->routeIs('donatur.locations.show') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                 Location
                         </p>
                     </a>
                     <a href="{{ route('donatur.donations.show') }}" class="flex ">
                         <p class="font-bold transition duration-300 ease-out  text-sm md:text-xs lg:text-sm xl:text-base
-                                {{ request()->routeIs('guest.donations') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                {{ request()->routeIs('donatur.donations.show') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                 Donate
+                        </p>
+                    </a>
+                    <a href="{{ route('donatur.details.show') }}" class="flex ">
+                        <p class="font-bold transition duration-300 ease-out  text-sm md:text-xs lg:text-sm xl:text-base
+                                {{ request()->routeIs('donatur.details.show') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                Details
                         </p>
                     </a>
                     <div class="ms-3 relative ">

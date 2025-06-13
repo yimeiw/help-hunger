@@ -30,8 +30,14 @@
                         <div class="text-creamcard font-regular max-w-2xl">
                             <p class="mb-2 text-lg"><span class="font-bold">{{ $selectedEvent->event_name }}</span> by <span class="font-bold">"{{ $selectedEvent->partner->partner_name }}"</span></p>
 
-                            
-                            <p class="text-sm">Total Volunteers: {{ $selectedEvent->total_volunteers_count ?? 0 }} Volunteers</p>
+                            <p class="text-sm font-bold">Total Donation Donated by You: Rp{{ number_format($totalDonatedAmountByYou, 0, ',', '.') }}</p>
+
+                            {{-- Pastikan ini untuk total donasi/transaksi sukses di event ini (dari semua donatur) --}}
+                            <p class="text-sm">Total Donations (for this event): {{ $selectedEvent->total_donations_count_for_event ?? 0 }}</p>
+
+                            {{-- Atau jika Anda ingin menampilkan total uang yang terkumpul untuk event ini: --}}
+                            <p class="text-sm">Total Amount Collected (for this event): Rp{{ number_format($selectedEvent->total_donations_collected_amount ?? 0, 0, ',', '.') }}</p>
+
 
                             <p class="text-xs text-justify mb-4 mt-4">{{ $selectedEvent->first_paragraph }}</p>
 
@@ -76,7 +82,7 @@
                     $eventIsOngoing = $eventStartDate->lte($now) && $eventEndDate->gte($now);
                 @endphp
 
-                @if (!$eventIsDone  && !$eventIsOngoing)
+                @if (!$eventIsDone && !$eventIsOngoing)
                     <div class="flex justify-center items-center mt-10">
                         <form id="cancelParticipationForm" action="{{ route('volunteer.cancel_participation', ['event' => $selectedEvent->id]) }}" method="POST">
                             @csrf
@@ -106,13 +112,13 @@
                             <p class="text-gray-500">Certificate not available (participation detail not found).</p>
                         @endif
                     </div>
+                {{-- Tombol Volunteer Now jika belum berpartisipasi atau sudah dibatalkan/belum diterima --}}
                 @elseif($eventIsOngoing)
                     <div class="flex justify-center items-center mt-10">
                         <a href="" class="px-6 py-2 bg-greyAuth border-2 border-greyAuth rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                             Fighting!
                         </a>
                     </div>
-                {{-- Tombol Volunteer Now jika belum berpartisipasi atau sudah dibatalkan/belum diterima --}}
                 @else
                     <div class="flex justify-center items-center mt-10">
                         <a href="{{ route('volunteer.events.create', ['event' => $selectedEvent->id]) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">

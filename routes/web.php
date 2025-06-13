@@ -118,13 +118,19 @@ Route::middleware([
     // Donatur
     Route::prefix('donatur')->name('donatur.')->middleware('role:donatur')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'donatur'])->name('dashboard'); 
-        Route::get('/donations', [DonaturDashboardController::class, 'donations'])->name('donations.show');
         Route::get('/about', [DonaturDashboardController::class, 'about'])->name('about.show');
         Route::get('/locations', [DonaturDashboardController::class, 'locations'])->name('locations.show');
+        Route::get('/donations', [DonaturDashboardController::class, 'donations'])->name('donations.show');
         Route::post('/locations/search', [DonaturDashboardController::class, 'searchLocations'])->name('locations.search');
-        Route::get('/donations/register', [DonaturDashboardController::class, 'eventsRegister'])->name('donations.create');
-        Route::get('/events/register/landing', [DonaturDashboardController::class, 'eventsRegisterLanding'])->name('events.landing');
-        Route::post('/events/register/store', [DonaturDashboardController::class, 'eventsRegisterStore'])->name('events.store');
+
+        // Donations
+        Route::get('/donations/register', [DonaturDashboardController::class, 'donationsRegister'])->name('donations.create');
+        Route::post('/donations/register/store', [DonaturDashboardController::class, 'donationsRegisterStore'])->name('donations.store');
+        Route::get('/donations/register/landing', [DonaturDashboardController::class, 'donationsRegisterLanding'])->name('donations.landing');
+        Route::get('/donations/{donation_id}/confirmation', [DonaturDashboardController::class, 'showDonationConfirmation'])->name('donations.confirm');
+        Route::post('/donation/{donation_id}/upload-proof', [DonaturDashboardController::class, 'uploadPaymentProof'])->name('donations.upload-proof');
+
+        // Details Donations
         Route::get('/details', [DonaturDashboardController::class, 'details'])->name('details.show');
         Route::get('/details/events', [DonaturDashboardController::class, 'detailsEvents'])->name('details.details');
         Route::delete('/donatur/cancel-participation/{event}', [DonaturDashboardController::class, 'cancelParticipation'])->name('cancel_participation');

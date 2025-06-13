@@ -21,6 +21,6 @@ class Partner extends Model
     
     public function accounts()
     {
-        return $this->hasMany(PartnerAccount::class);
+        return $this->hasMany(PartnerAccounts::class);
     }
 }

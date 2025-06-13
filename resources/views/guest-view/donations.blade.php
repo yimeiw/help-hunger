@@ -21,18 +21,21 @@
                             <p class="text-base font-bold text-redb">Rp{{ number_format($event->total_donation_amount, 0, ',', '.') }}</p>
 
                             <!-- Progress Bar -->
-                            @php
-                                $target = $event->total_donation_target ?? 0; 
-                                $donationCount = $event->donation_count ?? 0;
-                                $volunteerCount = $event->volunteer_count ?? 0;
-                                $progress = $target > 0 ? min(100, ($donationCount / $target) * 100) : 0;
+                             @php
+                                $target = $event->donation_target ?? 0; 
+                                    
+                                // Sum the 'amount' from the associated 'donations' relationship
+                                // Ensure 'donations' relationship is eager loaded in the controller!
+                                $donationCollectedAmount = $event->donations->sum('amount') ?? 0;
+                                $progress = $target > 0 ? min(100, ($donationCollectedAmount / $target) * 100) : 0;
                             @endphp
 
                             <div class="w-full bg-creamcard rounded-full h-4 overflow-hidden mt-2">
-                                @if ($donationCount > 0)
+                                @if ($donationCollectedAmount > 0) {{-- Only show bar if some amount is collected --}}
                                     <div class="bg-redb h-4 rounded-full transition-all duration-500 ease-in-out" style="width: {{ $progress }}%"></div>
                                 @endif
                             </div>
+
 
                             <p class="text-sm font-regular text-creamcard mt-2">{{ $event->donation_count }} donation</p>
                         </div>

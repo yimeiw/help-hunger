@@ -27,7 +27,7 @@ class VolunteerDashboardController extends Controller
     }
 
     public function locations(){
-        return view('volunteer.location.show');
+        return view('volunteer.locations.show');
     }
 
     public function searchLocations()
@@ -125,7 +125,7 @@ class VolunteerDashboardController extends Controller
             $eventsDetail->save();
 
             $notification = new Notification();
-            $notification->volunteer_id = $authenticatedUser->id;
+            $notification->user_id = $authenticatedUser->id;
             $notification->title = 'Registration Confirmed for ' . $event->event_name;
             $notification->message = 'You have successfully registered as a volunteer for the ' . $event->event_name . ' event on ' . $event->start_date . ' until ' . $event->end_date . '.';
             $notification->is_read = false;
@@ -281,12 +281,12 @@ class VolunteerDashboardController extends Controller
     {
         $volunteerId = Auth::id();
         $now = Carbon::now();
-        $notifications = Notification::where('volunteer_id', $volunteerId)
+        $notifications = Notification::where('user_id', $volunteerId)
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Tandai semua notifikasi sebagai dibaca
-        Notification::where('volunteer_id', $volunteerId)
+        Notification::where('user_id', $volunteerId)
             ->where('is_read', false)
             ->update(['is_read' => true]);
 

@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Donation;
 use App\Models\Notification;
 use App\Models\LocationDonatur;
 use App\Models\EventsDonatur;
 use App\Models\EventsDonationDetails;
 use App\Models\Partner;
+use App\Models\PartnerAccounts;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\Log;
@@ -47,196 +49,307 @@ class DonaturDashboardController extends Controller
     
     public function donations()
     {
-        $events = EventsDonatur::with(['partner', 'location', 'donations'])->get();
+        // Eager load 'partner', 'location', dan 'successfulDonations'
+        $events = EventsDonatur::with(['partner', 'location', 'successfulDonations'])
+                            ->get();
+
+        // Sekarang, hitung total donasi dan jumlah donasi yang sukses
+        foreach ($events as $event) {
+            $event->total_donation_amount = $event->successfulDonations->sum('amount');
+            $event->donation_count = $event->successfulDonations->count();
+        }
+
         return view('donatur.donations.show', compact('events'));
     }
     
-    public function eventsRegister(Request $request)
+    public function donationsRegister(Request $request)
     {
-        $events = EventsDonatur::with(['partner', 'location'])->get();
-        $selectedEvent = null;
+        
+        $event = null; // Initialize $event to null
 
         if ($request->has('event')) {
-            $selectedEvent = EventsDonatur::with(['location', 'partner'])->find($request->event);
+            // Fetch the specific event based on the request parameter
+            // Ensure 'donations' are eager loaded for sum calculation in the view
+            $event = EventsDonatur::with(['location', 'partner', 'donations'])->find($request->event);
 
-            // --- Your splitting logic (which is correct for the controller) ---
-            if ($selectedEvent) { // Ensure an event was found before processing
-                $description = $selectedEvent->event_description;
+            // Your splitting logic (which is correct for the controller)
+            if ($event) { // Ensure an event was found before processing
+                $description = $event->event_description;
 
                 // Split by two or more newlines
                 $paragraphs = preg_split('/(\r?\n){2,}/', $description, 2);
 
                 // Assign the first paragraph
-                // Using strip_tags and nl2br might be useful if the description
-                // doesn't explicitly use <p> tags but relies on newlines for paragraphs.
-                $selectedEvent->first_paragraph = $paragraphs[0];
+                $event->first_paragraph = $paragraphs[0];
 
                 // Assign the remaining description, if it exists
-                $selectedEvent->remaining_description = isset($paragraphs[1]) && trim($paragraphs[1]) !== '' ? $paragraphs[1] : null;
+                $event->remaining_description = isset($paragraphs[1]) && trim($paragraphs[1]) !== '' ? $paragraphs[1] : null;
             }
         }
-        return view('donatur.donations.create', compact('events', 'selectedEvent'));
+        
+        // Now pass the variable as $event to match your Blade view
+        return view('donatur.donations.create', compact('event')); 
+
     }
 
-    public function eventsRegisterLanding()
+    public function donationsRegisterLanding()
     {
-        return view('volunteer.event.landing');
+        return view('donatur.donations.landing');
     }
 
-    public function eventsRegisterStore(Request $request)
+    public function donationsRegisterStore(Request $request)
     {
-        // 1. Validate the request
-        $validator = Validator::make($request->all(), [
-            'event_id' => 'required|exists:events_volunteers,id',
+        // 1. Validasi data yang masuk
+        $validatedData = $request->validate([
+            'amount' => 'required|numeric|min:1000',
+            'event_id' => 'required|exists:events_donatur,id',
+            'payment_method' => 'required|string|in:BCA,Master Card,Link Aja',
         ]);
 
-        if ($validator->fails()) {
-            // Redirect back with validation errors if not an AJAX request
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+        // Dapatkan ID pengguna yang terautentikasi
+        $donaturId = Auth::id();
 
-        // 2. Find the event
-        $event = EventsDonatur::findOrFail($request->event_id);
-
-        // 3. Get the authenticated user
-        $authenticatedUser = Auth::user();
-
-        if (!$authenticatedUser) {
-            return redirect()->route('login')->with('error', 'Please log in to volunteer.');
-        }
-
-        // 4. Check for existing registration to prevent duplicates
-        $existingRegistration = EventsDonaturDetail::where('volunteer_id', $authenticatedUser->id)
-                                                    ->where('event_id', $event->id)
-                                                    ->first();
-
-        if ($existingRegistration) {
-            // Flash the 'show_loading' flag here too if you want the loading on this specific redirect
-            return redirect()->route('volunteer.events.landing')
-                             ->with('info', 'You have already registered for this event.')
-                             ->with('show_loading', true); // Flash the loading flag
+        if (!$donaturId) {
+            return redirect()->back()->with('error', 'Silakan login untuk membuat donasi.');
         }
 
         try {
-            // 5. Create a new event detail entry (registration)
-            $eventsDetail = new EventsDonaturDetail();
-            $eventsDetail->event_id = $event->id;
-            $eventsDetail->volunteer_id = $authenticatedUser->id;
-            $eventsDetail->status = 'pending';
-            $eventsDetail->save();
+            // Temukan event dan pastikan partner terkaitnya dimuat
+            $event = EventsDonatur::with('partner')->findOrFail($validatedData['event_id']);
 
+            // Temukan detail rekening partner yang sesuai dengan metode pembayaran yang dipilih
+            // Asumsi partner punya minimal satu rekening. Jika tidak, tambahkan pengecekan error.
+            $partnerAccount = PartnerAccounts::where('partner_id', $event->partner->id)
+                                            ->where('rekening_type', $validatedData['payment_method'])
+                                            ->first();
+
+            if (!$partnerAccount) {
+                // Ini bisa terjadi jika partner tidak memiliki rekening dengan metode yang dipilih
+                throw new \Exception('Nomor rekening untuk metode pembayaran yang dipilih tidak ditemukan.');
+            }
+
+            // 2. Buat record Donasi dengan status 'pending'
+            $donation = Donation::create([
+                'amount' => $validatedData['amount'],
+                'payment_status' => 'pending', // Status awal selalu 'pending'
+                'payment_date' => now(), // Atau null jika pembayaran belum terjadi
+                'payment_method' => $validatedData['payment_method'],
+                'donatur_id' => $donaturId,
+                'event_id' => $validatedData['event_id'],
+                // payment_proof, receipt_url, transaction_reference akan diisi nanti
+            ]);
+
+            // 3. Buat notifikasi untuk donatur
             $notification = new Notification();
-            $notification->volunteer_id = $authenticatedUser->id;
-            $notification->title = 'Registration Confirmed for ' . $event->event_name;
-            $notification->message = 'You have successfully registered as a volunteer for the ' . $event->event_name . ' event on ' . $event->start_date . ' until ' . $event->end_date . '.';
+            $notification->user_id = $donaturId; // Pastikan kolom donatur_id ada di tabel notifikasi Anda
+            $notification->title = 'Donasi Dicatat untuk ' . $event->event_name;
+            $notification->message = 'Terima kasih atas donasi Anda sebesar IDR ' . number_format($validatedData['amount'], 0, ',', '.') . ' untuk event ' . $event->event_name . '. Silakan selesaikan pembayaran.';
             $notification->is_read = false;
-            $notification->created_at = now();
             $notification->save();
-            
 
-            // 6. Redirect with success message AND loading flag
-            return redirect()->route('volunteer.events.landing')
-                             ->with('success', 'Yay, you\'re officially a volunteer! Time to make the world a better place together ✨')
-                             ->with('show_loading', true); // Flash the loading flag
+            // 4. Redirect ke halaman konfirmasi pembayaran
+            // Kirim detail donasi, detail event, dan detail rekening bank
+            return redirect()->route('donatur.donations.confirm', [
+                'donation_id' => $donation->id, // Kirim ID donasi yang baru dibuat
+            ])->with([
+                'success' => 'Donasi Anda telah dicatat! Silakan selesaikan pembayaran.',
+                'show_loading' => true // Jika Anda memiliki loading screen
+            ]);
 
         } catch (\Exception $e) {
-            Log::error('Volunteer registration error: ' . $e->getMessage(), ['user_id' => $authenticatedUser->id, 'event_id' => $event->id]);
-            return redirect()->back()->with('error', 'An error occurred during registration. Please try again.');
+            Log::error('Kesalahan pendaftaran donasi: ' . $e->getMessage(), [
+                'donatur_id' => $donaturId,
+                'event_id' => $validatedData['event_id'],
+                'trace' => $e->getTraceAsString() // Tambahkan trace untuk debugging lebih lanjut
+            ]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses donasi Anda. Silakan coba lagi.')->withInput();
         }
     }
 
+    // --- Metode baru untuk menampilkan halaman konfirmasi pembayaran ---
+    public function showDonationConfirmation($donation_id)
+    {
+        $donation = Donation::with(['event.partner.accounts'])->findOrFail($donation_id);
+
+        // Cari detail rekening yang relevan dengan metode pembayaran donasi ini
+        $partnerAccount = $donation->event->partner->accounts->firstWhere('rekening_type', $donation->payment_method);
+
+        if (!$partnerAccount) {
+            // Tangani kasus jika rekening tidak ditemukan (walaupun seharusnya sudah ada)
+            return redirect()->route('donatur.donations.landing')->with('error', 'Detail rekening pembayaran tidak ditemukan.');
+        }
+
+        return view('donatur.donations.confirm', compact('donation', 'partnerAccount'));
+    }
+
+    // --- Metode baru untuk menangani unggahan bukti pembayaran ---
+    public function uploadPaymentProof(Request $request, $donation_id)
+    {
+        $validatedData = $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Maks 2MB
+        ]);
+
+        $donation = Donation::findOrFail($donation_id);
+
+        if ($request->hasFile('payment_proof')) {
+            $image = $request->file('payment_proof');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $filePath = $image->storeAs('payment_proofs', $fileName, 'public'); // Simpan di storage/app/public/payment_proofs
+
+            $donation->payment_proof = $filePath;
+            // Anda mungkin ingin mengubah status menjadi 'waiting_for_verification'
+            // jika ada status perantara sebelum 'success'
+            $donation->payment_status = 'pending'; // Status baru
+            $donation->save();
+
+            // Opsional: Kirim notifikasi ke admin bahwa ada bukti transfer baru
+            // atau notifikasi ke donatur bahwa bukti telah diterima
+
+            return redirect()->route('donatur.donations.landing')
+                             ->with('success', 'Bukti pembayaran Anda telah berhasil diunggah dan sedang menunggu verifikasi.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengunggah bukti pembayaran.');
+    }
+
+
     public function details(Request $request): View
     {
-        $volunteerId = Auth::id();
+        $donaturId = Auth::id(); // Ini adalah ID dari user/donatur yang sedang login
+
+        // Query untuk mendapatkan SEMUA event yang diikuti oleh donatur ini
+        // Kita harus memfilter melalui relasi 'donation'
+        $allParticipatedEventsQuery = EventsDonationDetails::whereHas('donation', function($q) use ($donaturId) {
+            $q->where('donatur_id', $donaturId);
+        });
+        $totalParticipatedEvents = $allParticipatedEventsQuery->count(); // Hitung jumlahnya
+
+        // Query utama yang akan difilter berdasarkan tanggal
+        $query = EventsDonationDetails::with(['donation', 'event.location', 'event.partner'])
+            // Hapus baris ->where('donation_id', $donaturId); yang salah
+            // Ganti dengan whereHas untuk memfilter berdasarkan donatur_id di tabel 'donations'
+            ->whereHas('donation', function($q) use ($donaturId) {
+                $q->where('donatur_id', $donaturId);
+            });
+
+
         $filter = $request->query('filter', 'all');
         $now = Carbon::now();
-        // dd($now->toDateString());
-
-        // Debugging: Lihat nilai $now dan $now->toDateString()
-        // dd('Current Carbon date:', $now, 'Current date string:', $now->toDateString());
-
-        $query = EventsDonaturDetail::with(['volunteer', 'event.location', 'event.partner'])
-            ->where('volunteer_id', $volunteerId);
 
         // Menerapkan filter berdasarkan parameter 'filter'
         if ($filter == 'upcoming') {
             $query->whereHas('event', function ($q) use ($now) {
-                // Debugging: Tambahkan dd() di sini untuk melihat query yang dihasilkan
                 $q->whereDate('start_date', '>', $now->toDateString());
-                // dd($q->toSql(), $q->getBindings());
             });
         } elseif ($filter == 'ongoing') {
             $query->whereHas('event', function ($q) use ($now) {
-                // Debugging: Tambahkan dd() di sini
                 $q->whereDate('start_date', '<=', $now->toDateString())
-                ->whereDate('end_date', '>=', $now->toDateString());
-                // dd($q->toSql(), $q->getBindings());
+                  ->whereDate('end_date', '>=', $now->toDateString());
             });
         } elseif ($filter == 'done') {
             $query->whereHas('event', function ($q) use ($now) {
-                // Debugging: Tambahkan dd() di sini
                 $q->whereDate('end_date', '<', $now->toDateString());
-                // dd($q->toSql(), $q->getBindings());
             });
         }
 
         $eventsDetail = $query->get();
 
-        // Debugging: Lihat hasil akhir query setelah filter
-        // dd($eventsDetail);
+        // Dapatkan jumlah event yang muncul setelah difilter (bukan total semua event)
+        $filteredEventCount = $eventsDetail->count();
 
-        return view('volunteer.details.show', compact('eventsDetail', 'filter'));
+        return view('donatur.details.show', compact('eventsDetail', 'filter', 'filteredEventCount'));
     }
 
     public function detailsEvents(Request $request): View
     {
-        // Ambil semua event (mungkin untuk daftar di sidebar atau di tempat lain)
-        // Variabel $events ini mungkin tidak digunakan langsung di view details.details,
-        // tapi jika memang ada kebutuhan lain, biarkan saja.
-        $events = EventsDonatur::with(['partner', 'location'])->get();
+        $donaturId = Auth::id(); // ID dari user yang sedang login (sebagai Donatur)
+        $now = Carbon::now();
 
-        $selectedEvent = null;
-        $volunteerParticipationStatus = null;
+        // --- 1. Mendapatkan daftar partisipasi donasi spesifik untuk donatur yang login ---
+        // Kita ingin mendapatkan EventsDonationDetails yang terkait dengan donasi
+        // yang dibuat oleh donatur ini.
+        $eventParticipationDetails = EventsDonationDetails::with([
+                'donation' => function ($query) use ($donaturId) {
+                    $query->where('donatur_id', $donaturId); // Filter donasi berdasarkan donatur yang login
+                },
+                'event.location',
+                'event.partner'
+            ])
+            ->whereHas('donation', function ($query) use ($donaturId) {
+                $query->where('donatur_id', $donaturId); // Pastikan EventsDonationDetails terkait donasi dari donatur ini
+            })
+            ->get();
 
-        $volunteerId = Auth::id();
+        // Filter out details where the 'donation' relation might be null after the whereHas filter
+        $eventDetails = $eventParticipationDetails->filter(function ($detail) {
+            return $detail->donation !== null;
+        });
 
-        // Mengambil detail partisipasi relawan untuk user yang login
-        // Eager load relasi 'volunteer', 'event.location', dan 'event.partner'
-        $eventDetailsQuery = EventsDonaturDetail::with(['volunteer', 'event.location', 'event.partner'])
-            ->where('volunteer_id', $volunteerId);
 
-        // Eksekusi query untuk mendapatkan semua event partisipasi user ini
-        $eventDetails = $eventDetailsQuery->get();
-
-        $now = Carbon::now(); // Dapatkan waktu sekarang
-
-        // --- BAGIAN PENTING: Loop melalui setiap detail partisipasi untuk menambahkan properti yang dihitung ---
+        // --- 2. Menghitung status setiap partisipasi (Upcoming, Ongoing, Done) ---
         foreach ($eventDetails as $detail) {
-            // Periksa apakah event sudah selesai
-            // Pastikan event memiliki end_date dan di-cast sebagai Carbon instance di model EventsDonatur
-            $detail->eventIsDone = Carbon::parse($detail->event->end_date)->isPast();
+            $eventStartDate = Carbon::parse($detail->event->start_date);
+            $eventEndDate = Carbon::parse($detail->event->end_date);
+
+            $detail->eventIsUpcoming = $eventStartDate->gt($now);
+            $detail->eventIsDone = $eventEndDate->lt($now);
+            $detail->eventIsOngoing = $eventStartDate->lte($now) && $eventEndDate->gte($now);
+            $detail->eventStatusLabel = ''; // Untuk menampilkan di Blade
+
+            if ($detail->eventIsUpcoming) {
+                $detail->eventStatusLabel = 'Upcoming';
+            } elseif ($detail->eventIsOngoing) {
+                $detail->eventStatusLabel = 'Ongoing';
+            } elseif ($detail->eventIsDone) {
+                $detail->eventStatusLabel = 'Done';
+            } else {
+                $detail->eventStatusLabel = 'Unknown'; // Fallback
+            }
 
             // Tentukan apakah sertifikat bisa diunduh
-            $detail->canDownloadCertificate = ($detail->status === 'accepted' && $detail->eventIsDone);
+            // Umumnya sertifikat hanya bisa diunduh jika event sudah Selesai
+            $detail->canDownloadCertificate = ($detail->eventIsDone);
         }
-        // --- AKHIR BAGIAN PENTING ---
 
+        // --- 3. Logika untuk selectedEvent (Jika user mengklik event tertentu untuk melihat detailnya) ---
+        $selectedEvent = null;
+        $totalDonatedAmountByYou = 0; // Total donasi yang diberikan oleh donatur untuk selectedEvent ini
+        $totalDonationsCountForEvent = 0; // Total donasi (jumlah transaksi) untuk selectedEvent ini
 
-        // --- Logika untuk selectedEvent (jika ada event tertentu yang dipilih/dilihat detailnya) ---
-        // Logika ini relevan jika view details.details juga menampilkan detail event spesifik
-        // yang dipilih melalui query parameter 'event'.
         if ($request->has('event')) {
-            $selectedEvent = EventsDonatur::with(['location', 'partner'])->find($request->event);
+            $selectedEventId = $request->event;
+            $selectedEvent = EventsDonatur::with(['location', 'partner'])->find($selectedEventId);
 
             if ($selectedEvent) {
-                // Pastikan end_date di-cast ke Carbon instance
+                // Pastikan tanggal di-cast ke Carbon instance di model EventsDonatur
+                // Idealnya ini sudah di-handle oleh $casts di model EventsDonatur
+                if (!($selectedEvent->start_date instanceof Carbon)) {
+                    $selectedEvent->start_date = Carbon::parse($selectedEvent->start_date);
+                }
                 if (!($selectedEvent->end_date instanceof Carbon)) {
                     $selectedEvent->end_date = Carbon::parse($selectedEvent->end_date);
                 }
 
-                // Hitung total relawan untuk selectedEvent ini
-                $totalVolunteers = EventsDonaturDetail::where('event_id', $selectedEvent->id)->count();
-                $selectedEvent->total_volunteers_count = $totalVolunteers;
+                // Hitung total donasi yang masuk ke selectedEvent (dari semua donatur, status sukses)
+                // Asumsi: Anda punya relasi 'successfulDonations' di EventsDonatur model (seperti yang saya sarankan sebelumnya)
+                // Atau eager load saja relasi 'donations' dan filter di sini
+                $totalDonationsCollected = Donation::where('event_id', $selectedEventId)
+                                                   ->where('payment_status', 'success')
+                                                   ->sum('amount');
+                $selectedEvent->total_donations_collected_amount = $totalDonationsCollected;
+
+                // Hitung total jumlah donasi (transaksi) yang sukses untuk event ini
+                $totalDonationsCountForEvent = Donation::where('event_id', $selectedEventId)
+                                                        ->where('payment_status', 'success')
+                                                        ->count();
+                $selectedEvent->total_donations_count_for_event = $totalDonationsCountForEvent;
+
+
+                // Hitung total donasi yang diberikan OLEH donatur yang sedang login untuk selectedEvent ini
+                $totalDonatedAmountByYou = Donation::where('event_id', $selectedEventId)
+                                                   ->where('donatur_id', $donaturId)
+                                                   ->where('payment_status', 'success') // Hanya donasi sukses
+                                                   ->sum('amount');
 
                 // Logika Pemisahan Deskripsi
                 $description = $selectedEvent->event_description;
@@ -244,41 +357,39 @@ class DonaturDashboardController extends Controller
                 $selectedEvent->first_paragraph = $paragraphs[0];
                 $selectedEvent->remaining_description = isset($paragraphs[1]) && trim($paragraphs[1]) !== '' ? $paragraphs[1] : null;
 
-                // Ambil Status Partisipasi untuk selectedEvent ini
-                $participationRecord = EventsDonaturDetail::where('event_id', $selectedEvent->id)
-                                                             ->where('volunteer_id', $volunteerId)
-                                                             ->first();
+                // Ambil Status Partisipasi donatur ini untuk selectedEvent ini
+                // Ini akan mendapatkan record EventsDonationDetails yang dibuat oleh donasi donatur ini ke event ini
+                $participationRecord = EventsDonationDetails::where('event_id', $selectedEventId)
+                                                            ->whereHas('donation', function($q) use ($donaturId) {
+                                                                $q->where('donatur_id', $donaturId);
+                                                            })
+                                                            ->first();
 
-                if ($participationRecord) {
-                    $volunteerParticipationStatus = $participationRecord->status;
-                }
+                // Variabel ini bisa menunjukkan apakah user sudah berpartisipasi di event ini
+                // Atau, jika ada status di EventsDonationDetails, bisa ditampilkan
+                $userParticipatedInSelectedEvent = ($participationRecord !== null);
+                // Jika EventsDonationDetails memiliki kolom 'status' yang relevan:
+                // $donationParticipationStatus = $participationRecord->status ?? null;
             }
         }
 
+        // Variabel $events di sini akan berisi semua EventsDonatur.
+        // Jika tidak digunakan di view donatur.details.details, bisa dihapus atau di-fetch sesuai kebutuhan.
+        $events = EventsDonatur::with(['partner', 'location'])->get();
+
+
         // Kirim semua variabel yang diperlukan ke view
-        return view('volunteer.details.details', compact('events', 'eventDetails', 'selectedEvent', 'volunteerParticipationStatus', 'now'));
+        return view('donatur.details.details', compact(
+            'events', // Jika masih diperlukan
+            'eventDetails', // Semua partisipasi donatur ini
+            'selectedEvent', // Detail event yang sedang dilihat
+            'totalDonatedAmountByYou', // Total donasi user ini untuk selectedEvent
+            'totalDonationsCountForEvent', // Total jumlah donasi sukses untuk selectedEvent (dari semua donatur)
+            'now' // Waktu sekarang
+            // '$userParticipatedInSelectedEvent' atau '$donationParticipationStatus' jika relevan
+        ));
     }
 
-
-    public function cancelParticipation(Request $request, EventsDonatur $event): RedirectResponse
-    {
-        $volunteerId = Auth::id();
-
-        // Cari record partisipasi yang sesuai
-        $participationRecord = EventsDonaturDetail::where('event_id', $event->id)
-                                                     ->where('volunteer_id', $volunteerId)
-                                                     ->first();
-
-        // Jika record partisipasi ditemukan, hapus
-        if ($participationRecord) {
-            $participationRecord->delete();
-            // Berikan pesan sukses ke user
-            return redirect()->route('volunteer.details.show')->with('success', 'Your participation in the event has been' . $event->event_name . ' successfully canceled.');
-        }
-
-        // Jika tidak ditemukan (misalnya sudah dibatalkan atau tidak pernah terdaftar)
-        return redirect()->route('volunteer.details.show')->with('error', 'You are not registered for this event, or your participation has been cancelled.');
-    }
 
     public function partner()
     {
@@ -288,14 +399,14 @@ class DonaturDashboardController extends Controller
 
     public function notifications()
     {
-        $volunteerId = Auth::id();
+        $donaturId = Auth::id();
         $now = Carbon::now();
-        $notifications = Notification::where('volunteer_id', $volunteerId)
+        $notifications = Notification::where('volunteer_id', $donaturId)
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Tandai semua notifikasi sebagai dibaca
-        Notification::where('volunteer_id', $volunteerId)
+        Notification::where('volunteer_id', $donaturId)
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
@@ -311,8 +422,8 @@ class DonaturDashboardController extends Controller
         }
 
         // Cari detail registrasi event
-        $eventsDetail = EventsDonaturDetail::where('id', $detailId)
-                                            ->where('volunteer_id', $authenticatedUser->id)
+        $eventsDetail = EventsDonationDetails::where('id', $detailId)
+                                            ->where('user_id', $authenticatedUser->id)
                                             ->firstOrFail(); // Pastikan hanya pengguna yang bersangkutan yang bisa mengunduh
 
         // Pastikan statusnya 'accepted' dan event sudah selesai
@@ -328,20 +439,20 @@ class DonaturDashboardController extends Controller
         // Jika sertifikat belum ada, generate
         try {
             $eventName = $eventsDetail->event->event_name;
-            $volunteerName = $authenticatedUser->name; // Asumsi nama volunteer ada di model User
+            $donaturName = $authenticatedUser->name; // Asumsi nama donatur ada di model User
             $startDate = \Carbon\Carbon::parse($eventsDetail->event->start_date)->format('d F Y');
             $endDate = \Carbon\Carbon::parse($eventsDetail->event->end_date)->format('d F Y');
             $issueDate = now()->format('d F Y');
 
             $data = [
-                'volunteerName' => $volunteerName,
+                'donaturName' => $donaturName,
                 'eventName' => $eventName,
                 'startDate' => $startDate,
                 'endDate' => $endDate,
                 'issueDate' => $issueDate,
             ];
 
-            $pdf = PDF::loadView('certifications.volunteer.show', $data);
+            $pdf = PDF::loadView('certifications.donatur.show', $data);
 
             // Tentukan nama file
             $fileName = 'certificate_' . str_replace(' ', '_', $volunteerName) . '_' . str_replace(' ', '_', $eventName) . '.pdf';

@@ -19,6 +19,32 @@
         @livewireStyles
     </head>
 
+    <style>
+        .amount-button.selected {
+            /* Example: Make the selected button stand out */
+            background-color: #FFF0B7; /* A darker red, for instance */
+        }
+
+        /* Optional: You might want to remove the default onClick styling if it conflicts */
+        .amount-button:active {
+            /* Keep a subtle effect for actual press */
+            transform: translateY(1px);
+            box-shadow: 3px 4px 0px rgba(144,43,41,0.8);
+        }
+
+        .payment-method-button.selected {
+            /* Example: Make the selected button stand out */
+            background-color: #FFF0B7; /* A darker red, for instance */
+        }
+
+        /* Optional: You might want to remove the default onClick styling if it conflicts */
+        .payment-method-button:active {
+            /* Keep a subtle effect for actual press */
+            transform: translateY(1px);
+            box-shadow: 3px 4px 0px rgba(144,43,41,0.8);
+        }
+    </style>
+
     <body class="antialiased">
 
         @if(session('success'))
