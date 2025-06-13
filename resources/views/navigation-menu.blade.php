@@ -105,19 +105,19 @@
                         </x-dropdown>
                     </div>
                 @elseif(Auth::user()->role === 'donatur')
-                    <a href="{{ route('guest.about') }}">
+                    <a href="{{ route('donatur.about.show') }}">
                         <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
                                 {{ request()->routeIs('guest.about') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                             About
                         </p>
                     </a>
-                    <a href="{{ route('guest.locations.index') }}" class="flex">
+                    <a href="{{ route('donatur.locations.show') }}" class="flex">
                         <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
                                 {{ request()->routeIs('guest.locations.index') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                 Location
                         </p>
                     </a>
-                    <a href="{{ route('guest.donations') }}" class="flex ">
+                    <a href="{{ route('donatur.donations.show') }}" class="flex ">
                         <p class="font-bold transition duration-300 ease-out  text-sm md:text-xs lg:text-sm xl:text-base
                                 {{ request()->routeIs('guest.donations') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                 Donate
@@ -127,7 +127,7 @@
                         <x-dropdown align="right" width="48" contentClasses="bg-greenbg" dropdownClasses=" shadow-3xl">
                             <x-slot name="trigger">
                                 <span class="inline-flex">
-                                    <button type="button" class="inline-flex items-center font-bold text-creamhh  leading-4 font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base {{ request()->routeIs('guest.partner') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                    <button type="button" class="inline-flex items-center font-bold text-creamhh  leading-4 font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base {{ request()->routeIs('donatur.partner.show') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                         Our Partners
                                         <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -137,13 +137,13 @@
                             </x-slot>
     
                             <x-slot name="content" class="bg-greenbg scroll-smooth">
-                                <x-dropdown-link href="{{ route('guest.partner')}}#community" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                                <x-dropdown-link href="{{ route('donatur.partner.show')}}#community" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
                                     Community
                                 </x-dropdown-link>
-                                <x-dropdown-link href="{{ route('guest.partner')}}#ngo" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                                <x-dropdown-link href="{{ route('donatur.partner.show')}}#ngo" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
                                     NGO
                                 </x-dropdown-link>
-                                <x-dropdown-link href="{{ route('guest.partner')}}#orphanage" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                                <x-dropdown-link href="{{ route('donatur.partner.show')}}#orphanage" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
                                     Orphanage
                                 </x-dropdown-link>
                             </x-slot>
@@ -162,7 +162,6 @@
                             </svg>
                         </a>
 
-
                         @elseif(Auth::user()->role === 'volunteer')
                         <a href="{{ route('volunteer.notification.show') }}">
                             <svg width="30" height="30" viewBox="0 0 31 37" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-blackAuth hover:text-redb transition duration-300 ease-in-out cursor-pointer">
@@ -172,7 +171,7 @@
                         </a>
 
                         @elseif(Auth::user()->role === 'donatur')
-                        <a href="">
+                        <a href="{{ route('donatur.notification.show') }}">
                             <svg width="30" height="30" viewBox="0 0 31 37" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-blackAuth hover:text-redb transition duration-300 ease-in-out cursor-pointer">
                                 <path d="M30.5746 29.1022L30.2258 28.782C29.2364 27.8648 28.3702 26.8132 27.6506 25.6556C26.8641 24.0581 26.3931 22.313 26.2655 20.5232V15.2521C26.2722 12.4411 25.2918 9.72425 23.5083 7.61206C21.7249 5.49986 19.2612 4.13767 16.5801 3.78143V2.40496C16.5801 2.02716 16.4358 1.66484 16.1789 1.39769C15.922 1.13055 15.5736 0.980469 15.2104 0.980469C14.8471 0.980469 14.4987 1.13055 14.2418 1.39769C13.985 1.66484 13.8407 2.02716 13.8407 2.40496V3.80277C11.1836 4.1847 8.74965 5.55512 6.98962 7.66022C5.22958 9.76532 4.26273 12.4624 4.26814 15.2521V20.5232C4.14046 22.313 3.6695 24.0581 2.88304 25.6556C2.17601 26.8105 1.32373 27.862 0.348838 28.782L0 29.1022V32.1112H30.5746V29.1022Z" fill="currentColor"/>
                                 <path d="M12.5889 33.2314C12.6788 33.9078 13.0011 34.5275 13.4961 34.976C13.9912 35.4245 14.6256 35.6716 15.2821 35.6716C15.9387 35.6716 16.573 35.4245 17.0681 34.976C17.5631 34.5275 17.8854 33.9078 17.9753 33.2314H12.5889Z" fill="currentColor"/>

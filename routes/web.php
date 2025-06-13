@@ -97,6 +97,18 @@ Route::middleware([
     // Donatur
     Route::prefix('donatur')->name('donatur.')->middleware('role:donatur')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'donatur'])->name('dashboard'); 
-        Route::get('/donations', [VolunteerDashboardController::class, 'events'])->name('donations.show'); 
+        Route::get('/donations', [DonaturDashboardController::class, 'donations'])->name('donations.show');
+        Route::get('/about', [DonaturDashboardController::class, 'about'])->name('about.show');
+        Route::get('/locations', [DonaturDashboardController::class, 'locations'])->name('locations.show');
+        Route::post('/locations/search', [DonaturDashboardController::class, 'searchLocations'])->name('locations.search');
+        Route::get('/donations/register', [DonaturDashboardController::class, 'eventsRegister'])->name('donations.create');
+        Route::get('/events/register/landing', [DonaturDashboardController::class, 'eventsRegisterLanding'])->name('events.landing');
+        Route::post('/events/register/store', [DonaturDashboardController::class, 'eventsRegisterStore'])->name('events.store');
+        Route::get('/details', [DonaturDashboardController::class, 'details'])->name('details.show');
+        Route::get('/details/events', [DonaturDashboardController::class, 'detailsEvents'])->name('details.details');
+        Route::delete('/donatur/cancel-participation/{event}', [DonaturDashboardController::class, 'cancelParticipation'])->name('cancel_participation');
+        Route::get('/our-partner', [DonaturDashboardController::class, 'partner'])->name('partner.show');
+        Route::get('/notification', [DonaturDashboardController::class, 'notifications'])->name('notification.show');
+        Route::get('/donatur/certificate/download/{detailId}', [DonaturDashboardController::class, 'downloadCertificate'])->name('certificate.download');
     });
 });
