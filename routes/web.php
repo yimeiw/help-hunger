@@ -45,6 +45,9 @@ Route::middleware([
     // Rute dashboard umum, mungkin akan mengarahkan ke dashboard spesifik peran
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    //reports
+    Route::get('/report', [DashboardController::class, 'showReports'])->name('report');
+
     // Admin
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');

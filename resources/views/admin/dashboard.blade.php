@@ -9,7 +9,7 @@
                     <div class="bg-creamcard p-4 rounded-lg shadow-md flex items-center justify-between">
                         <div>
                             <p class="text-sm text-redb font-semibold">Total Donations Collected</p>
-                            <p class="text-2xl font-bold text-redb">Rp{{ number_format($statistics['totalDonationAmount'], 0, ',', '.') }}</p>
+                            <p class="text-2xl font-bold text-redb">IDR{{ number_format($statistics['totalDonationAmount'], 0, ',', '.') }}</p>
                         </div>
                         <img src="{{ asset('/assets/default-icon-donations.svg') }}" alt="Donasi" class="h-12 w-12 text-blue-500"> 
                     </div>
