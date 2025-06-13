@@ -34,7 +34,7 @@
                         <x-dropdown align="right" width="48" contentClasses="bg-greenbg" dropdownClasses=" shadow-3xl">
                             <x-slot name="trigger">
                                 <span class="inline-flex">
-                                    <button type="button" class="inline-flex items-center font-bold text-creamhh  leading-4 font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base {{ request()->routeIs('admin.manage') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                    <button type="button" class="inline-flex items-center font-bold text-creamhh  leading-4 font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base {{ request()->routeIs('admin.manage-user') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                         Manage
                                         <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -43,11 +43,11 @@
                                 </span>
                             </x-slot>
     
-                            <x-slot name="content" class="bg-greenbg scroll-smooth">
-                                <x-dropdown-link href="{{ route('admin.manage')}}#community" class="text-left font-bold text-creamhh lg:text-sm xl:text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                            <x-slot name="content" class="bg-greenbg scroll-smooth mt-4 rounded-lg">
+                                <x-dropdown-link href="{{ route('admin.manage-user')}}" class="text-left font-bold text-creamhh lg:text-sm xl:text-base hover:text-redb transition duration-300 ease-out">
                                     User
                                 </x-dropdown-link>
-                                <x-dropdown-link href="{{ route('admin.manage')}}#ngo" class="text-left font-bold text-creamhh md:text-sm lg:text-sm xl:text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                                <x-dropdown-link href="{{ route('admin.manage-event')}}" class="text-left font-bold text-creamhh md:text-sm lg:text-sm xl:text-base hover:text-redb transition duration-300 ease-out">
                                     Event
                                 </x-dropdown-link>
                             </x-slot>
@@ -92,13 +92,13 @@
                             </x-slot>
     
                             <x-slot name="content" class="bg-greenbg scroll-smooth">
-                                <x-dropdown-link href="{{ route('volunteer.partner.show')}}#community" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                                <x-dropdown-link href="{{ route('volunteer.partner.show')}}#community" class="text-left font-bold text-creamhh text-base hover:text-redb hover:bg-transparent transition duration-300 ease-out">
                                     Community
                                 </x-dropdown-link>
-                                <x-dropdown-link href="{{ route('volunteer.partner.show')}}#ngo" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                                <x-dropdown-link href="{{ route('volunteer.partner.show')}}#ngo" class="text-left font-bold text-creamhh text-base hover:text-redb hover:bg-transparent transition duration-300 ease-out">
                                     NGO
                                 </x-dropdown-link>
-                                <x-dropdown-link href="{{ route('volunteer.partner.show')}}#orphanage" class="text-left font-bold text-creamhh text-base hover:text-redb hover:underline hover:bg-transparent transition duration-300 ease-out">
+                                <x-dropdown-link href="{{ route('volunteer.partner.show')}}#orphanage" class="text-left font-bold text-creamhh text-base hover:text-redb hover:bg-transparent transition duration-300 ease-out">
                                     Orphanage
                                 </x-dropdown-link>
                             </x-slot>

@@ -8,6 +8,9 @@ use App\Http\Controllers\RegisterAddressController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VolunteerDashboardController;
 use App\Http\Controllers\DonaturDashboardController;
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ManageUserController;
+use App\Http\Controllers\ManageEventController;
 
 
 Route::get('/', function () {
@@ -51,28 +54,46 @@ Route::middleware([
     // Admin
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
-        Route::get('/location', [DashboardController::class, 'location'])->name('location');
-        Route::get('/report', [DashboardController::class, 'report'])->name('report');
-        Route::get('/manage', [DashboardController::class, 'manage'])->name('manage');
-        Route::get('/manage/manage-user', [DashboardController::class, 'manageUser'])->name('manage.user');
-        Route::get('/manage/manage-event', [DashboardController::class, 'manageEvent'])->name('manage.event');
-        // User: volunteer, donatur, partner
-        Route::get('/manage/manage-user/volunteer', [AdminController::class, 'manageVolunteer'])->name('manage.user.volunteer');
-        Route::get('/manage/manage-user/donatur', [AdminController::class, 'manageDonatur'])->name('manage.user.donatur');
-        Route::get('/manage/manage-user/partner', [AdminController::class, 'managePartner'])->name('manage.user.partner');
+        Route::get('/location', [AdminDashboardController::class, 'location'])->name('location');
+        Route::get('/report', [AdminDashboardController::class, 'report'])->name('report');
+        Route::get('/manage-user', [AdminDashboardController::class, 'manageUser'])->name('manage-user');
+        Route::get('/manage-event', [AdminDashboardController::class, 'manageEvent'])->name('manage-event');
+        
+        Route::prefix('manage')->name('manage.')->group(function () {
 
-        // Event: volunteer, donation
-        Route::get('/manage/manage-event/volunteer', [AdminController::class, 'manageEventVolunteer'])->name('manage.event.volunteer');
-        Route::get('/manage/manage-event/donation', [AdminController::class, 'manageEventDonation'])->name('manage.event.donation');
+            Route::prefix('user')->name('user.')->group(function () {
+                Route::get('/', function () {
+                    return redirect()->route('admin.manage.user.volunteer');
+                })->name('user');
 
-        Route::delete('/manage/manage-user/volunteer/{id}', [AdminController::class, 'deleteVolunteer'])->name('manage.user.volunteer.delete');
-        Route::delete('/manage/manage-user/donatur/{id}', [AdminController::class, 'deleteDonatur'])->name('manage.user.donatur.delete');
-        Route::delete('/manage/manage-user/partner/{id}', [AdminController::class, 'deleteVolunteer'])->name('manage.user.partner.delete');
+                Route::get('/volunteer', [AdminDashboardController::class, 'manageVolunteer'])->name('volunteer');
+                Route::get('/donatur', [AdminDashboardController::class, 'manageDonatur'])->name('donatur');
+                Route::get('/partner', [AdminDashboardController::class, 'managePartner'])->name('partner');
+    
+                Route::delete('/volunteer/{id}', [AdminDashboardController::class, 'deleteVolunteer'])->name('volunteer.delete');
+                Route::delete('/donatur/{id}', [AdminDashboardController::class, 'deleteDonatur'])->name('donatur.delete');
+                Route::delete('/partner/{id}', [AdminDashboardController::class, 'deletePartner'])->name('partner.delete');
 
-        Route::post('/manage/manage-event/volunteer', [AdminController::class, 'storeEventVolunteer'])->name('manage.event.volunteer.store');
-        Route::delete('/manage/manage-event/volunteer/{id}', [AdminController::class, 'deleteEventVolunteer'])->name('manage.event.volunteer.delete');
-        Route::post('/manage/manage-event/donation', [AdminController::class, 'storeEventDonation'])->name('manage.event.donation.store');
-        Route::delete('/manage/manage-event/donation/{id}', [AdminController::class, 'deleteEventDonation'])->name('manage.event.donation.delete');
+            });
+
+            Route::prefix('event')->name('event.')->group(function () {
+                Route::get('/volunteer/add', function () {
+                    return view('admin.manage.event.addVolunteer');
+                })->name('volunteer.add');
+
+                Route::get('/donatur/add', function () {
+                    return view('admin.manage.event.addDonation');
+                })->name('donation.add');
+
+                Route::get('/volunteer', [AdminDashboardController::class, 'manageEventVolunteer'])->name('volunteer');
+                Route::post('/volunteer', [AdminDashboardController::class, 'storeEventVolunteer'])->name('volunteer.store');
+                Route::delete('/volunteer/{id}', [AdminDashboardController::class, 'deleteEventVolunteer'])->name('volunteer.delete');
+
+                Route::get('/donation', [AdminDashboardController::class, 'manageEventDonation'])->name('donation');
+                Route::post('/donation', [AdminDashboardController::class, 'storeEventDonation'])->name('donation.store');
+                Route::delete('/donation/{id}', [AdminDashboardController::class, 'deleteEventDonation'])->name('donation.delete');
+            });
+        });
 
     });
 

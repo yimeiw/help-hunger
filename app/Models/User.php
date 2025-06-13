@@ -10,10 +10,12 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\EventsVolunteersDetail;
+use App\Models\EventsDonationDetails;
 use App\Models\Provinces;
 use App\Models\Cities;
-use App\Models\EventsVolunteersDetail; // Import model pivot
-
+use App\Models\Donation;
+use App\Models\Notification;
 
 class User extends Authenticatable
 {
@@ -87,6 +89,21 @@ class User extends Authenticatable
         return $this->belongsTo(Cities::class, 'city_id');
     }
 
+    public function donations()
+    {
+        return $this->hasMany(Donation::class, 'user_id');
+    }
+
+    public function volunteerActivities()
+    {
+        return $this->hasMany(EventsVolunteersDetail::class, 'volunteer_id');
+    }
+
+    public function donationActivities()
+    {
+        return $this->hasMany(EventsDonationDetails::class, 'donation_id');
+    }
+
     public function eventVolunteersDetails()
     {
         return $this->hasMany(EventsVolunteersDetail::class, 'volunteer_id');
@@ -99,7 +116,7 @@ class User extends Authenticatable
 
     public function notifications()
     {
-        return $this->hasMany(Notification::class, 'volunteer_id');
+        return $this->hasMany(Notification::class, 'user_id');
     }
 
     public function isAdmin()
@@ -117,7 +134,7 @@ class User extends Authenticatable
         return $this->role === 'donatur';
     }
 
-    // ✅ sebagai volunteer
+    //sebagai volunteer
     public function volunteeredEvents()
     {
         return $this->belongsToMany(EventsVolunteers::class, 'events_volunteers_detail', 'volunteer_id',     'event_id')->withPivot('status')
@@ -130,9 +147,10 @@ class User extends Authenticatable
                    ->withTimestamps();
     }
 
-    // ✅ sebagai donatur
-    public function donations()
+    //sebagai donatur
+    public function donatur()
     {
         return $this->hasMany(Donation::class, 'donatur_id');
     }
+
 }

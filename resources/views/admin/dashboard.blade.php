@@ -1,6 +1,6 @@
 <x-app-layout>
     @section('title', 'Admin Dashboard')
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <h3 class="flex items-center justify-center text-[32px] font-bold text-redb mb-4">Summary Statistics</h3>
             <div class="bg-greenbg overflow-hidden shadow-xl sm:rounded-lg p-12">
