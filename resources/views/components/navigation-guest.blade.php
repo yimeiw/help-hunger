@@ -1,6 +1,6 @@
 @if (Route::has('register'))
 <header class="font-[poppins] min-w-full not-has-[nav]:hidden bg-greenbg">
-    <nav class="flex flex-wrap items-center gap-24 md:gap-8 lg:gap-24 xl:gap-24">
+    <nav class="flex flex-wrap items-center gap-20 md:gap-8 lg:gap-20 xl:gap-24">
         <a href="{{ route('guest.welcome') }}" class="m-4 ms-6">
             <svg class="w-40 md:w-32 lg:w-40 xl:w-52" width="162" height="76" viewBox="0 0 162 76" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <rect x="0.730225" width="160.539" height="76" fill="url(#pattern0_820_4209)"/>
@@ -69,12 +69,19 @@
             </div>
         </div>
 
-        <div class="flex justify-end ms-8 md:ms-6 lg:ms-8">
+        <div class="flex justify-end gap-4">
             <a
                 href="{{ route('register') }}"
-                class="flex items-center justify-center font-bold text-base text-redb border-redb bg-creamhh w-28 h-10 md:w-20 md:text-xs lg:text-sm lg:w-28 xl:text-base xl:w-32 border rounded-lg hover:border-greenbg hover:text-greenbg transition duration-300 ease-in-out">
+                class="flex items-center justify-center font-bold text-base text-redb border-redb bg-creamhh w-20 h-10 md:w-20 md:text-xs lg:w-20 xl:text-sm xl:w-32 border rounded-lg hover:border-greenbg hover:text-greenbg transition duration-300 ease-in-out">
                 Register
             </a>
+            
+            <a
+                href="{{ route('partner.register') }}"
+                class="flex items-center justify-center px-2 text-center font-bold text-base text-redb border-redb bg-creamhh w-24 h-10 md:w-20 md:text-xs lg:w-24 xl:text-sm xl:w-32 border rounded-lg hover:border-greenbg hover:text-greenbg transition duration-300 ease-in-out">
+                Register as Partner
+            </a>
+
         </div>
     </nav>
 </header>

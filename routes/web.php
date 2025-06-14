@@ -12,6 +12,9 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\ManageEventController;
 
+use App\Http\Controllers\RegisterPartnerController;
+use App\Http\Controllers\LoginPartnerController; 
+use App\Http\Controllers\PartnerController; 
 
 Route::get('/', function () {
     return redirect()->route('guest.welcome'); // Selalu redirect ke guest.welcome
@@ -28,15 +31,44 @@ Route::prefix('guest')->name('guest.')->group(function () { // Mengelompokkan ru
     Route::get('/our-partner', [GuestController::class, 'indexPartner'])->name('partner');
 });
 
+Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah titik (.) di name()
+    // Login Routes
+    Route::get('/login', [LoginPartnerController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginPartnerController::class, 'login'])->name('login.attempt');
+    Route::post('/logout', [LoginPartnerController::class, 'logout'])->name('logout');
+
+    // Registration Routes for Partner
+    // Perhatikan: Anda sudah di dalam prefix 'partner', jadi '/register/partner' akan menjadi '/partner/register/partner'.
+    // Cukup gunakan '/register' di sini.
+    Route::get('/register', [RegisterPartnerController::class, 'create'])->name('register'); // Asumsi method 'create' untuk menampilkan form
+    Route::post('/register', [RegisterPartnerController::class, 'store'])->name('register.store'); // Asumsi method 'store' untuk memproses registrasi
+
+    // Dashboard Route for Partner
+    // Pastikan ini dilindungi oleh middleware 'auth:partner'
+    Route::middleware('auth:partner')->group(function () {
+        // Karena sudah di prefix 'partner', cukup '/dashboard'
+        Route::get('/dashboard', [PartnerController::class, 'index'])->name('dashboard');
+        Route::get('/about', [PartnerController::class, 'about'])->name('about.show');
+        Route::get('/locations', [PartnerController::class, 'locations'])->name('locations.show');
+        Route::get('/program', [PartnerController::class, 'program'])->name('program.show');
+        Route::get('/report', [PartnerController::class, 'report'])->name('report.show');
+        Route::get('/notifications', [PartnerController::class, 'notifications'])->name('notifications.show');
+        Route::get('/profile', [PartnerController::class, 'profile'])->name('profile.show');
+    });
+});
+
+
 // Registration Routes
 Route::group([], function () { // Mengelompokkan rute registrasi
     Route::get('/register', [RegisterUserController::class, 'index'])->name('register');
-    Route::post('/register', [RegisterUserController::class, 'register']); // Nama rute 'register' sudah cukup untuk GET
+    Route::post('/register', [RegisterUserController::class, 'register']);
     Route::get('/register/role', [RegisterRoleController::class, 'index'])->name('register.role');
     Route::post('/register/role', [RegisterRoleController::class, 'registerRole']);
     Route::get('/register/address', [RegisterAddressController::class, 'index'])->name('register.address');
     Route::post('/register/address', [RegisterAddressController::class, 'registerAddress']);
     Route::get('/register/cities/{provinceId}', [RegisterAddressController::class, 'getCities'])->name('getCities');
+
+   
 });
 
 
