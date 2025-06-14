@@ -2,11 +2,13 @@
     @section('title', 'Register Account')
     <div class="flex flex-row justify-between items-center">
         <a href="#" onclick="history.back(); return false;" class="flex justify-end m-6">
-                <img src="{{ asset('/assets/back-button.svg') }}" alt="" class="w-10 h-10">
+                <img src="{{ asset('/assets/back-button.svg') }}" onmouseover="this.src='/assets/back-hover.svg'" 
+                        onmouseout="this.src='/assets/back-button.svg'" alt="" class="w-10 h-10">
             </a>
     
         <a href="{{ route('guest.welcome') }}" onclick="resetFormsAndNavigate(event);" class="flex justify-end m-6">
-            <img src="{{ asset('/assets/close-button.svg') }}" alt="" class="w-8 h-8">
+            <img src="{{ asset('/assets/close-button.svg') }}" onmouseover="this.src='/assets/close-hover.svg'" 
+                        onmouseout="this.src='/assets/close-button.svg'" alt="" class="w-8 h-8">
         </a>
     </div>
 

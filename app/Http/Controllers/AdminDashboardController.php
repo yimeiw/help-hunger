@@ -10,18 +10,20 @@ use App\Models\EventsDonatur;
 use App\Models\LocationVolunteers;
 use App\Models\LocationDonatur;
 use App\Models\Notification;
+use App\Models\Location;
+use App\Models\Provinces;
+use App\Models\Cities;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
 {
-        public function location(){
+    public function location(){
         return view('admin.location');
     }
 
-    public function report(Request $request)
-    {
+    public function report(Request $request){
          // Inisialisasi variabel waktu dan collection
         $now = Carbon::now();
         $monthlyDonations = collect(); // Kumpulkan data donasi per bulan
@@ -50,6 +52,10 @@ class AdminDashboardController extends Controller
         $roleNames = $userRoles->pluck('role')->toArray();
         $roleCounts = $userRoles->pluck('count')->toArray();
 
+        $communityCount = Partner::where('type', 'community')->count();
+        $ngoCount = Partner::where('type', 'ngo')->count();
+        $orphanageCount = Partner::where('type', 'orphanage')->count();
+
         // --- Laporan Partisipasi Volunteer per Event (contoh sederhana) ---
         // Ini akan lebih baik jika ada relasi yang terdefinisi dengan baik antara Event dan EventsVolunteersDetail
         $topEventsByVolunteers = EventsVolunteers::select('event_name')
@@ -68,8 +74,8 @@ class AdminDashboardController extends Controller
                 'data' => $monthlyDonations->pluck('total'),
             ],
             'userRoles' => [
-                'labels' => $roleNames,
-                'data' => $roleCounts
+                'labels' => array_merge($roleNames, ['Community', 'NGO', 'Orphanage']),
+                'data' => array_merge($roleCounts, [$communityCount, $ngoCount, $orphanageCount])
             ],
             'topEventsByVolunteers' => [
                 'labels' => $eventNames,
@@ -86,38 +92,49 @@ class AdminDashboardController extends Controller
 
     public function manageUser(Request $request) {
         $role = $request->query('role');
-        $query = User::query(); // Inisialisasi query
+        $query = User::query();
 
-        // Eager load counts untuk total kegiatan. Gunakan nama relasi yang benar dari User.php
+        if ($role === 'partner') {
+            // Ambil data dari tabel partners
+            $partners = Partner::paginate(10);
+
+            return view('admin.manage-user', [
+                'users' => null,
+                'partners' => $partners,
+                'role' => $role,
+            ]);
+        }
+
+
         $query->withCount([
-            'volunteerActivities as total_volunteered_activities', // Menghitung partisipasi volunteer
-            'donationActivities as total_donated_activities'      // Menghitung donasi yang terkait event
+            'volunteerActivities as total_volunteered_activities',
+            'donationActivities as total_donated_activities'
         ]);
 
-        // Filter berdasarkan Peran
-        if ($role && $role != '') {
-            $validUserRoles = ['admin', 'volunteer', 'donatur', 'partner'];
-            if (in_array($role, $validUserRoles)) {
+        if ($role && $role !== '') {
+            $validRoles = ['admin', 'volunteer', 'donatur'];
+            if (in_array($role, $validRoles)) {
                 $query->where('role', $role);
-            } else {
-                $role = null; // Reset filter untuk menghindari error atau tampilan aneh
             }
         }
 
-        // Fitur Pencarian (opsional, jika ingin ditambahkan)
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('username', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('phone', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
             });
         }
 
         $users = $query->paginate(10);
 
-        return view('admin.manage-user', compact('users', 'role'));
+        return view('admin.manage-user', [
+            'users' => $users,
+            'partners' => null,
+            'role' => $role,
+        ]);
     }
 
     public function deleteUser(User $user)
@@ -190,18 +207,76 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'Event donasi berhasil ditambahkan.');
     }
 
-    public function searchLocations()
+    public function manageLocation(Request $request)
     {
-        $zipcode = request()->input('zipcode');
+        $type = $request->get('type', 'volunteer');
+        $search = $request->get('search');
 
-        $locations = LocationVolunteers::with('events_volunteers.partner')
-            ->where('zipcode', $zipcode)
-            ->get();
+        $Model = $this->getLocationModel($type);
 
-        if ($locations->isNotEmpty()) {
-            return view('admin.location.search', compact('locations'));
-        } else {
-            return redirect()->back()->with('error', 'No locations found.');
-        }
+        $locations = $Model::with(['province', 'city'])
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%")
+                      ->orWhere('address', 'like', "%$search%")
+                      ->orWhere('zipcode', 'like', "%$search%")
+                      ->orWhereHas('province', fn($q) => $q->where('province_name', 'like', "%$search%"))
+                      ->orWhereHas('city', fn($q) => $q->where('cities_name', 'like', "%$search%"));
+            })
+            ->paginate(10);
+
+        $provinces = Provinces::all();
+        $cities = Cities::all();
+
+        return view('admin.location', compact('locations', 'type', 'search', 'provinces', 'cities'));
     }
+
+    public function storeLocation(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'province' => 'required|exists:provinces,id',
+            'city' => 'required|exists:cities,id',
+            'zipcode' => 'required|string|max:10',
+            'type' => 'required|in:volunteer,donation,donatur',
+        ]);
+
+        $Model = $this->getLocationModel($request->type);
+
+        $Model::create([
+            'name' => $request->name,
+            'address' => $request->address,
+            'province_id' => $request->province,
+            'city_id' => $request->city,
+            'zipcode' => $request->zipcode,
+            'latitude' => $city->latitude ?? 0.0,
+            'longitude' => $city->longitude ?? 0.0,
+        ]);
+
+        return redirect()->route('admin.location', ['type' => $request->type])
+                         ->with('success', 'Location added successfully!');
+    }
+
+    public function deleteLocation($id, Request $request)
+    {
+        $type = $request->get('type', 'volunteer');
+        $Model = $this->getLocationModel($type);
+
+        $location = $Model::findOrFail($id);
+        $location->delete();
+
+        return redirect()->route('admin.location', ['type' => $type])
+                         ->with('success', 'Location deleted successfully!');
+    }
+
+    private function getLocationModel($type)
+    {
+        return match($type) {
+            'volunteer' => new LocationVolunteers,
+            'donation' => new LocationDonation,
+            'donatur' => new LocationDonatur,
+            default => new LocationVolunteer,
+        };
+    }
+
 }

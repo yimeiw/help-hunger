@@ -86,7 +86,7 @@ Route::middleware([
     // Admin
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
-        Route::get('/location', [AdminDashboardController::class, 'location'])->name('location');
+        Route::get('/location', [AdminDashboardController::class, 'manageLocation'])->name('location');
         Route::get('/report', [AdminDashboardController::class, 'report'])->name('report');
         Route::get('/manage-user', [AdminDashboardController::class, 'manageUser'])->name('manage-user');
         Route::get('/manage-event', [AdminDashboardController::class, 'manageEvent'])->name('manage-event');
@@ -127,6 +127,10 @@ Route::middleware([
             });
         });
 
+        Route::prefix('location')->name('location.')->group(function () {
+            Route::post('/store', [AdminDashboardController::class, 'storeLocation'])->name('store');
+            Route::delete('/delete/{id}', [AdminDashboardController::class, 'deleteLocation'])->name('delete');
+        });
     });
 
     // Volunteer ini yang diubah

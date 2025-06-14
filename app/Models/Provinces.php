@@ -13,7 +13,7 @@ class Provinces extends Model
 
     public function cities()
     {
-        return $this->hasMany(Cities::class, 'province_id');
+        return $this->hasMany(Cities::class);
     }
 
     public function location_donatur()
