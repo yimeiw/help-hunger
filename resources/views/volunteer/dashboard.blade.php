@@ -162,7 +162,7 @@
                             @endforeach
                              
                             <div class="flex items-end">
-                                <a href="{{ route('guest.donations') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                                <a href="{{ route('logout') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                                     View More
                                     <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
                                 </a>

@@ -47,4 +47,15 @@ class Partner extends Authenticatable // <-- Ubah dari Model menjadi Authenticat
     {
         return $this->hasMany(PartnerAccounts::class);
     }
+
+    public function eventsVolunteers() // Nama relasi yang akan digunakan di with()
+    {
+        return $this->hasMany(EventsVolunteers::class, 'partner_id');
+    }
+
+    public function eventsDonatur() // Nama relasi yang akan digunakan di with()
+    {
+        return $this->hasMany(EventsDonatur::class, 'partner_id');
+    }
+
 }

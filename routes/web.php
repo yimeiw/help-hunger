@@ -50,6 +50,7 @@ Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah ti
         Route::get('/dashboard', [PartnerController::class, 'index'])->name('dashboard');
         Route::get('/about', [PartnerController::class, 'about'])->name('about.show');
         Route::get('/locations', [PartnerController::class, 'locations'])->name('locations.show');
+        Route::post('/locations/search', [PartnerController::class, 'searchLocation'])->name('locations.search');
         Route::get('/program', [PartnerController::class, 'program'])->name('program.show');
         Route::get('/report', [PartnerController::class, 'report'])->name('report.show');
         Route::get('/notifications', [PartnerController::class, 'notifications'])->name('notifications.show');
