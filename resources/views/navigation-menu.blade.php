@@ -68,13 +68,13 @@
                     </a>
                     <a href="{{ route('volunteer.events.show') }}" class="flex ">
                         <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
-                                {{ request()->routeIs('guest.events') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                {{ request()->routeIs('volunteer.events.show') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                 Event
                         </p>
                     </a>
                     <a href="{{ route('volunteer.details.show') }}" class="flex ">
                         <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
-                                {{ request()->routeIs('guest.events') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
+                                {{ request()->routeIs('volunteer.details.show') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
                                 Details
                         </p>
                     </a>

@@ -17,6 +17,10 @@ export default {
                 sans: ['Poppins', 'Noto Sans', 'sans-serif'],
                 poppins: ['Poppins', 'sans-serif'],
                 noto: ['Noto Sans', 'sans-serif'],
+                garet: ['Garet', 'cursive'],
+                greatVibes: ['Great Vibes', 'cursive'],
+                passion: ['Passion One', 'cursive'],// Jalnan
+                lilita: ['Lilita One', 'cursive'],
             },
             colors: {
                 'creamhh': '#FFF0B7',

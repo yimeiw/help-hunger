@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('donation', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('donatur_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('event_id')->constrained('events_donatur')->onDelete('cascade');
             $table->float('amount');
             $table->enum('payment_status', ['pending', 'success', 'failed'])->default('pending');
             $table->datetime('payment_date');
             $table->string('payment_proof')->nullable();
             $table->enum('payment_method', ['BCA', 'Master Card', 'Link Aja'])->default('BCA');
+            $table->string('certificate_path')->nullable();
             $table->string('receipt_url')->nullable();                 
             $table->string('transaction_reference')->nullable();      
-            $table->foreignId('donatur_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('event_id')->constrained('events_donatur')->onDelete('cascade');
             $table->timestamps();
         });
     }

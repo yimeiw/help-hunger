@@ -23,7 +23,6 @@ use PDF;
 
 class DonaturDashboardController extends Controller
 {
-    
     public function about(){
         return view('donatur.about.show');
     }
@@ -213,8 +212,7 @@ class DonaturDashboardController extends Controller
     }
 
 
-    public function details(Request $request): View
-    {
+    public function details(Request $request): View{
         $donaturId = Auth::id(); // Ini adalah ID dari user/donatur yang sedang login
 
         // Query untuk mendapatkan SEMUA event yang diikuti oleh donatur ini
@@ -260,8 +258,7 @@ class DonaturDashboardController extends Controller
         return view('donatur.details.show', compact('eventsDetail', 'filter', 'filteredEventCount'));
     }
 
-    public function detailsEvents(Request $request): View
-    {
+    public function detailsEvents(Request $request): View{
         $donaturId = Auth::id(); // ID dari user yang sedang login (sebagai Donatur)
         $now = Carbon::now();
 
@@ -421,56 +418,95 @@ class DonaturDashboardController extends Controller
             return redirect()->route('login')->with('error', 'Please log in to download your certificate.');
         }
 
-        // Cari detail registrasi event
-        $eventsDetail = EventsDonationDetails::where('id', $detailId)
-                                            ->where('user_id', $authenticatedUser->id)
-                                            ->firstOrFail(); // Pastikan hanya pengguna yang bersangkutan yang bisa mengunduh
+        // Find the event registration detail, ensuring it belongs to the authenticated user.
+        // If not found or not owned, firstOrFail() will throw a 404.
+        $eventsDetail = EventsDonationDetails::where('events_donation_details.id', $detailId)
+            ->whereHas('donation', function ($query) use ($authenticatedUser) {
+                $query->where('donatur_id', $authenticatedUser->id); // Assuming 'user_id' is on your 'Donation' model
+            })
+            ->firstOrFail();
 
-        // Pastikan statusnya 'accepted' dan event sudah selesai
-        if ($eventsDetail->status !== 'accepted' || now()->lt($eventsDetail->event->end_date)) {
-            return redirect()->back()->with('error', 'Certificate is not available for download yet.');
+        // Check if the event has actually ended. If not, the certificate isn't available.
+        if (now()->lt($eventsDetail->event->end_date)) {
+            return redirect()->back()->with('error', 'Certificate is not available for download yet. The event has not ended.');
         }
 
-        // Cek apakah sertifikat sudah ada
-        if ($eventsDetail->certificate_path && Storage::disk('public')->exists($eventsDetail->certificate_path)) {
-            return Storage::disk('public')->download($eventsDetail->certificate_path);
-        }
+        // --- NEW LOGIC FOR ONE CERTIFICATE PER EVENT PER DONATUR ---
+        // Before generating a new certificate, check if ANY donation by this user for THIS event already has a certificate.
+        // This assumes your User model has a 'donations' relationship.
+        $existingCertificateDonation = $authenticatedUser->donations()
+            ->where('event_id', $eventsDetail->event->id)
+            ->whereNotNull('certificate_path')
+            ->first(); // Get the first donation for this event by this user that has a certificate path
 
-        // Jika sertifikat belum ada, generate
+        if ($existingCertificateDonation && Storage::disk('public')->exists($existingCertificateDonation->certificate_path)) {
+            // If an existing certificate is found, download that one instead of generating a new one.
+            return Storage::disk('public')->download($existingCertificateDonation->certificate_path);
+        }
+        // --- END NEW LOGIC ---
+
+        // If we reach here, it means no certificate exists for this user for this event,
+        // so we proceed to generate one.
         try {
             $eventName = $eventsDetail->event->event_name;
-            $donaturName = $authenticatedUser->name; // Asumsi nama donatur ada di model User
-            $startDate = \Carbon\Carbon::parse($eventsDetail->event->start_date)->format('d F Y');
-            $endDate = \Carbon\Carbon::parse($eventsDetail->event->end_date)->format('d F Y');
+            $donaturName = $authenticatedUser->name;
+            $role = $authenticatedUser->role;
+            $startDate = Carbon::parse($eventsDetail->event->start_date)->format('d F Y');
+            $endDate = Carbon::parse($eventsDetail->event->end_date)->format('d F Y');
             $issueDate = now()->format('d F Y');
+
+            $partnerName = null;
+            $partnerType = null;
+
+            if ($eventsDetail->event->partner) {
+                $partnerName = $eventsDetail->event->partner->partner_name;
+                $partnerType = $eventsDetail->event->partner->type;
+            }
 
             $data = [
                 'donaturName' => $donaturName,
+                'role' => $role,
                 'eventName' => $eventName,
                 'startDate' => $startDate,
                 'endDate' => $endDate,
                 'issueDate' => $issueDate,
+                'partnerName' => $partnerName,
+                'partnerType' => $partnerType,
             ];
 
-            $pdf = PDF::loadView('certifications.donatur.show', $data);
+            $htmlContent = view('certifications.donatur.show', $data)->render();
+            file_put_contents(storage_path('app/public/debug_certificate.html'), $htmlContent); // Simpan ke storage
+            $pdf = PDF::loadView('certifications.donatur.show', $data)
+                  ->setPaper('A4', 'landscape')
+                  ->setOptions(['isRemoteEnabled' => true]);
 
-            // Tentukan nama file
-            $fileName = 'certificate_' . str_replace(' ', '_', $volunteerName) . '_' . str_replace(' ', '_', $eventName) . '.pdf';
+            // Tentukan nama file yang unik untuk setiap sertifikat
+            // Menggunakan ID donasi sebagai bagian dari nama file memastikan keunikan
+            $fileName = 'certificate_' . str_replace(' ', '_', $donaturName) . '_' . str_replace(' ', '_', $eventName) . '_' . $eventsDetail->donation->id . '.pdf';
             $filePath = 'certificates/' . $fileName;
 
             // Simpan PDF ke storage
             Storage::disk('public')->put($filePath, $pdf->output());
 
-            // Update path sertifikat di database
-            $eventsDetail->certificate_path = $filePath;
-            $eventsDetail->save();
+            // Update path sertifikat di model Donation yang terkait
+            $eventsDetail->donation->certificate_path = $filePath;
+            $eventsDetail->donation->save();
 
             // Unduh file PDF
             return Storage::disk('public')->download($filePath);
 
         } catch (\Exception $e) {
-            Log::error('Error generating certificate: ' . $e->getMessage(), ['detail_id' => $detailId, 'user_id' => $authenticatedUser->id]);
-            // dd($e->getMessage(), $e->getTraceAsString());
+            // Log the full error for debugging in server logs
+            Log::error('Error generating certificate: ' . $e->getMessage(), [
+                'detail_id' => $detailId,
+                'donatur_id' => $authenticatedUser->id,
+                'exception_trace' => $e->getTraceAsString(), // Add full trace for more context
+            ]);
+
+            // For development, you can use dd() to see the error immediately.
+            // For production, remove/comment out dd() and rely on the redirect with error message.
+            dd($e->getMessage());
+
             return redirect()->back()->with('error', 'Failed to generate certificate. Please try again later.');
         }
     }
