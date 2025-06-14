@@ -17,10 +17,11 @@ class EventsVolunteersSeeder extends Seeder
             [
                 'event_name' => 'Relawan "Makan Siang Gratis"',
                 'event_description' => 'Program ini bertujuan menyediakan makan siang bergizi bagi anak-anak sekolah dasar dari keluarga kurang mampu. Relawan akan membantu dalam persiapan, pengemasan, dan distribusi makanan, serta memberikan edukasi mengenai pentingnya gizi seimbang.',
-                'start_date' => '23-6-2025',
-                'end_date' => '23-8-2025',
+                'start_date' => '2025-06-16',
+                'end_date' => '2025-08-23',
                 'partner_id' => 3,
                 'location_id' => 1,
+                'status' => 'accepted',
                 'image_path' => 'assets/maksigratis-img.svg',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -29,10 +30,11 @@ class EventsVolunteersSeeder extends Seeder
             [
                 'event_name' => '"Dari Pasar ke Piring" – Penyelamatan Sayur & Buah di Pasar Tradisional',
                 'event_description' => 'Kegiatan ini bertujuan menyelamatkan sayur dan buah layak konsumsi yang tidak terjual di pasar tradisional untuk didistribusikan kepada masyarakat yang membutuhkan. Relawan akan membantu dalam proses penyortiran, pengemasan, dan distribusi makanan, serta memberikan edukasi kepada pedagang tentang pengurangan limbah makanan.',
-                'start_date' => '30-6-2025',
-                'end_date' => '30-8-2025',
+                'start_date' => '2025-06-30',
+                'end_date' => '2025-08-30',
                 'partner_id' => 3,
                 'location_id' => 2,
+                'status' => 'accepted',
                 'image_path' => 'assets/sayurbuah-img.svg',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -48,10 +50,11 @@ class EventsVolunteersSeeder extends Seeder
                 Selain bantuan pangan, perhatian terhadap kesehatan warga juga menjadi prioritas. Melalui Dinas Kesehatan Kota Gorontalo dan dukungan dari Universitas Negeri Gorontalo (UNG), pelayanan kesehatan darurat diberikan kepada masyarakat yang terdampak, khususnya karena tingginya risiko penyakit akibat genangan air yang berlangsung cukup lama.
 
                 Langkah preventif juga sedang dipersiapkan oleh Pemerintah Kota dan Provinsi Gorontalo. Mereka berkomitmen untuk memperbaiki infrastruktur yang menjadi salah satu penyebab utama terjadinya banjir dan longsor. Koordinasi telah dilakukan bersama balai sungai, balai jalan, dan lembaga terkait lainnya untuk melakukan rekonstruksi serta pencegahan bencana serupa di masa mendatang. Upaya ini mencerminkan keseriusan pemerintah daerah dalam melindungi keselamatan warganya sekaligus memulihkan kondisi sosial dan lingkungan pasca bencana.',
-                'start_date' => '12-7-2024',
-                'end_date' => '12-7-2024',
+                'start_date' => '2024-07-12',
+                'end_date' => '2024-07-12',
                 'partner_id' => 4,
                 'location_id' => 3,
+                'status' => 'accepted',
                 'image_path' => 'assets/gorontalo-img.svg',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -66,10 +69,11 @@ class EventsVolunteersSeeder extends Seeder
                 Para volunteer membantu mengemas snack dan minuman ke dalam plastik yang telah disediakan. Setelah dikemas, para volunteer membagikan bingkisan takjil tersebut ke pengguna jalan di sekitar BINUS @Senayan.
 
                 Selain dapat meningkatkan rasa peduli dengan sesama, berbagi takjil ini dapat merasakan ibdahnya berbagi keberkahan dengan orang lain.',
-                'start_date' => '1-4-2024',
-                'end_date' => '2-4-2024',
+                'start_date' => '2024-04-01',
+                'end_date' => '2024-04-02',
                 'partner_id' => 3,
                 'location_id' => 4,
+                'status' => 'accepted',
                 'image_path' => 'assets/takjil-img.svg',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -85,10 +89,11 @@ class EventsVolunteersSeeder extends Seeder
                 Kegiatan Disney VoluntEARS juga di hadiri oleh Dr. Nelly, S.Kom., M.M. selaku Rektor BINUS UNIVERSITY, Dr. Ir. Yohannes Kurniawan, S.Kom., S.E., MMSI. selaku Vice Rector Student Affairs BINUS University, Irma Irawati Ibrahim, SS., M.Kom. selaku Deputy Campus Director BINUS @Alam Sutera, Ibu Tursiana Setyohapsari selaku Head Of Corporate Communication The Walt Disney Company dan Tiki Keh selaku President Rise Against Hunger Malaysia.
 
                 Melalui kegiatan ini, diharapkan para BINUSIAN dapat terus berkontribusi bagi masyarakat salah satunya dengan kegiatan pengemasan bahan makanan untuk masyarakat yang kurang mampu. Selain itu, kegiatan ini dapat meningkatkan jiwa social dan rasa saling peduli kepada masyarakat di sekitarnya.',
-                'start_date' => '21-9-2025',
-                'end_date' => '21-9-2025',
+                'start_date' => '2025-09-21',
+                'end_date' => '2025-09-21',
                 'partner_id' => 4,
                 'location_id' => 5,
+                'status' => 'accepted',
                 'image_path' => 'assets/disney-img.svg',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -106,10 +111,11 @@ class EventsVolunteersSeeder extends Seeder
 
                 Kegiatan ini merupakan bagian dari program pertukaran budaya tahunan antara kedua universitas yang bertujuan memperkenalkan budaya Indonesia secara langsung kepada mahasiswa asing. Di sisi lain, mahasiswa lokal juga memperoleh pengalaman berharga dalam membangun jejaring internasional, memperluas wawasan global, serta meningkatkan kemampuan komunikasi lintas budaya.
                 Secara keseluruhan, kegiatan ini tidak hanya menekankan nilai edukatif dan kuliner, tetapi juga menumbuhkan empati sosial, kerja sama lintas bangsa, serta membentuk generasi muda yang lebih terbuka terhadap keberagaman budaya global.',
-                'start_date' => '9-8-2024',
-                'end_date' => '9-8-2024',
+                'start_date' => '2024-08-09',
+                'end_date' => '2024-08-09',
                 'partner_id' => 3,
                 'location_id' => 6,
+                'status' => 'accepted',
                 'image_path' => 'assets/meiji-img.svg',
                 'created_at' => now(),
                 'updated_at' => now(),

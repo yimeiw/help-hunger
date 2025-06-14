@@ -13,6 +13,8 @@ class EventsDonatur extends Model
         'event_description',
         'start_date',
         'end_date',
+        'donation_target',
+        'status',
         'partner_id',
         'location_id',
         'image_path',
@@ -31,8 +33,13 @@ class EventsDonatur extends Model
     public function donations()
     {
         return $this->belongsToMany(Donation::class, 'events_donation_details', 'event_id', 'donation_id')
-                    ->withPivot('donation_target')
                     ->withTimestamps();
+    }
+
+    public function successfulDonations()
+    {
+        return $this->hasMany(Donation::class, 'event_id')
+                    ->where('payment_status', 'success');
     }
 
     public function getTotalDonationAmountAttribute()
@@ -44,11 +51,4 @@ class EventsDonatur extends Model
     {
         return $this->donations()->where('payment_status', 'success')->count();
     }
-    
-    public function getTotalDonationTargetAttribute()
-    {
-        return $this->donations->sum(fn($donation) => $donation->pivot->donation_target);
-    }
-
-
 }

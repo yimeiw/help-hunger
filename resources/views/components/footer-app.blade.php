@@ -1,4 +1,4 @@
-<footer class="flex flex-row bg-greenbg w-full p-6 gap-48 font-[poppins]">
+<footer class="flex flex-row bg-greenbg w-full p-6 gap-48 font-[poppins] bottom-0">
     <div class="flex flex-col justify-center items-center gap-4 pl-10 ">
         <img src="{{ asset('/assets/logo-footer.svg') }}" alt="">
         <p class="font-bold text-creamhh text-lg">©HelpHunger, 2025.</p>

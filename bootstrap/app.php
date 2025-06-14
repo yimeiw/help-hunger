@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\CheckUserRole;
+use Illuminate\Console\Scheduling\Schedule; // Tetap import ini untuk kejelasan
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,4 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    // Perubahan ada di sini: Tambahkan backslash di depan Schedule
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) { 
+        // Jalankan perintah pengingat event setiap hari pada jam 8 pagi
+        // Pastikan Anda sudah membuat Artisan Command `SendEventReminders`
+        // $schedule->command('reminders:send-event')->dailyAt('08:00');
+
+        // Untuk pengujian, Anda bisa menjalankannya setiap menit:
+        $schedule->command('reminders:send-event')->everyMinute();
+    })
+    ->create();

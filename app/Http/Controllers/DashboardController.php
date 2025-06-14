@@ -92,10 +92,15 @@ class DashboardController extends Controller
 
     public function donatur()
     {
+        $loggedInUserEmail = Auth::user()->email;
+        $volunteerUser = User::where('email', $loggedInUserEmail)
+                             ->where('role', 'volunteer')
+                             ->first();
+
         $eventsDonation = EventsDonatur::with(['partner', 'location', 'donations'])->take(2)->get();
         $eventsVolunteers = EventsVolunteers::with(['partner', 'location', 'volunteers'])->take(2)->get();
         $eventsPartner = Partner::all();
-        return view('donatur.dashboard', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner')); 
+        return view('donatur.dashboard', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner', 'volunteerUser')); 
     }
 
     

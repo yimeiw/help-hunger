@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('event_description');
             $table->datetime('start_date');
             $table->datetime('end_date');
+            $table->enum('status', ['accepted', 'rejected', 'pending'])->default('pending');
             $table->string('image_path')->nullable();
             $table->foreignId('partner_id')->constrained('partner')->onDelete('cascade');
             $table->foreignId('location_id')->constrained('location_volunteers')->onDelete('cascade');

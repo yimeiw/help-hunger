@@ -13,10 +13,16 @@ class EventsVolunteers extends Model
         'event_description',
         'start_date',
         'end_date',
+        'status',
         'partner_id',
         'location_id',
         'image_path',
     ];
+
+    protected $casts = [
+        'start_date' => 'date', // atau 'datetime' jika ada waktu
+        'end_date' => 'date',   // atau 'datetime' jika ada waktu
+    ];    
 
     public function partner()
     {
@@ -31,7 +37,6 @@ class EventsVolunteers extends Model
     public function volunteers()
     {
         return $this->belongsToMany(User::class, 'events_volunteers_detail', 'event_id', 'volunteer_id')
-                    ->withPivot('status')
                     ->withTimestamps();
     }
 

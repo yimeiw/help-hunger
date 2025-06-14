@@ -10,7 +10,6 @@ protected $table = 'events_donation_details';
     protected $fillable = [
         'event_id',
         'donation_id',
-        'donation_target',
     ];
     public function event()
     {
