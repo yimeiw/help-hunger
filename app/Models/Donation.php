@@ -16,6 +16,7 @@ class Donation extends Model
         'payment_date',
         'payment_proof',
         'payment_method',
+        'certificate_path',
         'receipt_url',
         'transaction_reference',
     ];

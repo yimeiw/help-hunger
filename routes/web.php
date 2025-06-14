@@ -137,9 +137,9 @@ Route::middleware([
         // Details Donations
         Route::get('/details', [DonaturDashboardController::class, 'details'])->name('details.show');
         Route::get('/details/events', [DonaturDashboardController::class, 'detailsEvents'])->name('details.details');
-        Route::delete('/donatur/cancel-participation/{event}', [DonaturDashboardController::class, 'cancelParticipation'])->name('cancel_participation');
+        Route::delete('/cancel-participation/{event}', [DonaturDashboardController::class, 'cancelParticipation'])->name('cancel_participation');
         Route::get('/our-partner', [DonaturDashboardController::class, 'partner'])->name('partner.show');
         Route::get('/notification', [DonaturDashboardController::class, 'notifications'])->name('notification.show');
-        Route::get('/donatur/certificate/download/{detailId}', [DonaturDashboardController::class, 'downloadCertificate'])->name('certificate.download');
+        Route::get('/certificate/download/{detailId}', [DonaturDashboardController::class, 'downloadCertificate'])->name('certificate.download');
     });
 });

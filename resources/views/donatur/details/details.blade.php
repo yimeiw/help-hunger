@@ -4,7 +4,7 @@
     @if($selectedEvent)
         <div class="mx-8 mt-8 mb-8">
             <div class="flex items-center justify-between mb-8">
-                <a href="{{ route('volunteer.details.show') }}" class="flex-shrink-0">
+                <a href="{{ route('donatur.details.show') }}" class="flex-shrink-0">
                     <svg width="44" height="44" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="9" y="9" width="52" height="52" rx="26" stroke="#3F8044" stroke-width="2"/>
                         <rect x="11" y="11" width="48" height="48" rx="24" fill="#1E1E1E"/>
@@ -103,7 +103,7 @@
                         @endphp
 
                         @if ($selectedEventDetailForDownload)
-                            <a href="{{ route('volunteer.certificate.download', $selectedEventDetailForDownload->id) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                            <a href="{{ route('donatur.certificate.download', $selectedEventDetailForDownload->id) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                                 Download Certificate
                             </a>
                         @else
