@@ -1,17 +1,18 @@
 <x-app-layout>
+    @section('title', 'Report & Analysis')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Laporan & Analisis') }}
         </h2>
     </x-slot>
     
-    <div class="py-12">
+    <div class="py-6">
         <div class="sm:px-6 lg:px-8">
             <h3 class="flex items-center justify-center text-[32px] font-bold text-redb mb-6">Summary Report</h3>
             
             <div class="grid grid-cols-2 gap-8">
                 <div class="bg-greenbg overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <h4 class="flex justify-center text-md font-semibold text-creamcard mb-3">Tren Donasi Bulanan (12 Bulan Terakhir)</h4>
+                    <h4 class="flex justify-center text-md font-semibold text-creamcard mb-3">Monthly Donation Trends (Last 12 Months)</h4>
                     {{-- Laporan Donasi per Bulan (Grafik Batang) --}}
                     <div class="w-full max-w-5xl h-[350px] mx-auto">
                         <canvas id="monthlyDonationChart" width="500" height="800" class="mx-auto"></canvas>
@@ -20,7 +21,7 @@
     
                 {{-- Laporan Jumlah Pengguna per Role (Grafik Donut) --}}
                 <div class="bg-greenbg w-full max-w-5xl mx-auto h-[450px] p-4 overflow-hidden shadow-xl sm:rounded-lg">
-                    <h4 class="flex items-center justify-center text-md font-bold text-creamcard mb-3">Distribusi Pengguna Berdasarkan Peran</h4>
+                    <h4 class="flex items-center justify-center text-md font-bold text-creamcard mb-3">User Distribution Based on Role</h4>
                     <div class="relative h-[350px] w-full pr-12">
                         <canvas id="userRoleChart"></canvas>
                     </div>

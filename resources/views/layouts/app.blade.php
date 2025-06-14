@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>@yield('title', config('app.name', 'Laravel'))</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -24,12 +24,10 @@
         }
     </style>
 </head>
-<body class="font-[poppins] antialiased bg-all min-h-screen">
 
-    <!-- Navigation -->
+<body class="flex flex-col min-h-screen font-[poppins] antialiased bg-all">
     @livewire('navigation-menu')
 
-    <!-- Flash Messages with SweetAlert2 -->
     @if (session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -37,43 +35,27 @@
                     icon: 'success',
                     title: 'Success!',
                     text: '{{ session('success') }}',
-                    confirmButtonColor: '#d33'
                 });
             });
         </script>
     @endif
 
-    @if (session('error'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: '{{ session('error') }}',
-                    confirmButtonColor: '#d33'
-                });
-            });
-        </script>
-    @endif
-
-    <!-- Page Content -->
-    <main>
+    <main class="flex-grow">
         {{ $slot }}
     </main>
 
-    <!-- Footer -->
-    <x-footer-app />
+    <x-footer-app /> {{-- Sticky footer --}}
 
     <!-- Modals & Scripts -->
     @stack('modals')
     @livewireScripts
     @stack('scripts')
-
+    
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const originalSwalFire = Swal.fire;
-
+    
         Swal.fire = function(options) {
             const defaultConfig = {
                 confirmButtonColor: '#ef4444', // Tailwind's red-500 (matching redb)
@@ -91,15 +73,15 @@
                     icon: 'border-2 border-redb rounded-full'
                 }
             };
-
+    
             const finalOptions = Object.assign({}, defaultConfig, options || {});
             return originalSwalFire(finalOptions);
         };
     </script>
-
+    
     <!-- AlpineJS -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    
     <!-- Vite JS -->
     @vite(['resources/js/app.js'])
 </body>
