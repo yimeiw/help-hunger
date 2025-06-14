@@ -1,7 +1,10 @@
 <x-app-layout>
 
-    <form action="" method="post">
-        <a href="{{ route('partner.logout') }}">Logout</a>
+    <form method="POST" action="{{ route('partner.logout') }}">
+        @csrf
+        <button type="submit" class="">
+            Logout
+        </button>
     </form>
-
+    
 </x-app-layout>

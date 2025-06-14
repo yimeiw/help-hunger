@@ -17,23 +17,42 @@ class LoginPartnerController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $credentials = $request->validate([
+        'partner_email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        // --- Gunakan guard 'partner' untuk mencoba login ---
-        if (Auth::guard('partner')->attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
+    $partner = \App\Models\Partner::where('partner_email', $credentials['partner_email'])->first();
 
-            return redirect()->intended(route('partner.dashboard')); // Redirect ke dashboard Partner
-        }
+    // if ($partner) {
+    //     $passwordMatches = \Illuminate\Support\Facades\Hash::check($credentials['password'], $partner->password);
 
-        throw ValidationException::withMessages([
-            'email' => __('auth.failed'), // Pesan error login default Laravel
-        ]);
+    //     // Output debugging sebelumnya
+    //     dd(
+    //         'Email from form:', $credentials['email'],
+    //         'Password from form (plain):', $credentials['password'],
+    //         'Hashed password from DB:', $partner->password,
+    //         'Does password match hash?', $passwordMatches
+    //     );
+    //     // Hapus dd() di atas setelah Anda memastikan 'true'
+    // }
+
+    // --- Tambahkan ini: Debug hasil langsung dari Auth::attempt ---
+    $attemptResult = Auth::guard('partner')->attempt($credentials, $request->remember);
+
+    // dd('Result of Auth::guard("partner")->attempt():', $attemptResult); // <--- INI PENTING!
+
+    if ($attemptResult) {
+        $request->session()->regenerate();
+        return redirect()->intended(route('partner.dashboard'));
     }
+
+    throw ValidationException::withMessages([
+        'email' => __('auth.failed'),
+    ]);
+}
+
 
     public function logout(Request $request)
     {

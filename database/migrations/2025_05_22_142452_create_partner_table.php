@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('partner_email')->unique();
             $table->string('password');
             $table->string('partner_link');
+            $table->rememberToken(); 
             $table->timestamps();
         });
     }
@@ -29,6 +30,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('partner');
+        Schema::table('partner', function (Blueprint $table) {
+            $table->dropColumn('remember_token');
+        });
     }
 };
