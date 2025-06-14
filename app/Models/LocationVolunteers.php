@@ -14,6 +14,7 @@ class LocationVolunteers extends Model
         'name',
         'address',
         'zipcode',
+        'city_id',
         'latitude',
         'longitude',
     ];

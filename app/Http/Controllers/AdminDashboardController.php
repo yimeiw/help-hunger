@@ -11,6 +11,8 @@ use App\Models\LocationVolunteers;
 use App\Models\LocationDonatur;
 use App\Models\Notification;
 use App\Models\Location;
+use App\Models\Provinces;
+use App\Models\Cities;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -205,48 +207,76 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'Event donasi berhasil ditambahkan.');
     }
 
-    private function getLocationModel($type)
-    {
-        return match ($type) {
-            'volunteer' => LocationVolunteers::class,
-            'donation', 'donatur' => LocationDonatur::class,
-            default => abort(404),
-        };
-    }
-
     public function manageLocation(Request $request)
     {
-        $type = $request->query('type', 'volunteer');
+        $type = $request->get('type', 'volunteer');
+        $search = $request->get('search');
+
         $Model = $this->getLocationModel($type);
 
-        $locations = $Model::with(['province', 'city'])->paginate(10);
+        $locations = $Model::with(['province', 'city'])
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%$search%")
+                      ->orWhere('address', 'like', "%$search%")
+                      ->orWhere('zipcode', 'like', "%$search%")
+                      ->orWhereHas('province', fn($q) => $q->where('province_name', 'like', "%$search%"))
+                      ->orWhereHas('city', fn($q) => $q->where('cities_name', 'like', "%$search%"));
+            })
+            ->paginate(10);
 
-        return view('admin.location', [
-            'locations' => $locations,
-            'locationType' => $type,
-        ]);
+        $provinces = Provinces::all();
+        $cities = Cities::all();
+
+        return view('admin.location', compact('locations', 'type', 'search', 'provinces', 'cities'));
     }
 
     public function storeLocation(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'address' => 'required',
-            'province' => 'required',
-            'city' => 'required',
-            'zipcode' => 'required',
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'province' => 'required|exists:provinces,id',
+            'city' => 'required|exists:cities,id',
+            'zipcode' => 'required|string|max:10',
             'type' => 'required|in:volunteer,donation,donatur',
         ]);
 
         $Model = $this->getLocationModel($request->type);
 
-        $Model::create($request->only([
-            'name', 'address', 'province', 'city', 'zipcode'
-        ]));
+        $Model::create([
+            'name' => $request->name,
+            'address' => $request->address,
+            'province_id' => $request->province,
+            'city_id' => $request->city,
+            'zipcode' => $request->zipcode,
+            'latitude' => $city->latitude ?? 0.0,
+            'longitude' => $city->longitude ?? 0.0,
+        ]);
 
         return redirect()->route('admin.location', ['type' => $request->type])
-                        ->with('success', 'Lokasi berhasil ditambahkan.');
+                         ->with('success', 'Location added successfully!');
     }
 
+    public function deleteLocation($id, Request $request)
+    {
+        $type = $request->get('type', 'volunteer');
+        $Model = $this->getLocationModel($type);
+
+        $location = $Model::findOrFail($id);
+        $location->delete();
+
+        return redirect()->route('admin.location', ['type' => $type])
+                         ->with('success', 'Location deleted successfully!');
+    }
+
+    private function getLocationModel($type)
+    {
+        return match($type) {
+            'volunteer' => new LocationVolunteers,
+            'donation' => new LocationDonation,
+            'donatur' => new LocationDonatur,
+            default => new LocationVolunteer,
+        };
+    }
 
 }

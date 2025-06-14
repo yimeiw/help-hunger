@@ -96,7 +96,8 @@ Route::middleware([
         });
 
         Route::prefix('location')->name('location.')->group(function () {
-            Route::post('/search', [AdminDashboardController::class, 'searchLocation'])->name('search');
+            Route::post('/store', [AdminDashboardController::class, 'storeLocation'])->name('store');
+            Route::delete('/delete/{id}', [AdminDashboardController::class, 'deleteLocation'])->name('delete');
         });
     });
 
