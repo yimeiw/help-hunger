@@ -161,12 +161,16 @@
                                 </div>
                             @endforeach
                              
-                            <div class="flex items-end">
-                                <a href="{{ route('logout') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                            <form method="POST" action="{{ route('logout.to.register') }}" id="logoutForm">
+                                @csrf
+                                <button type="submit"
+                                    class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out"
+                                    onclick="logoutAndRedirectToRegister()">
                                     View More
-                                    <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
-                                </a>
-                            </div>
+                                    <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8 ml-2">
+                                </button>
+                            </form>
+
                         </div>
 
                         <div class="grid grid-cols-3 flex-row-reverse gap-6">
@@ -314,7 +318,5 @@
             });
         </script>
         @endpush
-
-        @stack('scripts')
     </div>
 </x-app-layout>

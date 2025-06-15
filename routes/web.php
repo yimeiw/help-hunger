@@ -154,6 +154,12 @@ Route::middleware([
         Route::get('/our-partner', [VolunteerDashboardController::class, 'partner'])->name('partner.show');
         Route::get('/notification', [VolunteerDashboardController::class, 'notifications'])->name('notification.show');
         Route::get('/volunteer/certificate/download/{detailId}', [VolunteerDashboardController::class, 'downloadCertificate'])->name('certificate.download');
+        Route::post('/volunteer/logout-to-register', function (Request $request) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('register');
+        })->name('volunteer.logout.to.register');
     });
 
     // Donatur
