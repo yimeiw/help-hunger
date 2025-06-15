@@ -7,8 +7,8 @@
         {{ __('Permanently delete your account.') }}
     </x-slot>
 
-    <x-slot name="content">z
-        <div class="max-w-xl text-sm text-creamcard">
+    <x-slot name="content">
+        <div class="w-full p-4 text-sm text-creamcard">
             {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
         </div>
 
@@ -44,7 +44,7 @@
                     {{ __('Cancel') }}
                 </x-button>
 
-                <x-button class="ms-3" wire:click="deleteUser" wire:loading.attr="disabled">
+                <x-button class="" wire:click="deleteUser" wire:loading.attr="disabled">
                     {{ __('Delete Account') }}
                 </x-button>
             </x-slot>

@@ -505,7 +505,7 @@ class DonaturDashboardController extends Controller
 
             // For development, you can use dd() to see the error immediately.
             // For production, remove/comment out dd() and rely on the redirect with error message.
-            dd($e->getMessage());
+           // dd($e->getMessage());
 
             return redirect()->back()->with('error', 'Failed to generate certificate. Please try again later.');
         }
