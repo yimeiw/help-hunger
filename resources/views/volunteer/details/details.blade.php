@@ -89,7 +89,6 @@
                 {{-- Tombol Download Certificate jika event sudah selesai --}}
                 @elseif ($eventIsDone)
                     <div class="flex justify-center items-center mt-10">
-                        {{-- **PERBAIKAN DI SINI:** Ambil EventsVolunteersDetail yang spesifik untuk event ini --}}
                         @php
                             // $eventDetails adalah koleksi semua partisipasi user.
                             // Kita perlu mencari partisipasi yang cocok dengan $selectedEvent
@@ -97,7 +96,7 @@
                         @endphp
 
                         @if ($selectedEventDetailForDownload)
-                            <a href="{{ route('volunteer.certificate.download', $selectedEventDetailForDownload->id) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                            <a href="{{ route('certifications.download', ['eventType' => 'volunteer', 'eventId' => $detail->event->id]) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                                 Download Certificate
                             </a>
                         @else
@@ -115,7 +114,7 @@
                 {{-- Tombol Volunteer Now jika belum berpartisipasi atau sudah dibatalkan/belum diterima --}}
                 @else
                     <div class="flex justify-center items-center mt-10">
-                        <a href="{{ route('volunteer.events.create', ['event' => $selectedEvent->id]) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                        <a href="{{ route('volunteer.events.create'}}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                             Volunteer Now
                         </a>
                     </div>
