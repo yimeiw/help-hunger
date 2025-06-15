@@ -20,4 +20,10 @@ class EventsVolunteersDetail extends Model
     {
         return $this->belongsTo(User::class, 'volunteer_id');
     }
+
+    public function eventVolunteers()
+    {
+        return $this->belongsTo(EventsVolunteers::class, 'event_id');
+    }
+
 }

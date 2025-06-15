@@ -75,13 +75,6 @@
                 class="flex items-center justify-center font-bold text-base text-redb border-redb bg-creamhh w-20 h-10 md:w-20 md:text-xs lg:w-20 xl:text-sm xl:w-32 border rounded-lg hover:border-greenbg hover:text-greenbg transition duration-300 ease-in-out">
                 Register
             </a>
-            
-            <a
-                href="{{ route('partner.register') }}"
-                class="flex items-center justify-center px-2 text-center font-bold text-base text-redb border-redb bg-creamhh w-24 h-10 md:w-20 md:text-xs lg:w-24 xl:text-sm xl:w-32 border rounded-lg hover:border-greenbg hover:text-greenbg transition duration-300 ease-in-out">
-                Register as Partner
-            </a>
-
         </div>
     </nav>
 </header>

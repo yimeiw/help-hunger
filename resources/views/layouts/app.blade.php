@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>@yield('title', config('app.name', 'Laravel'))</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        
+        <title>@yield('title', config('app.name', 'Laravel'))</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -49,7 +49,7 @@
             border: none;
             overflow: hidden; 
         }
-
+        
         .flatpickr-months {
             background-color: #FFF7D9 !important;
             padding: 10px 0px; /* Changed from 10px 0px */
@@ -69,7 +69,7 @@
             align-items: center;
             gap: 5px; /* Add a gap between month and year */
         }
-
+        
         /* --- Styling for the Month Display Element (the part that LOOKS like a dropdown) --- */
         /* Ini adalah elemen yang kemungkinan besar memiliki background biru saat ini */
         .flatpickr-current-month .flatpickr-month {
@@ -86,7 +86,7 @@
             font-size: 16px !important; /* Ukuran font teks bulan yang terlihat */
             font-weight: bold;
         }
-
+        
         .flatpickr-current-month .flatpickr-monthDropdown-months {
             background-color: #FFF7D9 !important; /* Warna background creamcard Anda */
         }
@@ -99,7 +99,7 @@
             border-radius: 4px; /* Sudut sedikit melengkung */
             padding: 4px 8px; /* Padding di dalam dropdown */
             cursor: pointer;
-
+            
             /* Perbaikan: Atur border secara eksplisit */
             outline: none !important; /* HILANGKAN OUTLINE BIRU DEFAULT BROWSER */
 
@@ -110,7 +110,7 @@
             background-repeat: no-repeat;
             background-position: right 8px center;
             background-size: 12px;
-           
+            
         }
 
         /* Style untuk opsi-opsi dalam dropdown bulan (saat dibuka) */
@@ -126,7 +126,7 @@
             outline: none !important; /* Tetap hilangkan outline */
         }
 
-
+        
         /* --- Styling for the Year Input (the <input> element) --- */
         .flatpickr-current-month input.cur-year {
             background-color: #FFF7D9 !important; /* Background input tahun */
@@ -139,7 +139,7 @@
             -moz-appearance: textfield;
             appearance: textfield;
             box-sizing: border-box; /* Include padding in width */
-
+            
             /* IMPORTANT: Berikan padding-right tambahan agar panah tidak menimpa teks tahun */
             /* Sesuaikan nilai 25px ini berdasarkan ukuran panah Anda */
             padding-right: 0px;
@@ -156,7 +156,7 @@
             border-color: transparent transparent #3F8044 !important; /* Warna panah bawah */
         }
 
-
+        
         /* Style for the individual month header within the calendar (if using multiple months view) */
         .flatpickr-months .flatpickr-month {
             background-color: #FFF7D9 !important;
@@ -189,7 +189,7 @@
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain; /* Ensures the SVG fits within the element */
-
+            
             /* Set dimensions for your custom arrow icon */
             width: 35px; /* Adjust as needed, usually smaller than 70px */
             height: 35px; /* Adjust as needed */
@@ -204,7 +204,7 @@
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain; /* Ensures the SVG fits within the element */
-
+            
             transform: rotate(180deg); /* Rotate the right arrow to point right */
             width: 35px; /* Adjust as needed, usually smaller than 70px */
             height: 35px; /* Adjust as needed */
@@ -226,7 +226,7 @@
             color: #A4A4A4 !important;
             font-size: 12px !important;
             font-weight: 500 !important; 
-
+            
         }
 
         .flatpickr-weekdaycontainer {
@@ -245,7 +245,7 @@
             color: #902B29;
             border-radius: 8px; /* Rounded corners for each day */
         }
-
+        
         .flatpickr-day.prevMonthDay,
         .flatpickr-day.nextMonthDay {
             background-color: rgb(63, 128, 68, 0.41) !important;
@@ -279,15 +279,15 @@
 </head>
 <body class="flex flex-col min-h-screen font-[poppins] antialiased bg-all">
     @livewire('navigation-menu')
-
+    
     @if (session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                });
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+            });
             });
         </script>
     @endif
@@ -299,7 +299,10 @@
     <x-footer-app /> {{-- Sticky footer --}}
 
     @stack('modals')
+    @livewireScripts
+    @stack('scripts')
 
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -364,5 +367,8 @@
     @stack('scripts')
 
     @vite(['resources/js/app.js'])
+
+    @stack('scripts')
+    
 </body>
 </html>

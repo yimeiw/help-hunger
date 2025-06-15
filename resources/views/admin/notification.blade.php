@@ -6,25 +6,25 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-greenbg shadow-xl sm:rounded-lg p-6">
 
                 @if (session('success'))
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <div class="bg-greenbg border border-redb text-creamcard px-4 py-3 rounded-lg relative mb-4" role="alert">
                         <span class="block sm:inline">{{ session('success') }}</span>
                     </div>
                 @endif
                 @if (session('error'))
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <div class="bg-redb border border-creamcard text-creamcard px-4 py-3 rounded-lg relative mb-4" role="alert">
                         <span class="block sm:inline">{{ session('error') }}</span>
                     </div>
                 @endif
 
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Your Notifications</h3>
+                <h3 class="text-lg font-semibold text-creamcard mb-4 px-4 py-2">Your Notifications</h3>
 
                 @if($notifications->isEmpty())
-                    <p class="text-gray-500">No new notifications.</p>
+                    <p class="text-blackAuth px-4 py-2">No new notifications.</p>
                 @else
                     <div class="space-y-4">
                         @foreach($notifications as $notification)
@@ -45,7 +45,7 @@
                                             </x-secondary-button>
                                         </form>
                                     @else
-                                        <span class="text-xs text-gray-400">Read</span>
+                                        <span class="text-xs text-blackAuth">Read</span>
                                     @endunless
                                 </div>
                                 @if($notification->type == 'event_submission_volunteer' || $notification->type == 'event_submission_donation')

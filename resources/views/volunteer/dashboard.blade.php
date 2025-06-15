@@ -379,7 +379,5 @@
             });
         </script>
         @endpush
-
-        @stack('scripts')
     </div>
 </x-app-layout>

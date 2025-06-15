@@ -11,7 +11,7 @@ use App\Http\Controllers\DonaturDashboardController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ManageUserController;
 use App\Http\Controllers\ManageEventController;
-
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\RegisterPartnerController;
 use App\Http\Controllers\LoginPartnerController; 
 use App\Http\Controllers\PartnerController; 
@@ -70,6 +70,7 @@ Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah ti
         Route::get('/get-cities/{provinceId}', [PartnerController::class, 'getCitiesByProvince'])->name('get.cities');
 
 
+
         Route::get('/report', [PartnerController::class, 'report'])->name('report.show');
         Route::get('/notifications', [PartnerController::class, 'notifications'])->name('notifications.show');
         Route::get('/profile', [PartnerController::class, 'profile'])->name('profile.show');
@@ -103,6 +104,7 @@ Route::middleware([
 
     //reports
     Route::get('/report', [DashboardController::class, 'showReports'])->name('report');
+    Route::get('/certificate/download/{eventType}/{eventId}', [CertificateController::class, 'downloadCertificate'])->name('certifications.download');
 
     // Admin
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
@@ -173,8 +175,21 @@ Route::middleware([
         Route::delete('/volunteer/cancel-participation/{event}', [VolunteerDashboardController::class, 'cancelParticipation'])->name('cancel_participation');
         Route::get('/our-partner', [VolunteerDashboardController::class, 'partner'])->name('partner.show');
         Route::get('/notification', [VolunteerDashboardController::class, 'notifications'])->name('notification.show');
-        Route::get('/volunteer/certificate/download/{detailId}', [VolunteerDashboardController::class, 'downloadCertificate'])->name('certificate.download');
+        Route::post('/volunteer/logout-to-register', function (Request $request) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('register');
+        })->name('volunteer.logout.to.register');
     });
+
+    Route::get('/volunteer/certificate/download', [VolunteerDashboardController::class, 'downloadCertificate'])
+    ->name('volunteer.certifications.download')
+    ->middleware(['auth', 'verified', 'check.role:volunteer']);
+
+    Route::get('/donatur/certificate/download', [DonaturDashboardController::class, 'downloadCertificate'])
+    ->name('donatur.certifications.download')
+    ->middleware(['auth', 'verified', 'check.role:donatur']);
 
     // Donatur
     Route::prefix('donatur')->name('donatur.')->middleware('role:donatur')->group(function () {
@@ -197,6 +212,5 @@ Route::middleware([
         Route::delete('/cancel-participation/{event}', [DonaturDashboardController::class, 'cancelParticipation'])->name('cancel_participation');
         Route::get('/our-partner', [DonaturDashboardController::class, 'partner'])->name('partner.show');
         Route::get('/notification', [DonaturDashboardController::class, 'notifications'])->name('notification.show');
-        Route::get('/certificate/download/{detailId}', [DonaturDashboardController::class, 'downloadCertificate'])->name('certificate.download');
     });
 });

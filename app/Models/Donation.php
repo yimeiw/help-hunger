@@ -30,4 +30,9 @@ class Donation extends Model
     {
         return $this->belongsTo(EventsDonatur::class, 'event_id');
     }
+
+    public function eventDonatur()
+    {
+        return $this->belongsTo(EventsDonatur::class, 'event_id');
+    }
 }

@@ -1,7 +1,7 @@
 <x-app-layout>
     @section('title', 'Profile')
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-redb leading-tight">
             {{ __('Profile') }}
         </h2>
     </x-slot>
@@ -34,23 +34,25 @@
                 @livewire('profile.logout-other-browser-sessions-form')
             </div>
             
+            @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+            <x-section-border />
+            
+            <div class="mt-10 sm:mt-0">
+                @livewire('profile.delete-user-form')
+            </div>
+            @endif
+            
             <x-section-border />
 
-            <form method="POST" action="{{ route('logout') }}" x-data>
-                @csrf
-                    <a href="{{ route('logout') }}"
-                        @click.prevent="$root.submit();">
-                            {{ __('Log Out') }}
-                    </a>
-            </form>
-            @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-                <x-section-border />
-
-                <div class="mt-10 sm:mt-0">
-                    @livewire('profile.delete-user-form')
-                </div>
-            @endif
-
+            <div class="flex justify-end">
+                <form method="POST" action="{{ route('logout') }}" x-data>
+                    @csrf
+                        <x-button href="{{ route('logout') }}" class="text-redb font-semibold text-xl"
+                            @click.prevent="$root.submit();">
+                                {{ __('Log Out') }}
+                        </x-button>
+                </form>
+            </div>
 
         </div>
     </div>
