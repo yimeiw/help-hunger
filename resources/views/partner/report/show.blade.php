@@ -2,23 +2,28 @@
     <div class="container-fluid">
 
         {{-- Filter Laporan --}}
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">Filter Laporan</div>
-                    <div class="card-body">
-                        <form action="{{ route('partner.report.show') }}" method="GET" class="row g-3 align-items-end">
-                            <div class="col-md-4">
-                                <label for="start_date" class="form-label">Tanggal Mulai:</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ request('start_date', \Carbon\Carbon::now()->subMonths(11)->startOfMonth()->format('Y-m-d')) }}">
+        <div class="m-6">
+            <div class="w-1/2">
+                <div class="bg-redb/50  shadow-lg rounded-xl overflow-hidden"> 
+                    <div class="bg-redb text-creamcard font-semibold py-4 px-6 border-b border-creamcard text-lg"> Filter Report
+                    </div>
+                    <div class="p-6"> 
+                        <form action="{{ route('partner.report.show') }}" method="GET" class="flex flex-col items-end -mx-2">
+                            <div class="flex flex-wrap -mx-2 w-full mb-4">
+                                <div class="w-full md:w-1/3 sm:w-1/2 px-2 mb-4 md:mb-0"> 
+                                    <label for="start_date" class="block text-creamcard font-medium text-sm mb-2">Tanggal Mulai:</label> 
+                                    <input type="text" class="block w-full px-4 py-2 bg-creamcard text-redb font-medium border-redb rounded-lg focus:outline-none focus:ring-2 focus:ring-redb focus:border-redb transition duration-300 ease-in-out" id="start_date" name="start_date" value="{{ request('start_date', \Carbon\Carbon::now()->subMonths(11)->startOfMonth()->format('Y-m-d')) }}"> 
+                                </div>
+                                <div class="w-full md:w-1/3 sm:w-1/2 px-2 mb-4 md:mb-0"> 
+                                    <label for="end_date" class="block text-creamcard font-medium text-sm mb-2">Tanggal Akhir:</label> 
+                                    <input type="text" class="block w-full px-4 py-2 bg-creamcard text-redb font-medium border-redb rounded-lg focus:outline-none focus:ring-2 focus:ring-redb focus:border-redb transition duration-300 ease-in-out" id="end_date" name="end_date" value="{{ request('end_date', \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d')) }}"> 
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <label for="end_date" class="form-label">Tanggal Akhir:</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request('end_date', \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d')) }}">
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-                                <a href="{{ route('partner.report.show') }}" class="btn btn-secondary">Reset Filter</a>
+                            <div class=""> 
+                                <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto"> 
+                                    <button type="submit" class="w-full md:w-auto px-5 py-2 bg-creamcard text-redb shadow-quadrupleNonHover font-medium rounded-lg hover:shadow-quadrupleHover hover:text-greenbg transition duration-200 ease-in-out transform hover:-translate-y-px">Terapkan Filter</button> 
+                                    <a href="{{ route('partner.report.show') }}" class="w-full md:w-auto px-5 py-2 bg-creamcard text-redb shadow-quadrupleNonHover font-medium rounded-lg hover:shadow-quadrupleHover hover:text-greenbg transition duration-200 ease-in-out transform hover:-translate-y-px">Reset Filter</a> 
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -26,10 +31,7 @@
             </div>
         </div>
 
-        ---
-
-        {{-- Ringkasan Laporan Event & Partisipasi Mitra --}}
-        <h2>Ringkasan Event & Partisipasi Mitra</h2>
+        <p class="font-bold text-redb text-lg">Ringkasan Event & Partisipasi Mitra</p>
         @php
             $partner = $reportData['partnerReports'];
         @endphp
@@ -145,9 +147,35 @@
 
     </div> {{-- End container-fluid --}}
 
-    {{-- SCRIPTS Chart.js (Ditempatkan di sini untuk memastikan elemen canvas sudah ada) --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr("#start_date", {
+                dateFormat: "Y-m-d",
+                locale: {
+                    weekdays: { shorthand: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'], longhand: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'], },
+                    months: { shorthand: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'], longhand: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'], },
+                    firstDayOfWeek: 1,
+                    rangeSeparator: ' hingga ',
+                    time_24hr: true,
+                    ordinal: (nth) => { if (nth > 9) { return ''; } return ["", "", "", ""][nth - 1]; },
+                },
+            });
+
+            flatpickr("#end_date", {
+                dateFormat: "Y-m-d",
+                locale: {
+                    weekdays: { shorthand: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'], longhand: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'], },
+                    months: { shorthand: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'], longhand: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'], },
+                    firstDayOfWeek: 1,
+                    rangeSeparator: ' hingga ',
+                    time_24hr: true,
+                    ordinal: (nth) => { if (nth > 9) { return ''; } return ["", "", "", ""][nth - 1]; },
+                },
+            });
+        });
+
+
+
         // Data dari PHP
         const reportData = @json($reportData);
 

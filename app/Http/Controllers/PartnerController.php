@@ -208,8 +208,8 @@ class PartnerController extends Controller
 
         $reportData = [
             'monthlyDonations' => [
-                'labels' => $monthlyDonations->pluck('label'),
-                'data' => $monthlyDonations->pluck('total'),
+                'labels' => $monthlyDonations->pluck('label')->toArray(), // Convert to array
+                'data' => $monthlyDonations->pluck('total')->toArray(),   // Convert to array
             ],
             'userRoles' => [
                 'labels' => array_merge($roleNames, ['Community', 'NGO', 'Orphanage']),
