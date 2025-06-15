@@ -51,7 +51,27 @@ Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah ti
         Route::get('/about', [PartnerController::class, 'about'])->name('about.show');
         Route::get('/locations', [PartnerController::class, 'locations'])->name('locations.show');
         Route::post('/locations/search', [PartnerController::class, 'searchLocation'])->name('locations.search');
+
+        // Program
         Route::get('/program', [PartnerController::class, 'program'])->name('program.show');
+
+        Route::get('/program/volunteer/add', [PartnerController::class, 'createVolunteerEvent'])->name('program.volunteer.add');
+        Route::post('/program/volunteer/store', [PartnerController::class, 'storeVolunteerEvent'])->name('program.volunteer.store');
+        Route::get('/program/volunteer/{event}', [PartnerController::class, 'showVolunteerEvent'])->name('program.volunteer.show');
+        Route::delete('/program/volunteer/{event}', [PartnerController::class, 'deleteVolunteerEvent'])->name('program.volunteer.delete');
+
+        // Rute untuk Event Donasi
+        Route::get('/program/donation/add', [PartnerController::class, 'createDonationEvent'])->name('program.donation.add');
+        Route::post('/program/donation/store', [PartnerController::class, 'storeDonationEvent'])->name('program.donation.store');
+        Route::get('/program/donation/{event}', [PartnerController::class, 'showDonationEvent'])->name('program.donation.show');
+        Route::delete('/program/donation/{event}', [PartnerController::class, 'deleteDonationEvent'])->name('program.donation.delete');
+
+        // API Route for fetching cities
+        Route::get('/get-cities/{provinceId}', [PartnerController::class, 'getCitiesByProvince'])->name('get.cities');
+
+
+
+
         Route::get('/report', [PartnerController::class, 'report'])->name('report.show');
         Route::get('/notifications', [PartnerController::class, 'notifications'])->name('notifications.show');
         Route::get('/profile', [PartnerController::class, 'profile'])->name('profile.show');
