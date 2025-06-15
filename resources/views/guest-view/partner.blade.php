@@ -118,7 +118,7 @@
                 </ul>
             </div>
 
-            <a href="{{ route('register') }}" class="bg-creamcard font-bold text-redb text-base px-8 py-2 border border-2 border-redb rounded-lg mt-4 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">Apply as a Partner</a>
+            <a href="{{ route('partner.register') }}" class="bg-creamcard font-bold text-redb text-base px-8 py-2 border border-2 border-redb rounded-lg mt-4 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">Apply as a Partner</a>
         </div>
     </body>
 </x-guest-layout>
