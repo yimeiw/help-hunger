@@ -113,53 +113,56 @@ class DonaturDashboardController extends Controller
         }
 
         try {
-            // Temukan event dan pastikan partner terkaitnya dimuat
-            $event = EventsDonatur::with('partner')->findOrFail($validatedData['event_id']);
-
-            // Temukan detail rekening partner yang sesuai dengan metode pembayaran yang dipilih
-            // Asumsi partner punya minimal satu rekening. Jika tidak, tambahkan pengecekan error.
-            $partnerAccount = PartnerAccounts::where('partner_id', $event->partner->id)
-                                            ->where('rekening_type', $validatedData['payment_method'])
-                                            ->first();
-
-            if (!$partnerAccount) {
-                // Ini bisa terjadi jika partner tidak memiliki rekening dengan metode yang dipilih
-                throw new \Exception('Nomor rekening untuk metode pembayaran yang dipilih tidak ditemukan.');
-            }
-
             // 2. Buat record Donasi dengan status 'pending'
             $donation = Donation::create([
                 'amount' => $validatedData['amount'],
-                'payment_status' => 'pending', // Status awal selalu 'pending'
-                'payment_date' => now(), // Atau null jika pembayaran belum terjadi
+                'payment_status' => 'pending',
+                'payment_date' => now(),
                 'payment_method' => $validatedData['payment_method'],
                 'donatur_id' => $donaturId,
                 'event_id' => $validatedData['event_id'],
-                // payment_proof, receipt_url, transaction_reference akan diisi nanti
             ]);
 
-            // 3. Buat notifikasi untuk donatur
-            $notification = new Notification();
-            $notification->user_id = $donaturId; // Pastikan kolom donatur_id ada di tabel notifikasi Anda
-            $notification->title = 'Donasi Dicatat untuk ' . $event->event_name;
-            $notification->message = 'Terima kasih atas donasi Anda sebesar IDR ' . number_format($validatedData['amount'], 0, ',', '.') . ' untuk event ' . $event->event_name . '. Silakan selesaikan pembayaran.';
-            $notification->is_read = false;
-            $notification->save();
+            $user = Auth::user(); // Dapatkan data user yang terautentikasi
+            $formattedAmount = number_format($validatedData['amount'], 0, ',', '.');
 
-            // 4. Redirect ke halaman konfirmasi pembayaran
-            // Kirim detail donasi, detail event, dan detail rekening bank
+            // Notifikasi untuk admin
+            $adminUsers = User::where('role', 'admin')->get();
+            
+            foreach ($adminUsers as $admin) {
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'title' => 'Donasi Baru Diterima',
+                    'message' => 'Donatur ' . $user->username . ' telah melakukan donasi sebesar IDR ' . $formattedAmount . ' untuk event ' . $event->event_name,
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Notifikasi untuk donatur
+            Notification::create([
+                'user_id' => $donaturId,
+                'title' => 'Donasi Dicatat untuk ' . $event->event_name,
+                'message' => 'Terima kasih atas donasi Anda sebesar IDR ' . $formattedAmount . ' untuk event ' . $event->event_name . '. Silakan selesaikan pembayaran.',
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 3. Redirect ke halaman konfirmasi pembayaran
             return redirect()->route('donatur.donations.confirm', [
-                'donation_id' => $donation->id, // Kirim ID donasi yang baru dibuat
+                'donation_id' => $donation->id,
             ])->with([
                 'success' => 'Donasi Anda telah dicatat! Silakan selesaikan pembayaran.',
-                'show_loading' => true // Jika Anda memiliki loading screen
+                'show_loading' => true
             ]);
 
         } catch (\Exception $e) {
             Log::error('Kesalahan pendaftaran donasi: ' . $e->getMessage(), [
                 'donatur_id' => $donaturId,
                 'event_id' => $validatedData['event_id'],
-                'trace' => $e->getTraceAsString() // Tambahkan trace untuk debugging lebih lanjut
+                'trace' => $e->getTraceAsString()
             ]);
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses donasi Anda. Silakan coba lagi.')->withInput();
         }
