@@ -29,6 +29,8 @@
             font-family: 'Figtree', sans-serif;
         }
 
+        /* kalender di report */
+
         .flatpickr-calendar {
             /* Change background of the entire calendar */
             background-color: #FFF7D9; /* Main calendar background, including padding areas */

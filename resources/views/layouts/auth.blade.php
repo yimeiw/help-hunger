@@ -7,21 +7,25 @@
 
         <title>@yield('title', config('app.name', 'Laravel'))</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
-        <!-- Styles -->
+
         @livewireStyles
 
-        
+        {{-- TEMPORARY: Removed integrity and crossorigin for testing --}}
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     </head>
     <body class="font-[poppins] bg-all text-creamhh">
 
         {{ $slot }}
 
         @livewireScripts
+        {{-- TEMPORARY: Removed integrity and crossorigin for testing --}}
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+        @stack('scripts')
     </body>
 </html>

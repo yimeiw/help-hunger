@@ -31,114 +31,162 @@
             </div>
         </div>
 
-        <p class="font-bold text-redb text-lg">Ringkasan Event & Partisipasi Mitra</p>
-        @php
-            $partner = $reportData['partnerReports'];
-        @endphp
+        <div class="m-6 mt-12">
+            @php
+                $partner = $reportData['partnerReports'];
+            @endphp
+             <p class="font-bold text-redb text-lg ">Event Summary & Participation of {{ $partner['partner_name'] }}</p>
 
-        @if (empty($partner))
-            <p class="alert alert-info">Tidak ada data mitra ditemukan untuk laporan.</p>
-        @else
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <strong>Detail Mitra: {{ $partner['partner_name'] }}</strong>
-                    <div>
-                        <span class="badge bg-primary me-2">Event Relawan: {{ $partner['total_volunteer_events'] }}</span>
-                        <span class="badge bg-success">Event Donasi: {{ $partner['total_donatur_events'] }}</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>Event Relawan:</h5>
-                            @if ($partner['volunteer_event_details']->isEmpty())
-                                <p>Tidak ada event relawan ditemukan untuk mitra ini dalam periode yang dipilih.</p>
-                            @else
-                                <ul class="list-group list-group-flush">
-                                    @foreach ($partner['volunteer_event_details'] as $event)
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            {{ $event['event_name'] }}
-                                            <span class="badge bg-info rounded-pill">Total Relawan: {{ $event['total_volunteers'] }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
+            @if (empty($partner))
+                <p class="alert alert-info">Tidak ada data mitra ditemukan untuk laporan.</p>
+            @else
+            <form action="{{ route('partner.program.show') }}" method="get">
+                <div class="w-full shadow-md sm:rounded-xl border border-2 border-blackAuth/50">
+                    <div class="border border-2 border-greenAuth/50 rounded-lg p-0">
+                        <div class="border border-2 h-auto border-redb/50 bg-creamcard rounded-lg">
+                            <div class="mb-4 p-8 px-16 flex flex-row justify-between text-redb text-md">
+                                <input type="hidden" name="type" id="event-type-input" value="{{ $eventType }}">
+                                <div class="flex flex-col gap-y-6 w-full">
+                                    <button data-type="volunteer" class="me-2 shadow-md rounded-lg p-4 bg-redb text-creamcard hover:bg-greenbg transition duration-300 ease-in-out event-type-btn">Events Volunteer: {{ $partner['total_volunteer_events'] }} events</button>
+                                    
+                                    <div >
+                                        <p class="font-bold mb-4">Details:</p>
+                                        @if ($partner['volunteer_event_details']->isEmpty())
+                                            <p class="text-sm">No volunteer events were found for you in the selected period.</p>
+                                        @else
+                                            <div class="h-32 overflow-y-auto scrollbar-hide">
+                                                <ol class="flex flex-col gap-y-8 list-none">
+                                                    @foreach ($partner['volunteer_event_details'] as $event)
+                                                        <li class="font-bold flex flex-col text-sm">
+                                                            {{ $event['event_name'] }}
+                                                            <p class="text-sm font-normal">
+                                                                Status: 
+                                                                <span class="font-semibold {{ $event['status'] == 'accepted' ? 'text-green-500' : ($event['status'] == 'pending' ? 'text-yellow-500' : 'text-red-500') }}">
+                                                                    {{ ucfirst($event['status']) }}
+                                                                </span>
+                                                            </p>
+                                                            <span class="text-sm font-normal">Total Volunteer: {{ $event['total_volunteers'] }}</span>
+                                                            <hr class="border w-full h-0 border-redb flex justify-center items-center">
+
+                                                        </li>
+                                                    @endforeach
+                                                </ol>
+                                            </div> 
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-center w-full">
+                                    <hr class="border w-0 h-full border-redb flex justify-center items-center">
+                                </div>
+                                                    
+                                <div class="flex flex-col gap-y-6 w-full">
+                                    <button data-type="donation" class="me-2 shadow-md rounded-lg p-4 bg-redb text-creamcard hover:bg-greenbg transition duration-300 ease-in-out event-type-btn">Event Donasi: {{ $partner['total_donatur_events'] }} events</button>
+                                 
+                                    <div>
+                                        <p class="font-bold mb-4">Details:</p>
+                                        @if ($partner['donatur_event_details']->isEmpty())
+                                            <p class="text-sm">No donation events were found for you in the selected period.</p>
+                                        @else
+                                            <div class="h-32 overflow-y-auto scrollbar-hide justify-end" >
+                                                <ol class="flex flex-col gap-y-8 list-none ">
+                                                    @foreach ($partner['donatur_event_details'] as $event)
+                                                        <li class="font-bold flex flex-col text-sm">
+                                                            {{ $event['event_name'] }}
+                                                            
+                                                            <p class="text-sm font-normal">
+                                                                Status: 
+                                                                <span class="font-semibold {{ $event['status'] == 'accepted' ? 'text-green-500' : ($event['status'] == 'pending' ? 'text-yellow-500' : 'text-red-500') }}">
+                                                                    {{ ucfirst($event['status']) }}
+                                                                </span>
+                                                            </p>
+
+                                                            <span class="text-sm font-normal">Total Donation: Rp{{ number_format($event['total_donations_collected'], 0, ',', '.') }}</span>
+                                                            <hr class="border w-full h-0 border-redb flex justify-center items-center">
+                                                        </li>
+                                                    @endforeach
+                                                </ol>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <h5>Event Donasi:</h5>
-                            @if ($partner['donatur_event_details']->isEmpty())
-                                <p>Tidak ada event donasi ditemukan untuk mitra ini dalam periode yang dipilih.</p>
-                            @else
-                                <ul class="list-group list-group-flush">
-                                    @foreach ($partner['donatur_event_details'] as $event)
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            {{ $event['event_name'] }}
-                                            <span class="badge bg-warning rounded-pill">Donasi Terkumpul: Rp{{ number_format($event['total_donations_collected'], 0, ',', '.') }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
+                    </div>
+                </div>
+            </form>
+            @endif
+
+        </div>
+
+        <div class="m-6 mt-12">
+            <p class="font-bold text-redb text-xl mb-6">Analyst Data</p>
+
+            <div class="grid grid-cols-2 gap-6">
+                {{-- Monthly Donations Chart --}}
+                <div class="shadow-lg rounded-lg mb-4 p-4 bg-creamhh/50">
+                    <div class="card h-100">
+                        <div class="font-medium text-redb text-sm mb-4">Monthly Donations</div>
+                        <div class="card-body">
+                            <canvas id="monthlyDonationsChart"></canvas>
                         </div>
                     </div>
                 </div>
-            </div>
-        @endif
 
-        ---
-
-        <h2>Analisis Data</h2>
-        <div class="row">
-            {{-- Monthly Donations Chart --}}
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">Donasi Bulanan</div>
-                    <div class="card-body">
-                        <canvas id="monthlyDonationsChart"></canvas>
+                {{-- Monthly Events Conducted by Partner Chart --}}
+                <div class="shadow-lg rounded-lg mb-4 p-4 bg-creamhh/50">
+                    <div class="card h-100">
+                        <div class="font-medium text-redb text-sm mb-4">Jumlah Event Diselenggarakan per Bulan</div>
+                        <div class="card-body">
+                            <canvas id="monthlyEventsChart"></canvas>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Monthly Events Conducted by Partner Chart --}}
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">Jumlah Event Diselenggarakan per Bulan</div>
-                    <div class="card-body">
-                        <canvas id="monthlyEventsChart"></canvas>
+                {{-- Volunteer Event Status Distribution --}}
+                <div class="shadow-lg rounded-lg mb-4 p-4 bg-creamhh/50">
+                    <div class="card h-auto">
+                        <div class="font-medium text-redb text-sm mb-4">Distribusi Status Event Relawan</div>
+                        @if($reportData['volunteerEventStatus']['hasData'])
+                            <div class="flex items-center justify-center">
+                                <div class=" w-96 h-96">
+                                    <canvas id="volunteerStatusChart"></canvas>
+                                </div>
+                            </div>
+                        @else
+                            <div class="p-4 text-center bg-gray-100 rounded-lg">
+                                <p class="text-gray-600">Belum ada event volunteer dalam periode ini.</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
-            </div>
 
-            {{-- NEW CHART: Volunteer Event Status Distribution --}}
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">Distribusi Status Event Relawan</div>
-                    <div class="card-body d-flex justify-content-center align-items-center">
+                {{-- Donatur Event Status Distribution --}}
+                <div class="shadow-lg rounded-lg mb-4 p-4 bg-creamhh/50">
+                    <div class="card h-auto">
+                        <div class="font-medium text-redb text-sm mb-4">Distribusi Status Event Donasi</div>
                         {{-- Added chart-container class --}}
-                        <div class="chart-container" style="position: relative; height:300px; width:100%;">
-                            <canvas id="volunteerEventStatusChart"></canvas>
-                        </div>
+                        @if($reportData['donaturEventStatus']['hasData'])
+                            <div class="flex items-center justify-center">
+                                <div class=" w-96 h-96">
+                                    <canvas id="donaturEventStatusChart"></canvas>
+                                </div>
+                            </div>
+                        @else
+                            <div class="p-4 text-center bg-gray-100 rounded-lg">
+                                <p class="text-gray-600">Belum ada event volunteer dalam periode ini.</p>
+                            </div>
+                        @endif
+
                     </div>
                 </div>
-            </div>
 
-            {{-- NEW CHART: Donatur Event Status Distribution --}}
-            <div class="col-lg-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">Distribusi Status Event Donasi</div>
-                    <div class="card-body d-flex justify-content-center align-items-center">
-                        {{-- Added chart-container class --}}
-                        <div class="chart-container" style="position: relative; height:300px; width:100%;">
-                            <canvas id="donaturEventStatusChart"></canvas>
-                        </div>
-                    </div>
-                </div>
             </div>
-
             {{-- Top 5 Events by Volunteer Participation --}}
-            <div class="col-lg-6 mb-4">
+            <div class="shadow-lg rounded-lg mb-4 p-4 bg-creamhh/50">
                 <div class="card h-100">
-                    <div class="card-header">5 Event Teratas Berdasarkan Partisipasi Relawan</div>
-                    <div class="card-body">
+                    <div class="font-medium text-redb text-sm mb-4">5 Event Teratas Berdasarkan Partisipasi Relawan</div>
+                    <div class="card-body h-72">
                         <canvas id="topVolunteersChart"></canvas>
                     </div>
                 </div>
@@ -173,8 +221,6 @@
                 },
             });
         });
-
-
 
         // Data dari PHP
         const reportData = @json($reportData);
@@ -297,96 +343,101 @@
             }
         });
 
-        // --- NEW CHART: Distribusi Status Event Relawan ---
-        console.log('Volunteer Event Status Data:', reportData.volunteerEventStatus.data); // Add this
-        const ctxVolunteerStatus = document.getElementById('volunteerEventStatusChart').getContext('2d');
-        new Chart(ctxVolunteerStatus, {
-            type: 'pie',
-            data: {
-                labels: reportData.volunteerEventStatus.labels,
-                datasets: [{
-                    label: 'Jumlah Event',
-                    data: reportData.volunteerEventStatus.data,
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.6)', // Selesai
-                        'rgba(255, 206, 86, 0.6)', // Sedang Berlangsung
-                        'rgba(54, 162, 235, 0.6)'  // Akan Datang
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(54, 162, 235, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + ' Event';
-                                }
-                                return label;
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'right', // Place legend on the right for pie charts
-                    }
-                }
-            }
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Volunteer Chart
+            if (document.getElementById('volunteerStatusChart') && @json($reportData['volunteerEventStatus']['hasData'])) {
+                new Chart(
+                    document.getElementById('volunteerStatusChart').getContext('2d'),
+                    {
+                        type: 'pie',
+                        data: {
+                            labels: @json($reportData['volunteerEventStatus']['labels']),
+                            datasets: [{
+                                data: @json($reportData['volunteerEventStatus']['data']),
+                                backgroundColor: function(context) {
+                                    const status = @json($reportData['volunteerEventStatus']['labels'])[context.dataIndex];
+                                    return {
+                                        'accepted': '#6FB275',
+                                        'pending': '#FFDC58',
+                                        'rejected': '#E66967'
+                                    }[status];
+                                },
+                                borderWidth: 0
 
-        // --- NEW CHART: Distribusi Status Event Donasi ---
-        const ctxDonaturStatus = document.getElementById('donaturEventStatusChart').getContext('2d');
-        new Chart(ctxDonaturStatus, {
-            type: 'pie',
-            data: {
-                labels: reportData.donaturEventStatus.labels,
-                datasets: [{
-                    label: 'Jumlah Event',
-                    data: reportData.donaturEventStatus.data,
-                    backgroundColor: [
-                        'rgba(153, 102, 255, 0.6)', // Selesai
-                        'rgba(255, 99, 132, 0.6)'  // Aktif/Berlangsung
-                    ],
-                    borderColor: [
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 99, 132, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            aspectRatio: 1,
+                            radius: '90%',
+                            layout: {
+                                padding: {
+                                    left: 20,
+                                    right: 20,
+                                    top: 20,
+                                    bottom: 20
                                 }
-                                if (context.parsed !== null) {
-                                    label += context.parsed + ' Event';
+                            },
+                            elements: {
+                                arc: {
+                                    borderWidth: 0 // Hilangkan border pie segments
                                 }
-                                return label;
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        borderWidth: 0, // Hilangkan border legend
+                                        useBorderRadius: false
+                                    }
+                                }
                             }
+
                         }
-                    },
-                    legend: {
-                        position: 'right', // Place legend on the right for pie charts
                     }
-                }
+                );
+            }
+            
+            // Donatur Chart
+            if (document.getElementById('donaturEventStatusChart') && @json($reportData['donaturEventStatus']['hasData'])) {
+                new Chart(
+                    document.getElementById('donaturEventStatusChart').getContext('2d'),
+                    {
+                        type: 'pie',
+                        data: {
+                            labels: @json($reportData['donaturEventStatus']['labels']),
+                            datasets: [{
+                                data: @json($reportData['donaturEventStatus']['data']),
+                                backgroundColor: function(context) {
+                                    const status = @json($reportData['donaturEventStatus']['labels'])[context.dataIndex];
+                                    return {
+                                        'accepted': '#6FB275',
+                                        'pending': '#FFDC58',
+                                        'rejected': '#E66967'
+                                    }[status];
+                                },
+                                borderWidth: 0
+
+                            }]
+                        },
+                        options: {
+                            elements: {
+                                arc: {
+                                    borderWidth: 0 // Hilangkan border pie segments
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        borderWidth: 0, // Hilangkan border legend
+                                        useBorderRadius: false
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                );
             }
         });
 
@@ -407,7 +458,15 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                indexAxis: 'y', // Membuat bar horizontal
+                indexAxis: 'y',
+                layout: {
+                    padding: {
+                        left: 100,  // Ruang ekstra untuk label
+                        right: 20,
+                        top: 20,
+                        bottom: 20
+                    }
+                },
                 scales: {
                     x: {
                         beginAtZero: true,
@@ -417,13 +476,33 @@
                         }
                     },
                     y: {
+                        ticks: {
+                            autoSkip: false,
+                            font: {
+                                size: 11
+                            },
+                            mirror: true,  // Alternatif tampilan
+                            padding: 15
+                        },
                         title: {
                             display: true,
                             text: 'Nama Event'
+                        },
+                        afterFit: function(axis) {
+                            axis.width = 120;  // Memaksa lebar minimum
                         }
                     }
                 }
             }
+        });
+
+        document.querySelectorAll('.event-type-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const type = this.dataset.type;
+                document.getElementById('event-type-input').value = type;
+                document.getElementById('event-type-text').innerText = type.charAt(0).toUpperCase() + type.slice(1);
+                this.closest('form').submit();
+            });
         });
     </script>
 </x-app-layout>

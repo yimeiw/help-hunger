@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Partner; 
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Donatur;
 use App\Models\Donation;
 use App\Models\Volunteer;
@@ -13,11 +12,16 @@ use App\Models\EventsDonatur;
 use Illuminate\Support\Facades\Auth; 
 use App\Models\EventsDonationDetails;
 use App\Models\EventsVolunteersDetail;
+use App\Models\Notifications;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Models\LocationVolunteers;
 use App\Models\LocationDonatur;
+use App\Models\Provinces; 
+use App\Models\Cities;     
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 
 class PartnerController extends Controller
 {
@@ -76,15 +80,232 @@ class PartnerController extends Controller
         }
     }
 
-    public function program()
+    public function program(Request $request)
     {
-        return view('partner.program.show');
+        $eventType = $request->query('type', 'volunteer');
+        $events = collect();
+        $partnerId = Auth::guard('partner')->id();
+
+        if ($eventType === 'volunteer') {
+            $events = EventsVolunteers::with(['partner', 'location'])
+                                      ->where('partner_id', $partnerId)
+                                      ->paginate(10);
+        } elseif ($eventType === 'donation') {
+            $events = EventsDonatur::with(['partner', 'location'])
+                                   ->where('partner_id', $partnerId)
+                                   ->paginate(10);
+        }
+
+        return view('partner.program.show', compact('eventType', 'events'));
     }
+
+    public function createVolunteerEvent()
+    {
+        $partners = Partner::all();
+        $provinces = Provinces::all(); // Get all provinces
+        // No need to fetch cities initially, they will be loaded via AJAX
+
+        return view('partner.program.create-volunteer', compact('partners', 'provinces'));
+    }
+
+
+    public function storeVolunteerEvent(Request $request)
+    {
+        $validatedData = $request->validate([
+            'event_name' => 'required|string|max:255',
+            'event_description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'max_volunteers' => 'required|integer|min:1',
+            'current_needs' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+            // New fields for creating a location
+            'location_name' => 'required|string|max:255',
+            'location_address' => 'required|string|max:255',
+            'location_zipcode' => 'required|digits:5', // Assuming 5-digit zipcode
+            'province_id' => 'required|exists:provinces,id',
+            'city_id' => 'required|exists:cities,id',
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        // 1. Create the new LocationVolunteers entry
+        $location = LocationVolunteers::create([
+            'name' => $validatedData['location_name'],
+            'address' => $validatedData['location_address'],
+            'zipcode' => $validatedData['location_zipcode'],
+            'province_id' => $validatedData['province_id'],
+            'city_id' => $validatedData['city_id'],
+            'latitude' => $validatedData['latitude'],
+            'longitude' => $validatedData['longitude'],
+        ]);
+
+        // 2. Prepare event data
+        $eventData = [
+            'event_name' => $validatedData['event_name'],
+            'event_description' => $validatedData['event_description'],
+            'start_date' => $validatedData['start_date'],
+            'end_date' => $validatedData['end_date'],
+            'max_volunteers' => $validatedData['max_volunteers'],
+            'current_needs' => $validatedData['current_needs'],
+            'partner_id' => Auth::guard('partner')->id(),
+            'status' => 'pending', // Or 'pending' if you need approval
+            'location_id' => $location->id, // Assign the newly created location's ID
+        ];
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('event_images/volunteer', 'public');
+            $eventData['image_path'] = $imagePath;
+        }
+
+        // 3. Create the event
+        EventsVolunteers::create($eventData);
+
+        return redirect()->route('partner.program.show', ['type' => 'volunteer'])->with('success', 'Volunteer event added successfully!');
+    }
+
+
+    public function createDonationEvent()
+    {
+        $locations = LocationDonatur::all();
+        $provinces = Provinces::all(); // Get all provinces
+        // No need to fetch cities initially, they will be loaded via AJAX
+
+        return view('partner.program.create-donation', compact('locations', 'provinces'));
+    }
+
+    public function storeDonationEvent(Request $request)
+    {
+        $validatedData = $request->validate([
+            'event_name' => 'required|string|max:255',
+            'event_description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'donation_target' => 'required|numeric|min:1000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+            // New fields for creating a location for donation events
+            'location_name' => 'required|string|max:255',
+            'location_address' => 'required|string|max:255',
+            'location_zipcode' => 'required|digits:5', // Assuming 5-digit zipcode
+            'province_id' => 'required|exists:provinces,id', // Validasi terhadap tabel provinces
+            'city_id' => 'required|exists:cities,id',       // Validasi terhadap tabel cities
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        // 1. Create the new LocationDonaturs entry
+        // Pastikan model LocationDonaturs memiliki $fillable yang sesuai
+        $location = LocationDonatur::create([
+            'name' => $validatedData['location_name'],
+            'address' => $validatedData['location_address'],
+            'zipcode' => $validatedData['location_zipcode'],
+            'province_id' => $validatedData['province_id'],
+            'city_id' => $validatedData['city_id'],
+            'latitude' => $validatedData['latitude'],
+            'longitude' => $validatedData['longitude'],
+        ]);
+
+        // 2. Prepare event data
+        $eventData = [
+            'event_name' => $validatedData['event_name'],
+            'event_description' => $validatedData['event_description'],
+            'start_date' => $validatedData['start_date'],
+            'end_date' => $validatedData['end_date'],
+            'donation_target' => $validatedData['donation_target'],
+            'partner_id' => Auth::guard('partner')->id(),
+            'status' => 'pending', // Or your default status
+            'location_id' => $location->id, // Assign the newly created location's ID
+        ];
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('event_images/donation', 'public');
+            $eventData['image_path'] = $imagePath;
+        }
+
+        // 3. Create the event
+        // Pastikan model EventsDonatur memiliki $fillable yang sesuai
+        EventsDonatur::create($eventData);
+
+        return redirect()->route('partner.program.show', ['type' => 'donation'])->with('success', 'Donation event added successfully!');
+    }
+
+
+    public function getCitiesByProvince($provinceId)
+    {
+        $cities = City::where('province_id', $provinceId)->pluck('name', 'id');
+        return response()->json($cities);
+    }
+
+
+    public function showVolunteerEvent(EventsVolunteers $event) // Using route model binding
+    {
+        // Ensure the event belongs to the authenticated partner
+        if ($event->partner_id !== Auth::guard('partner')->id()) {
+            abort(403); // Forbidden
+        }
+        return view('partner.program.show-volunteer-detail', compact('event'));
+    }
+
+
+    public function showDonationEvent(EventsDonatur $event) // Using route model binding
+    {
+        // Ensure the event belongs to the authenticated partner
+        if ($event->partner_id !== Auth::guard('partner')->id()) {
+            abort(403); // Forbidden
+        }
+        return view('partner.program.show-donation-detail', compact('event'));
+    }
+
+
+    public function deleteVolunteerEvent(EventsVolunteers $event)
+    {
+        if ($event->partner_id !== Auth::guard('partner')->id()) {
+            return redirect()->back()->with('error', 'You are not authorized to delete this event.');
+        }
+        // Optionally delete image from storage
+        if ($event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+        }
+        $event->delete();
+        return redirect()->route('partner.program.show', ['type' => 'volunteer'])->with('success', 'Volunteer event deleted successfully!');
+    }
+
+    // Example for deleting donation event
+    public function deleteDonationEvent(EventsDonatur $event)
+    {
+        if ($event->partner_id !== Auth::guard('partner')->id()) {
+            return redirect()->back()->with('error', 'You are not authorized to delete this event.');
+        }
+        // Optionally delete image from storage
+        if ($event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+        }
+        $event->delete();
+        return redirect()->route('partner.program.show', ['type' => 'donation'])->with('success', 'Donation event deleted successfully!');
+    }
+
+
 
     public function report(Request $request)
     {
         if (!Auth::guard('partner')->check()) {
             return redirect('/login/partner')->with('error', 'Anda harus login sebagai Partner untuk mengakses laporan ini.');
+        }
+
+        $eventType = $request->query('type', 'volunteer');
+        $events = collect();
+        $partnerId = Auth::guard('partner')->id();
+
+        if ($eventType === 'volunteer') {
+            $events = EventsVolunteers::with(['partner', 'location'])
+                                      ->where('partner_id', $partnerId)
+                                      ->paginate(10);
+        } elseif ($eventType === 'donation') {
+            $events = EventsDonatur::with(['partner', 'location'])
+                                   ->where('partner_id', $partnerId)
+                                   ->paginate(10);
         }
 
         $loggedInPartner = Auth::guard('partner')->user();
@@ -100,12 +321,13 @@ class PartnerController extends Controller
         while ($currentMonth->lte($endDate->copy()->startOfMonth())) {
             $label = $currentMonth->format('M Y');
 
-            $total = Donation::where('partner_id', $partnerId)
-                // Pastikan filter ini menggunakan tabel 'donation' jika 'created_at' ada di sana.
-                // Jika 'created_at' adalah dari relasi EventsDonatur, biarkan saja.
-                // Karena model Donation sudah pakai 'donation', maka ini akan otomatis benar.
-                ->whereBetween('created_at', [$currentMonth->copy()->startOfMonth(), $currentMonth->copy()->endOfMonth()])
-                ->sum('amount');
+            $total = Donation::join('events_donatur', 'donation.event_id', '=', 'events_donatur.id')
+                ->where('events_donatur.partner_id', $partnerId)
+                ->whereBetween('donation.created_at', [
+                    $currentMonth->copy()->startOfMonth(),
+                    $currentMonth->copy()->endOfMonth()
+                ])
+                ->sum('donation.amount');
 
             $monthlyDonations->push([
                 'label' => $label,
@@ -114,13 +336,7 @@ class PartnerController extends Controller
             $currentMonth->addMonth();
         }
 
-        // --- Laporan Jumlah Pengguna per Role ---
-        $userRoles = User::selectRaw('role, COUNT(*) as count')
-            ->groupBy('role')
-            ->get();
-        $roleNames = $userRoles->pluck('role')->toArray();
-        $roleCounts = $userRoles->pluck('count')->toArray();
-
+    
         $communityCount = Partner::where('type', 'community')->count();
         $ngoCount = Partner::where('type', 'ngo')->count();
         $orphanageCount = Partner::where('type', 'orphanage')->count();
@@ -187,6 +403,7 @@ class PartnerController extends Controller
                     return [
                         'event_name' => $event->event_name,
                         'total_volunteers' => $event->volunteers_count,
+                        'status' => $event->status
                     ];
                 }),
 
@@ -201,6 +418,7 @@ class PartnerController extends Controller
                     return [
                         'event_name' => $event->event_name,
                         'total_donations_collected' => $event->donations_sum_amount ?? 0,
+                        'status' => $event->status
                     ];
                 }),
         ];
@@ -210,10 +428,6 @@ class PartnerController extends Controller
             'monthlyDonations' => [
                 'labels' => $monthlyDonations->pluck('label')->toArray(), // Convert to array
                 'data' => $monthlyDonations->pluck('total')->toArray(),   // Convert to array
-            ],
-            'userRoles' => [
-                'labels' => array_merge($roleNames, ['Community', 'NGO', 'Orphanage']),
-                'data' => array_merge($roleCounts, [$communityCount, $ngoCount, $orphanageCount])
             ],
             'topEventsByVolunteers' => [
                 'labels' => $eventNames,
@@ -231,6 +445,7 @@ class PartnerController extends Controller
         // Di dalam metode controller Anda, setelah filter diterapkan
         $startDate = request('start_date', Carbon::now()->subMonths(11)->startOfMonth());
         $endDate = request('end_date', Carbon::now()->endOfMonth());
+        $statusOrder = ['accepted', 'pending', 'rejected'];
 
         // ... kode untuk monthlyDonations, monthlyEvents, topEventsByVolunteers ...
 
@@ -238,43 +453,40 @@ class PartnerController extends Controller
         $totalVolunteerEvents = EventsVolunteers::whereBetween('start_date', [$startDate, $endDate])
                                     ->where('partner_id', auth()->user()->partner_id) // Jika ini laporan per partner
                                     ->count();
-        $completedVolunteerEvents = EventsVolunteers::whereBetween('start_date', [$startDate, $endDate])
-                                        ->where('partner_id', auth()->user()->partner_id)
-                                        ->where('status', 'completed') // Atau kondisi status Anda
-                                        ->count();
-        $ongoingVolunteerEvents = EventsVolunteers::whereBetween('start_date', [$startDate, $endDate])
-                                    ->where('partner_id', auth()->user()->partner_id)
-                                    ->where('status', 'ongoing') // Atau kondisi status Anda
-                                    ->count();
-        $upcomingVolunteerEvents = EventsVolunteers::whereBetween('start_date', [$startDate, $endDate])
-                                        ->where('partner_id', auth()->user()->partner_id)
-                                        ->where('status', 'upcoming') // Atau kondisi status Anda
-                                        ->count();
+        $statusCounts = EventsVolunteers::where('partner_id', auth('partner')->id())
+                                ->selectRaw('status, count(*) as count')
+                                ->groupBy('status')
+                                ->pluck('count', 'status')
+                                ->toArray();
 
         $reportData['volunteerEventStatus'] = [
-            'labels' => ['Selesai', 'Sedang Berlangsung', 'Akan Datang'],
-            'data' => [$completedVolunteerEvents, $ongoingVolunteerEvents, $upcomingVolunteerEvents]
+                'labels' => $statusOrder,
+                'data' => array_map(function($status) use ($statusCounts) {
+                    return $statusCounts[$status] ?? 0;
+                }, $statusOrder),
+                'hasData' => array_sum($statusCounts) > 0
         ];
 
         // Contoh data untuk distribusi status event donasi
         $totalDonaturEvents = EventsDonatur::whereBetween('start_date', [$startDate, $endDate])
                                     ->where('partner_id', auth()->user()->partner_id)
                                     ->count();
-        $completedDonaturEvents = EventsDonatur::whereBetween('start_date', [$startDate, $endDate])
-                                    ->where('partner_id', auth()->user()->partner_id)
-                                    ->where('status', 'completed')
-                                    ->count();
-        $activeDonaturEvents = EventsDonatur::whereBetween('start_date', [$startDate, $endDate])
-                                    ->where('partner_id', auth()->user()->partner_id)
-                                    ->where('status', 'active') // Atau kondisi status Anda
-                                    ->count();
+        $statusCounts = EventsDonatur::where('partner_id', auth('partner')->id())
+                            ->selectRaw('status, count(*) as count')
+                            ->groupBy('status')
+                            ->pluck('count', 'status')
+                            ->toArray();
+
 
         $reportData['donaturEventStatus'] = [
-            'labels' => ['Selesai', 'Aktif/Berlangsung'],
-            'data' => [$completedDonaturEvents, $activeDonaturEvents]
+                'labels' => $statusOrder,
+                'data' => array_map(function($status) use ($statusCounts) {
+                    return $statusCounts[$status] ?? 0;
+                }, $statusOrder),
+                'hasData' => array_sum($statusCounts) > 0
         ];
 
-        return view('partner.report.show', compact('reportData'));
+        return view('partner.report.show', compact('eventType', 'reportData'));
     }
 
 
