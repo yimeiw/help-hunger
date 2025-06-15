@@ -8,14 +8,19 @@ use App\Models\Partner;
 use App\Models\EventsVolunteers;
 use App\Models\EventsDonatur;
 use App\Models\LocationVolunteers;
-use App\Models\LocationDonatur;
+use App\Models\LocationDonatur;   
 use App\Models\Notification;
-use App\Models\Location;
+use App\Models\Location; 
 use App\Models\Provinces;
 use App\Models\Cities;
+use App\Models\EventsDonationDetails;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -90,6 +95,29 @@ class AdminDashboardController extends Controller
         return view('admin.manage.manage');
     }
 
+    public function showNotifications(Request $request)
+    {
+        $adminId = Auth::id(); // Dapatkan ID admin yang sedang login
+
+        // Ambil notifikasi yang ditujukan untuk admin ini
+        // Filter berdasarkan tipe notifikasi event submission jika diinginkan
+        $notifications = Notification::where('user_id', $adminId)
+                                    ->whereIn('type', ['event_submission_volunteer', 'event_submission_donation', 'event_status_update']) // Contoh tipe notifikasi
+                                    ->orderBy('created_at', 'desc')
+                                    ->paginate(10); // Notifikasi di-paginate
+
+        return view('admin.notification', compact('notifications'));
+    }
+
+    public function markNotificationAsRead($id)
+    {
+        $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
+        $notification->is_read = true;
+        $notification->save();
+
+        return back()->with('success', 'Notification marked as read.');
+    }
+
     public function manageUser(Request $request) {
         $role = $request->query('role');
         $query = User::query();
@@ -144,6 +172,96 @@ class AdminDashboardController extends Controller
         return back()->with('success', 'User deleted successfully.');
     }
 
+    /**
+     * Show the form for creating a new volunteer event.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function createVolunteerEvent()
+    {
+        $partners = Partner::all();
+        $locations = LocationVolunteers::all(); // Assuming a single Location model for both types
+        return view('admin.manage.event.addVolunteer', compact('partners', 'locations'));
+    }
+
+    /**
+     * Store a newly created volunteer event in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeEventVolunteer(Request $request)
+    {
+        $validatedData = $request->validate([
+            'event_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'current_needs' => 'required|string',
+            'max_volunteers' => 'required|integer|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'partner_id' => 'required|exists:partners,id',
+            'location_id' => 'required|exists:locations,id', // Assuming 'locations' table
+        ]);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('event_images/volunteer', 'public');
+            $validatedData['image'] = $imagePath;
+        }
+
+        // Admin menambahkan event, jadi status langsung 'accepted'
+        $validatedData['status'] = 'accepted';
+
+        EventsVolunteers::create($validatedData);
+
+        return redirect()->route('admin.manage-event', ['type' => 'volunteer'])->with('success', 'Volunteer event added successfully!');
+    }
+
+    /**
+     * Show the form for creating a new donation event.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function createDonationEvent()
+    {
+        $partners = Partner::all();
+        $locations = LocationDonatur::all(); // Assuming a single Location model for both types
+        return view('admin.manage.event.addDonation', compact('partners', 'locations'));
+    }
+
+    /**
+     * Store a newly created donation event in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeEventDonation(Request $request)
+    {
+        $validatedData = $request->validate([
+            'event_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'donation_target' => 'required|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'partner_id' => 'required|exists:partners,id',
+            'location_id' => 'required|exists:locations,id', // Assuming 'locations' table
+        ]);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('event_images/donation', 'public');
+            $validatedData['image'] = $imagePath;
+        }
+
+        // Admin menambahkan event, jadi status langsung 'accepted'
+        $validatedData['status'] = 'accepted';
+        $partners = Partner::all();
+
+        EventsDonatur::create($validatedData);
+
+        return redirect()->route('admin.manage-event', ['type' => 'donation'])->with('success', 'Donation event added successfully!');
+    }
+
     public function manageEvent(Request $request) {
          $eventType = $request->get('type', 'volunteer'); // Default ke 'volunteer'
 
@@ -183,28 +301,6 @@ class AdminDashboardController extends Controller
          $event = EventsDonatur::findOrFail($id);
         $event->delete();
         return redirect()->back()->with('success', 'Event donation successfully deleted.');
-    }
-
-    public function storeEventVolunteer(Request $request) {
-        $request->validate([
-            'event_name' => 'required',
-            'partner_id' => 'required',
-            'location_id' => 'required',
-            'description' => 'required',
-        ]);
-        EventsVolunteers::create($request->all());
-        return back()->with('success', 'Event volunteer berhasil ditambahkan.');
-    }
-
-    public function storeEventDonation(Request $request) {
-        $request->validate([
-            'event_name' => 'required',
-            'partner_id' => 'required',
-            'location_id' => 'required',
-            'description' => 'required',
-        ]);
-        EventsDonatur::create($request->all());
-        return back()->with('success', 'Event donasi berhasil ditambahkan.');
     }
 
     public function manageLocation(Request $request)
@@ -277,6 +373,159 @@ class AdminDashboardController extends Controller
             'donatur' => new LocationDonatur,
             default => new LocationVolunteer,
         };
+    }
+
+    public function manageEventsApproval(Request $request)
+    {
+        $statistics = [
+            'totalUsers' => User::count(),
+            'totalVolunteers' => User::where('role', 'volunteer')->count(),
+            'totalDonaturs' => User::where('role', 'donatur')->count(),
+            'totalPartners' => Partner::count(),
+            'totalDonationAmount' => Donation::sum('amount'),
+            'totalEvents' => EventsVolunteers::count() + EventsDonatur::count(),
+            'activeEvents' => EventsVolunteers::where('status', 'accepted')->whereDate('start_date', '<=', now())->whereDate('end_date', '>=', now())->count()
+                            + EventsDonatur::where('status', 'accepted')->whereDate('start_date', '<=', now())->whereDate('end_date', '>=', now())->count(),
+            'upcomingEvents' => EventsVolunteers::where('status', 'accepted')->whereDate('start_date', '>', now())->count()
+                                + EventsDonatur::where('status', 'accepted')->whereDate('start_date', '>', now())->count(),
+        ];
+
+        $perPage = 10; // Number of items per page for pending events
+        $page = $request->query('page', 1); // Current page from request, default to 1
+
+        // --- Fetch and Combine PENDING Events ---
+        $pendingVolunteerEvents = EventsVolunteers::with('partner', 'location')
+            ->where('status', 'pending')
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'volunteer';
+                return $event;
+            });
+
+        $pendingDonationEvents = EventsDonatur::with('partner', 'location')
+            ->where('status', 'pending')
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'donation';
+                return $event;
+            });
+
+        $allPendingEvents = $pendingVolunteerEvents->merge($pendingDonationEvents)->sortByDesc('created_at');
+
+        // Manually paginate the merged collection
+        $pendingEvents = new LengthAwarePaginator(
+            $allPendingEvents->forPage($page, $perPage),
+            $allPendingEvents->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+
+        // --- Fetch and Combine ONGOING Events ---
+        $now = Carbon::now();
+        $ongoingVolunteerEvents = EventsVolunteers::with('partner', 'location')
+            ->where('status', 'accepted')
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'volunteer';
+                return $event;
+            });
+
+        $ongoingDonationEvents = EventsDonatur::with('partner', 'location')
+            ->where('status', 'accepted')
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'donation';
+                return $event;
+            });
+        $ongoingEvents = $ongoingVolunteerEvents->merge($ongoingDonationEvents)->sortBy('start_date');
+
+
+        // --- Fetch and Combine COMPLETED Events ---
+        $completedVolunteerEvents = EventsVolunteers::with('partner', 'location', 'eventsVolunteersDetails')
+            ->where('status', 'accepted')
+            ->where('end_date', '<', $now)
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'volunteer';
+                return $event;
+            });
+
+        $completedDonationEvents = EventsDonatur::with('partner', 'location', 'donations')
+            ->where('status', 'accepted')
+            ->where('end_date', '<', $now)
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'donation';
+                return $event;
+            });
+        $completedEvents = $completedVolunteerEvents->merge($completedDonationEvents)->sortByDesc('end_date');
+
+
+        // --- Fetch and Combine DECLINED Events ---
+        $declinedVolunteerEvents = EventsVolunteers::with('partner', 'location')
+            ->where('status', 'rejected')
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'volunteer';
+                return $event;
+            });
+
+        $declinedDonationEvents = EventsDonatur::with('partner', 'location')
+            ->where('status', 'rejected')
+            ->get()
+            ->map(function ($event) {
+                $event->event_type = 'donation';
+                return $event;
+            });
+        $declinedEvents = $declinedVolunteerEvents->merge($declinedDonationEvents)->sortByDesc('updated_at');
+
+
+        return view('admin.dashboard', compact(
+            'statistics',
+            'pendingEvents',
+            'ongoingEvents',
+            'completedEvents',
+            'declinedEvents'
+        ));
+    }
+
+    // approveEvent and declineEvent methods remain the same as before
+    public function approveEvent($type, $id)
+    {
+        if ($type === 'volunteer') {
+            $event = EventsVolunteers::findOrFail($id);
+        } elseif ($type === 'donation') {
+            $event = EventsDonatur::findOrFail($id);
+        } else {
+            return back()->with('error', 'Invalid event type.');
+        }
+
+        $event->status = 'accepted';
+        $event->save();
+
+        return back()->with('success', 'Event ' . $event->event_name . ' has been approved.');
+    }
+
+    public function declineEvent($type, $id)
+    {
+        if ($type === 'volunteer') {
+            $event = EventsVolunteers::findOrFail($id);
+        } elseif ($type === 'donation') {
+            $event = EventsDonatur::findOrFail($id);
+        } else {
+            return back()->with('error', 'Invalid event type.');
+        }
+
+        $event->status = 'rejected';
+        $event->save();
+
+        return back()->with('success', 'Event ' . $event->event_name . ' has been declined.');
     }
 
 }
