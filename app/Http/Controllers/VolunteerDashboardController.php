@@ -124,20 +124,34 @@ class VolunteerDashboardController extends Controller
             $eventsDetail->volunteer_id = $authenticatedUser->id;
             $eventsDetail->save();
 
-            $notification = new Notification();
-            $notification->user_id = $authenticatedUser->id;
-            $notification->title = 'Registration Confirmed for ' . $event->event_name;
-            $notification->message = 'You have successfully registered as a volunteer for the ' . $event->event_name . ' event on ' . $event->start_date . ' until ' . $event->end_date . '.';
-            $notification->is_read = false;
-            $notification->created_at = now();
-            $notification->save();
+            // Notifikasi untuk admin
+            $adminUsers = User::where('role', 'admin')->get();
             
+            foreach ($adminUsers as $admin) {
+                Notification::create([
+                    'user_id' => $admin->id,
+                    'title' => 'New Volunteer Registered',
+                    'message' => 'Volunteer ' . $authenticatedUser->username . ' has registered for event: ' . $event->event_name,
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Notifikasi untuk volunteer
+            Notification::create([
+                'user_id' => $authenticatedUser->id,
+                'title' => 'Registration Confirmed for ' . $event->event_name,
+                'message' => 'You have successfully registered as a volunteer for the ' . $event->event_name . ' event on ' . $event->start_date->format('d F Y') . ' until ' . $event->end_date->format('d F Y') . '.',
+                'is_read' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             // 6. Redirect with success message AND loading flag
             return redirect()->route('volunteer.events.landing')
-                             ->with('success', 'Yay, you\'re officially a volunteer! Time to make the world a better place together ✨')
-                             ->with('show_loading', true); // Flash the loading flag
-
+                            ->with('success', 'Yay, you\'re officially a volunteer! Time to make the world a better place together ✨')
+                            ->with('show_loading', true);
         } catch (\Exception $e) {
             Log::error('Volunteer registration error: ' . $e->getMessage(), ['user_id' => $authenticatedUser->id, 'event_id' => $event->id]);
             return redirect()->back()->with('error', 'An error occurred during registration. Please try again.');

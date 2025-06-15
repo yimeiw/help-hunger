@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User; 
 use App\Models\Partner; 
 use Illuminate\Http\Request;
 use App\Models\Donatur;
@@ -12,7 +13,7 @@ use App\Models\EventsDonatur;
 use Illuminate\Support\Facades\Auth; 
 use App\Models\EventsDonationDetails;
 use App\Models\EventsVolunteersDetail;
-use App\Models\Notifications;
+use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Models\LocationVolunteers;
@@ -161,6 +162,27 @@ class PartnerController extends Controller
 
         // 3. Create the event
         EventsVolunteers::create($eventData);
+
+        // Create notification for admin about new volunteer event
+        $adminUsers = User::where('role', 'admin')->get(); // Asumsi ada kolom 'role' di tabel users
+        
+        foreach ($adminUsers as $admin) {
+            Notification::create([
+                'user_id' => $admin->id,
+                'title' => 'New Volunteer Event Created',
+                'message' => 'Partner ' . Auth::guard('partner')->user()->partner_name . ' has created a new volunteer event: ' . $eventData['event_name'] . '. Please review for approval.',
+                'is_read' => false,
+            ]);
+        }
+
+        // Juga bisa menambahkan notifikasi untuk partner itu sendiri
+        Notification::create([
+            'user_id' => Auth::guard('partner')->user()->id, // Asumsi partner juga ada di tabel users atau sesuaikan
+            'title' => 'Volunteer Event Successfully Created',
+            'message' => 'Your Volunteer Event  "' . $eventData['event_name'] . '" successfully created and waiting for admin approval.',
+            'is_read' => false,
+        ]);
+
 
         return redirect()->route('partner.program.show', ['type' => 'volunteer'])->with('success', 'Volunteer event added successfully!');
     }
