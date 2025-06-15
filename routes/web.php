@@ -35,7 +35,7 @@ Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah ti
     // Login Routes
     Route::get('/login', [LoginPartnerController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginPartnerController::class, 'login'])->name('login.attempt');
-    Route::post('/logout', [LoginPartnerController::class, 'logout'])->name('logout');
+    Route::post('/partner/logout', [ProfileController::class, 'logout'])->name('logout');
 
     // Registration Routes for Partner
     // Perhatikan: Anda sudah di dalam prefix 'partner', jadi '/register/partner' akan menjadi '/partner/register/partner'.
@@ -70,12 +70,12 @@ Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah ti
         Route::get('/get-cities/{provinceId}', [PartnerController::class, 'getCitiesByProvince'])->name('get.cities');
 
 
-
-
         Route::get('/report', [PartnerController::class, 'report'])->name('report.show');
         Route::get('/notifications', [PartnerController::class, 'notifications'])->name('notifications.show');
         Route::get('/profile', [PartnerController::class, 'profile'])->name('profile.show');
+        Route::post('/partner/profile', [ProfileController::class, 'update'])->name('profile.update');
     });
+
 });
 
 

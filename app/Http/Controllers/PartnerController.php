@@ -521,7 +521,72 @@ class PartnerController extends Controller
 
     public function profile()
     {
-        return view('partner.profile.show');
+        // Mendapatkan pengguna yang sedang login menggunakan guard 'partner'
+        $user = Auth::guard('partner')->user();
+
+        // Jika tidak ada pengguna yang login dengan guard 'partner', arahkan ke login
+        if (!$user) {
+            return redirect('/partner/login'); // Sesuaikan dengan route login partner Anda
+        }
+
+        // Mengirim data pengguna ke view
+        return view('partner.profile.show', compact('user'));
+    }
+
+    public function update(Request $request)
+    {
+        // Mendapatkan pengguna yang sedang login menggunakan guard 'partner'
+        $user = Auth::guard('partner')->user();
+
+        // Jika tidak ada pengguna yang login dengan guard 'partner', arahkan ke login
+        if (!$user) {
+            return redirect('/partner/login'); // Sesuaikan dengan route login partner Anda
+        }
+
+        // Memvalidasi data yang masuk dari form
+        $validatedData = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                // Pastikan email unik di tabel 'partners', kecuali untuk email partner saat ini
+                // Ganti 'partners' jika provider 'partner' Anda menggunakan nama tabel lain
+                Rule::unique('partners')->ignore($user->id),
+            ],
+        ]);
+
+        // Memperbarui data pengguna
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+
+        // Menyimpan perubahan ke database
+        $user->save();
+
+        // Mengarahkan kembali ke halaman profil dengan pesan sukses
+        // Anda bisa menggunakan 'with()' untuk mengirimkan flash message
+        return redirect()->route('partner.profile.show')->with('status', 'Profile updated successfully!');
+    }
+
+    /**
+     * Melakukan logout pengguna dari guard 'partner'.
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function logout(Request $request)
+    {
+        // Melakukan logout khusus untuk guard 'partner'
+        Auth::guard('partner')->logout();
+
+        // Menginvalidasi sesi
+        $request->session()->invalidate();
+
+        // Meregenerasi token CSRF
+        $request->session()->regenerateToken();
+
+        // Mengarahkan pengguna ke halaman login partner
+        return redirect('/partner/login'); // Sesuaikan dengan route login partner Anda
     }
 
 }

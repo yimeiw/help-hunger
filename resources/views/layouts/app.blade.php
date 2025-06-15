@@ -22,11 +22,21 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
     <!-- Custom Style -->
     <style>
         body {
             font-family: 'Figtree', sans-serif;
+        }
+        /* button di donation create */
+        .amount-button.selected,
+        .payment-method-button.selected {
+            background-color: #FFF0B7;
+        }
+
+        /* Optional: Untuk transisi background yang halus */
+        .amount-button,
+        .payment-method-button {
+            transition: background-color 0.3s ease;
         }
 
         /* kalender di report */
@@ -267,7 +277,6 @@
         }
     </style>
 </head>
-
 <body class="flex flex-col min-h-screen font-[poppins] antialiased bg-all">
     @livewire('navigation-menu')
 
@@ -289,43 +298,71 @@
 
     <x-footer-app /> {{-- Sticky footer --}}
 
-    <!-- Modals & Scripts -->
     @stack('modals')
-    @livewireScripts
-    @stack('scripts')
-    
-    <!-- SweetAlert2 -->
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        const originalSwalFire = Swal.fire;
-    
-        Swal.fire = function(options) {
-            const defaultConfig = {
-                confirmButtonColor: '#ef4444', // Tailwind's red-500 (matching redb)
-                cancelButtonColor: '#d1d5db',  // Tailwind's gray-300
-                background: '#fff7ed', // Tailwind's orange-50 (matching creamcard)
-                color: '#991b1b', // Tailwind's red-800 (matching redb)
-                iconColor: '#ef4444', // Red icon
-                buttonsStyling: false,
-                customClass: {
-                    popup: 'rounded-xl shadow-lg',
-                    title: 'text-xl font-bold text-redb',
-                    htmlContainer: 'text-sm text-gray-700',
-                    confirmButton: 'text-creamcard px-4 py-2 rounded hover:bg-red-700 transition',
-                    cancelButton: 'text-gray-800 px-4 py-2 rounded hover:bg-greenbg-400 transition',
-                    icon: 'border-2 border-redb rounded-full'
-                }
+        if (typeof Swal !== 'undefined' && typeof Swal.fire === 'function') {
+            const originalSwalFire = Swal.fire;
+
+            Swal.fire = function(options) {
+                const defaultConfig = {
+                    confirmButtonColor: '#902B29', // Merah gelap
+                    cancelButtonColor: '#3085d6', // Biru
+                    background: '#FFF7D9', // Krem terang
+                    color: '#902B29', // Warna teks utama, merah gelap
+                    iconColor: '#902B29', // Warna ikon, merah gelap
+                    buttonsStyling: false, // PENTING: Matikan styling default Swal untuk pakai Tailwind
+                    customClass: {
+                        popup: 'rounded-xl shadow-lg',
+                        title: 'text-xl font-bold text-redb', // Asumsi redb adalah warna dari Tailwind
+                        htmlContainer: 'text-sm text-gray-700',
+                        buttonsStyling: false,
+                        confirmButton: '!bg-redb !text-creamhh * px-4 py-2 rounded-lg font-bold shadow-quadrupleNonHover hover:shadow-quadrupleHover transition duration-300 ease-in-out mr-4',
+                        cancelButton: '!bg-creamhh !text-redb px-4 py-2 rounded-lg font-bold shadow-quadrupleNonHover hover:shadow-quadrupleHover transition duration-300 ease-in-out',
+                        icon: 'border-2 border-redb rounded-full'
+                    }
+                };
+
+                const finalOptions = Object.assign({}, defaultConfig, options || {});
+                return originalSwalFire.apply(this, [finalOptions]); // <--- THE KEY FIX IS HERE
             };
-    
-            const finalOptions = Object.assign({}, defaultConfig, options || {});
-            return originalSwalFire(finalOptions);
-        };
+        } else {
+            console.warn("SweetAlert2's Swal.fire not found for modification. Check loading order.");
+        }
     </script>
-    
-    <!-- AlpineJS -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <!-- Vite JS -->
+
+    {{-- Script untuk carousel Anda yang memicu SweetAlert (disarankan di file JS terpisah atau di bawah ini) --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutSlides = document.querySelectorAll('.logout-slide');
+
+            logoutSlides.forEach(slide => {
+                slide.addEventListener('click', function(event) {
+                    // Prevent the default action if it's an <a> tag
+                    if (this.tagName === 'A') {
+                        event.preventDefault();
+                    }
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You have to logout before accessing this content!",
+                        icon: 'warning',
+                        confirmButtonText: 'Yes, Logout!',
+                        cancelButtonText: 'No, Stay Logged In'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('logout-form').submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+    @stack('scripts')
+
     @vite(['resources/js/app.js'])
 </body>
 </html>

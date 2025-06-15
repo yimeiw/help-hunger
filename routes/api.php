@@ -9,6 +9,33 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+
+Route::get('/check-email-role', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'role' => 'required|in:volunteer,donatur'
+    ]);
+
+    $user = App\Models\User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return response()->json([
+            'valid' => false,
+            'message' => 'Email not registered.'
+        ]);
+    }
+
+    if ($user->role !== $request->role) {
+        return response()->json([
+            'valid' => false,
+            'message' => 'This email is registered as '.ucfirst($user->role)
+        ]);
+    }
+
+    return response()->json(['valid' => true]);
+});
+
+
 // IMPORTANT: Removed the '/api' prefix from the route path
 Route::get('/geocode/reverse', function (Request $request) {
     $lat = $request->query('lat');

@@ -1,5 +1,7 @@
 <x-app-layout>
     @section('title', 'Donatur Register')
+    @inject('Storage', 'Illuminate\Support\Facades\Storage')
+
 
     @if($event)
         <div class="mx-8 mt-8 mb-8">
@@ -22,15 +24,28 @@
 
             <div class="flex flex-row">
                 <div class="p-8 mb-8 text-redb w-1/2">
-                    <div class="bg-greenbg p-8  rounded-lg  mb-4">
-                        <img src="{{ asset($event->image_path) }}" alt="" class="h-full">
+                    <div class="bg-greenbg p-8 rounded-lg  mb-4 flex items-center justify-center">
+                        {{-- Display the event image --}}
+                        @php
+                            $imageUrl = '';
+                            if ($event->image_path && str_starts_with($event->image_path, 'assets/')) {
+                                $imageUrl = asset($event->image_path);
+                            }
+                            else if ($event->image_path) {
+                                $imageUrl = $Storage::url($event->image_path);
+                            }
+                            // Fallback for null/empty path or if no image is found via the above methods
+                            else {
+                                $imageUrl = asset('/assets/default-icon-community.svg'); // Your default image
+                            }
+                        @endphp
+                        <img src="{{ $imageUrl }}" alt="Event Image" class="h-full">
                     </div>
 
-                    <p class="mb-4">Program <span class="font-bold">{{ $event->event_name }}</span> </p>
+                    <p class="mb-4 font-bold">{{ $event->event_name }} </p>
                     <p class="text-sm text-justify mb-4">{{ $event->first_paragraph }}</p>
                     @if($event->remaining_description)
-                        <div class="text-creamcard font-regular">
-                            {{-- Use {!! !!} if your remaining description might contain HTML, like new paragraphs --}}
+                        <div class="text-redb font-regular">
                             <p class="text-sm text-justify mb-4">{!! nl2br(e($event->remaining_description)) !!}</p>
                         </div>
                     @endif
@@ -175,9 +190,18 @@
                             </div>
                             <input type="hidden" id="payment_method_input" name="payment_method" value="" required>
                             
-                            {{-- Donate --}}
-                            <button type="submit" id="donateButton" class="rounded-md [box-shadow:4px_5px_0px_rgb(144,43,41,1)] bg-creamcard text-redb font-bold px-4 py-2 mt-4 w-full text-center">Donate</button>
-                            
+                            <button type="submit" id="donateButton"
+                            class="rounded-md px-4 py-2 mt-4 w-full text-center font-bold
+                                {{ $canDonate ? 'bg-creamcard text-redb [box-shadow:4px_5px_0px_rgb(144,43,41,1)] hover:shadow-none hover:translate-y-px hover:translate-x-px' : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}"
+                            {{ $canDonate ? '' : 'disabled' }}>
+                                {{ $canDonate ? 'Donate Now' : 'Donation Closed' }}
+                            </button>
+
+                            {{-- Pesan opsional jika donasi ditutup --}}
+                            @unless($canDonate)
+                                <p class="text-red-500 text-sm mt-2 text-center">This donation period has ended.</p>
+                            @endunless
+                                
                             {{-- Terms And Conditions --}}
                             <div class="mt-4">
                                 <input type="checkbox" name="agree" id="agree" class="peer rounded bg-transparent shadow-sm focus:ring-redb border border-creamcard rounded-sm mr-2" required>
@@ -213,33 +237,34 @@
 
             let numericAmount = parseFloat(amount);
 
-            // Ensure amount is a positive number and meets minimum requirement
-            if (isNaN(numericAmount) || numericAmount < 1000) { // Set minimum here to match backend
-                numericAmount = 0; // Or keep it at min:1000 if you want the input to reflect that
-                // You might want to visually indicate an error if numericAmount < 1000 here
+            if (isNaN(numericAmount) || numericAmount < 1000) {
+                numericAmount = 0;
             }
 
-            // Update the hidden input field that gets submitted
-            donationAmountInput.value = numericAmount > 0 ? numericAmount : ''; // Set to empty string if 0 or invalid, so 'required' works
-
-            // Calculate estimated meals
+            donationAmountInput.value = numericAmount > 0 ? numericAmount : '';
             const estimatedMeals = Math.floor(numericAmount / COST_PER_MEAL);
             estimatedMealsSpan.textContent = estimatedMeals;
 
             // --- Handle Button Styles ---
-            amountButtons.forEach(btn => btn.classList.remove('selected')); // Remove 'selected' from all
+            amountButtons.forEach(btn => btn.classList.remove('selected'));
 
-            if (clickedButton) { // If a preset button was clicked
-                clickedButton.classList.add('selected'); // Add 'selected' to it
-                customAmountInput.value = ''; // Clear custom input
+            if (clickedButton) {
+                clickedButton.classList.add('selected');
+                customAmountInput.value = '';
+
+                // --- Efek animasi klik: Tambahkan kelas animasi sementara ---
+                // Misalnya: scale down sedikit saat aktif, lalu kembali normal
+                clickedButton.classList.add('scale-95', 'duration-100'); // Skala 95% dan durasi 100ms
+                setTimeout(() => {
+                    clickedButton.classList.remove('scale-95', 'duration-100');
+                }, 150); // Hapus setelah sedikit waktu agar terlihat transisi
+                // Anda juga bisa menambahkan 'active:scale-95' langsung di HTML jika ingin CSS saja
             } else {
-                // If custom input was used, ensure its value is numericAmount
                 if (numericAmount > 0) {
                     customAmountInput.value = numericAmount;
                 }
             }
 
-            // Call the checkFormValidity function after updating the amount
             checkFormValidity();
         }
 
@@ -248,19 +273,18 @@
             const paymentMethodInput = document.getElementById('payment_method_input');
             const paymentMethodButtons = document.querySelectorAll('.payment-method-button');
 
-            // Remove 'selected' from all payment method buttons
             paymentMethodButtons.forEach(btn => btn.classList.remove('selected'));
-
-            // Add 'selected' to the clicked button
             clickedButton.classList.add('selected');
-
-            // Set the value of the hidden payment method input
             paymentMethodInput.value = method;
 
-            // Call the checkFormValidity function after updating the payment method
+            // --- Efek animasi klik: Tambahkan kelas animasi sementara ---
+            clickedButton.classList.add('scale-95', 'duration-100');
+            setTimeout(() => {
+                clickedButton.classList.remove('scale-95', 'duration-100');
+            }, 150);
+
             checkFormValidity();
         }
-
 
         // Function to check all form validity and enable/disable the submit button
         function checkFormValidity() {
@@ -270,16 +294,10 @@
             const donateButton = document.getElementById('donateButton');
             const customAmountInput = document.getElementById('custom_amount');
 
-            // Check if amount is selected/entered and is valid (min 1000)
             const isAmountSelected = donationAmountInput.value !== '' && parseFloat(donationAmountInput.value) >= 1000;
-
-            // Check if payment method is selected
             const isPaymentMethodSelected = paymentMethodInput.value !== '';
-
-            // Check if terms and conditions are agreed
             const isAgreed = agreeCheckbox.checked;
 
-            // Enable button only if all conditions are true
             if (isAmountSelected && isPaymentMethodSelected && isAgreed) {
                 donateButton.removeAttribute('disabled');
             } else {
@@ -287,14 +305,13 @@
             }
         }
 
-
         // Add event listeners when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             const amountButtons = document.querySelectorAll('.amount-button');
             amountButtons.forEach(button => {
                 button.addEventListener('click', (event) => {
                     const amount = event.currentTarget.dataset.amount;
-                    updateSelectedAmount(amount, event.currentTarget); // Pass the clicked button element
+                    updateSelectedAmount(amount, event.currentTarget);
                 });
             });
 
@@ -306,15 +323,8 @@
                 });
             });
 
-            // Add event listener for the terms and conditions checkbox
             document.getElementById('agree').addEventListener('change', checkFormValidity);
 
-            // Add event listener for the custom amount input
-            // Note: The oninput already calls updateSelectedAmount which calls checkFormValidity
-            // document.getElementById('custom_amount').addEventListener('input', checkFormValidity);
-
-            // Initialize the display and button state on page load
-            // Check if a default amount button is selected or if custom amount has a value
             const defaultSelectedAmountButton = document.querySelector('.amount-button.selected');
             const initialCustomAmount = document.getElementById('custom_amount').value;
 
@@ -323,16 +333,13 @@
             } else if (initialCustomAmount) {
                 updateSelectedAmount(initialCustomAmount, null);
             } else {
-                // Ensure initial check happens even if no default amount is set
                 checkFormValidity();
             }
 
-            // Initialize payment method if one is pre-selected (though not in your current HTML)
             const defaultSelectedPaymentMethodButton = document.querySelector('.payment-method-button.selected');
             if (defaultSelectedPaymentMethodButton) {
                 updatePaymentMethod(defaultSelectedPaymentMethodButton.dataset.paymentMethod, defaultSelectedPaymentMethodButton);
             } else {
-                // Ensure initial check happens even if no default payment method is set
                 checkFormValidity();
             }
         });

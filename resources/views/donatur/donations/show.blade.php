@@ -1,5 +1,7 @@
 <x-app-layout>
     @section('title', 'Donations')
+    @inject('Storage', 'Illuminate\Support\Facades\Storage')
+
     <body>
         <div class="flex items-center justify-center text-center m-12 px-96">
             <p class="text-redb font-bold text-3xl">ONE DONATION, COUNTLESS IMPACT!</p>
@@ -52,7 +54,22 @@
                             {{-- Gambar --}}
                             <div class="flex items-center justify-center mb-4">
                             @if ($event->image_path)
-                                <img src="{{ asset('/' . $event->image_path) }}" alt="Event Image" class="w-50 h-44 object-cover rounded-lg">
+                                @php
+                                    $imageUrl = '';
+                                    // Check if the path starts with 'assets/' (from seeder/public directory)
+                                    if ($event->image_path && str_starts_with($event->image_path, 'assets/')) {
+                                        $imageUrl = asset($event->image_path);
+                                    }
+                                    // Otherwise, assume it's a path for storage (uploaded files)
+                                    else if ($event->image_path) {
+                                        $imageUrl = $Storage::url($event->image_path);
+                                    }
+                                    // Fallback for null/empty path or if no image is found via the above methods
+                                    else {
+                                        $imageUrl = asset('/assets/default-icon-community.svg'); // Your default image
+                                    }
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="Event Image" class="w-50 h-44 object-cover rounded-lg">
                             @else
                                 <img src="{{ asset('/assets/default-icon-community.svg') }}" alt="Default Event Image" class="w-32 h-32 object-cover rounded-lg">
                             @endif
@@ -87,41 +104,6 @@
         </div>
 
 
-        <div class="flex items-center justify-center pl-8 pr-8 pb-8 pt-4">
-            <hr class="border-t-2 border-redb w-full">
-        </div>
 
-        <div class="flex flex-row items-center justify-center gap-32 ml-64 mr-48 text-center">
-            <div class="flex flex-col items-center justify-center text-redb">
-                <p class="text-3xl font-bold">#STEP 1</p>
-                <p class="text-lg font-bold">Register Account</p>
-                <p class="text-base font-regular">Register yourself as a donor on the HelpHunger platform.</p>
-            </div>
-            <div class="flex ml-16">
-                <hr class="border w-0 h-36 border-redb w-full">
-            </div>
-
-            <div class="flex flex-col items-center justify-center text-redb">
-                <p class="text-3xl font-bold">#STEP 2</p>
-                <p class="text-lg font-bold">Choose Donation Type</p>
-                <p class="text-base font-regular">Fill out the form to donate food or money, including details like location, quantity, or payment method.</p>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-center ml-96 mr-96 mb-12 mt-6">
-            <hr class="border-t-2 border-redb w-full">
-        </div>
-
-        <div class="flex items-center justify-center mb-14">
-            <div class="flex flex-col items-center justify-center text-redb px-96 text-center">
-                <p class="text-3xl font-bold">#STEP 3</p>
-                <p class="text-lg font-bold">Track & See the Impact</p>
-                <p class="text-base font-regular">Your donation will be distributed through our network of volunteers and social partners. You can view the impact of your contribution directly from your account dashboard.</p>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-center ml-8 mr-8 mb-14 mt-4">
-            <hr class="border-t-2 border-redb w-full">
-        </div>
     </body>
 </x-app-layout>

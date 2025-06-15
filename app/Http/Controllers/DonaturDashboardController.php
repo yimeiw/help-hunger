@@ -50,7 +50,8 @@ class DonaturDashboardController extends Controller
     {
         // Eager load 'partner', 'location', dan 'successfulDonations'
         $events = EventsDonatur::with(['partner', 'location', 'successfulDonations'])
-                            ->get();
+                               ->where('status', 'accepted') // <-- TAMBAHKAN BARIS INI
+                               ->get();
 
         // Sekarang, hitung total donasi dan jumlah donasi yang sukses
         foreach ($events as $event) {
@@ -61,34 +62,39 @@ class DonaturDashboardController extends Controller
         return view('donatur.donations.show', compact('events'));
     }
     
+    
     public function donationsRegister(Request $request)
     {
-        
-        $event = null; // Initialize $event to null
+        $event = null;
+        $canDonate = false; // Default: tidak bisa donasi
 
         if ($request->has('event')) {
-            // Fetch the specific event based on the request parameter
-            // Ensure 'donations' are eager loaded for sum calculation in the view
             $event = EventsDonatur::with(['location', 'partner', 'donations'])->find($request->event);
 
-            // Your splitting logic (which is correct for the controller)
-            if ($event) { // Ensure an event was found before processing
+            if ($event) {
+                // Periksa apakah event masih aktif (tanggal berakhir belum lewat)
+                // Pastikan kolom start_date dan end_date adalah tipe 'date' atau 'datetime' di database
+                $now = Carbon::now();
+                $startDate = Carbon::parse($event->start_date); // Konversi ke objek Carbon
+                $endDate = Carbon::parse($event->end_date);     // Konversi ke objek Carbon
+
+                // Logika: Bisa donasi jika tanggal sekarang antara start_date dan end_date (inklusif)
+                // Atau, jika Anda hanya ingin cek end_date: $canDonate = $now->lte($endDate);
+                $canDonate = $now->between($startDate, $endDate);
+
+                // Jika ingin event juga harus memiliki status 'accepted'
+                // $canDonate = $now->between($startDate, $endDate) && $event->status === 'accepted';
+
+
                 $description = $event->event_description;
-
-                // Split by two or more newlines
                 $paragraphs = preg_split('/(\r?\n){2,}/', $description, 2);
-
-                // Assign the first paragraph
                 $event->first_paragraph = $paragraphs[0];
-
-                // Assign the remaining description, if it exists
                 $event->remaining_description = isset($paragraphs[1]) && trim($paragraphs[1]) !== '' ? $paragraphs[1] : null;
             }
         }
-        
-        // Now pass the variable as $event to match your Blade view
-        return view('donatur.donations.create', compact('event')); 
 
+        // Teruskan variabel $canDonate ke view
+        return view('donatur.donations.create', compact('event', 'canDonate'));
     }
 
     public function donationsRegisterLanding()
@@ -96,24 +102,24 @@ class DonaturDashboardController extends Controller
         return view('donatur.donations.landing');
     }
 
+    
     public function donationsRegisterStore(Request $request)
     {
-        // 1. Validasi data yang masuk
         $validatedData = $request->validate([
             'amount' => 'required|numeric|min:1000',
             'event_id' => 'required|exists:events_donatur,id',
             'payment_method' => 'required|string|in:BCA,Master Card,Link Aja',
         ]);
 
-        // Dapatkan ID pengguna yang terautentikasi
         $donaturId = Auth::id();
-
         if (!$donaturId) {
             return redirect()->back()->with('error', 'Silakan login untuk membuat donasi.');
         }
 
         try {
-            // 2. Buat record Donasi dengan status 'pending'
+            // Tambahkan ini - ambil data event terlebih dahulu
+            $event = EventsDonatur::findOrFail($validatedData['event_id']);
+            
             $donation = Donation::create([
                 'amount' => $validatedData['amount'],
                 'payment_status' => 'pending',
@@ -123,7 +129,7 @@ class DonaturDashboardController extends Controller
                 'event_id' => $validatedData['event_id'],
             ]);
 
-            $user = Auth::user(); // Dapatkan data user yang terautentikasi
+            $user = Auth::user();
             $formattedAmount = number_format($validatedData['amount'], 0, ',', '.');
 
             // Notifikasi untuk admin
@@ -150,7 +156,6 @@ class DonaturDashboardController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // 3. Redirect ke halaman konfirmasi pembayaran
             return redirect()->route('donatur.donations.confirm', [
                 'donation_id' => $donation->id,
             ])->with([
@@ -159,7 +164,7 @@ class DonaturDashboardController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Kesalahan pendaftaran donasi: ' . $e->getMessage(), [
+            \Log::error('Kesalahan pendaftaran donasi: ' . $e->getMessage(), [
                 'donatur_id' => $donaturId,
                 'event_id' => $validatedData['event_id'],
                 'trace' => $e->getTraceAsString()
@@ -167,6 +172,8 @@ class DonaturDashboardController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memproses donasi Anda. Silakan coba lagi.')->withInput();
         }
     }
+
+
 
     // --- Metode baru untuk menampilkan halaman konfirmasi pembayaran ---
     public function showDonationConfirmation($donation_id)

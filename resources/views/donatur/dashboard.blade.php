@@ -58,45 +58,50 @@
                     </a>
                 </div>
 
-                <div class="flex flex-col lg:flex-row gap-8 m-7 rounded-lg overflow-hidden">
+                
+
+                <div class="flex flex-col lg:flex-row gap-8 m-7 rounded-lg overflow-hidden">  
                     <!-- Slider -->
-                    <div id="default-carousel" class="relative bg-greenbg rounded-lg w-[884px] min-h-[500px] " data-carousel="slide">
+                    <div id="default-carousel" class="relative bg-greenbg rounded-lg w-[884px] min-h-[500px]" data-carousel="slide">
                         <!-- Carousel wrapper -->
-                        <div class="relative w-full overflow-hidden rounded-lg min-h-[450px] flex justify-center items-center">
-                            <!-- Item 1 -->
-                            <a href="{{ route('guest.events') }}" class="absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center" data-carousel-item>
-                                <p class="text-creamhh font-bold text-lg mb-4">One day of your time = dozens of full stomachs!</p>
-                                <img src="{{ asset('/assets/slider-image-1.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
-                            </a>
+                                <div class="relative w-full overflow-hidden rounded-lg min-h-[450px] flex justify-center items-center">
+                                    <!-- Item 1 -->
+                                    <div class="logout-slide absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center cursor-pointer" data-carousel-item>
+                                        <p class="text-creamhh font-bold text-lg mb-4">One day of your time = dozens of full stomachs!</p>
+                                        <img src="{{ asset('/assets/slider-image-1.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
+                                    </div>
+        
+                                    <!-- Item 2 -->
+                                    <a href="{{ route('donatur.donations.show') }}" class="absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center" data-carousel-item>
+                                        <p class="text-creamhh font-bold text-lg px-6 pt-14">#1 Food Donation Connecting Platform in Indonesia</p>
+                                        <img src="{{ asset('/assets/slider-image-2.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
+                                    </a>
+        
+                                    <!-- Item 3 -->
+                                    <div class="logout-slide absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center cursor-pointer" data-carousel-item>
+                                        <p class="text-creamhh font-bold text-lg px-6 pt-14">With HelpHunger, your social efforts reach even more people in need!</p>
+                                        <img src="{{ asset('/assets/slider-image-3.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
+                                    </div>
+                                </div>
 
-                            <!-- Item 2 -->
-                            <a href="{{ route('guest.donations') }}" class="absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center" data-carousel-item>
-                                <p class="text-creamhh font-bold text-lg px-6 pt-14">#1 Food Donation Connecting Platform in Indonesia</p>
-                                <img src="{{ asset('/assets/slider-image-2.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
-                            </a>
-
-                            <!-- Item 3 -->
-                            <a href="{{ route('guest.partner') }}" class="absolute inset-0 hidden duration-700 ease-in-out flex flex-col justify-center items-center p-4 text-center" data-carousel-item>
-                                <p class="text-creamhh font-bold text-lg px-6 pt-14">With HelpHunger, your social efforts reach even more people in need!</p>
-                                <img src="{{ asset('/assets/slider-image-3.svg') }}" class="w-full max-w-xl h-auto object-contain" alt="...">
-                            </a>
-
-                        </div>
-                        <!-- Slider indicators -->
-                        <div class="absolute bottom-4 flex space-x-3 rtl:space-x-reverse left-1/2 -translate-x-1/2">
-                            <button type="button" aria-current="true" aria-label="Slide 1" data-carousel-slide-to="0" class="w-6 h-6 flex items-center justify-center">
-                                <img src="{{ asset('/assets/indicator-unactive.svg') }}" alt="Indicator 1">
-                            </button>
-                            <button type="button" aria-current="false" aria-label="Slide 2" data-carousel-slide-to="1" class="w-6 h-6 flex items-center justify-center">
-                                <img src="{{ asset('/assets/indicator-unactive.svg') }}" alt="Indicator 2">
-                            </button>
-                            <button type="button" aria-current="false" aria-label="Slide 3" data-carousel-slide-to="2" class="w-6 h-6 flex items-center justify-center">
-                                <img src="{{ asset('/assets/indicator-unactive.svg') }}" alt="Indicator 3">
-                            </button>
-                        </div>
-
-                        
+    
+                            <!-- Slider indicators -->
+                            <div class="absolute bottom-4 flex space-x-3 rtl:space-x-reverse left-1/2 -translate-x-1/2">
+                                <button type="button" aria-current="true" aria-label="Slide 1" data-carousel-slide-to="0" class="w-6 h-6 flex items-center justify-center">
+                                    <img src="{{ asset('/assets/indicator-unactive.svg') }}" alt="Indicator 1">
+                                </button>
+                                <button type="button" aria-current="false" aria-label="Slide 2" data-carousel-slide-to="1" class="w-6 h-6 flex items-center justify-center">
+                                    <img src="{{ asset('/assets/indicator-unactive.svg') }}" alt="Indicator 2">
+                                </button>
+                                <button type="button" aria-current="false" aria-label="Slide 3" data-carousel-slide-to="2" class="w-6 h-6 flex items-center justify-center">
+                                    <img src="{{ asset('/assets/indicator-unactive.svg') }}" alt="Indicator 3">
+                                </button>
+                            </div>
                     </div>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="post">
+                        @csrf
+                    </form>
 
 
                     <!-- View More -->
@@ -126,7 +131,7 @@
                                     </div>
 
                                     <div class="flex justify-center items-center mt-4">
-                                        <a href="{{ route('volunteer.events.create', ['event' => $event->id]) }}" class="px-4 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
+                                        <a href="{{ route('donatur.donations.create', ['event' => $event->id]) }}" class="px-4 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
                                     </div>
 
 
@@ -135,7 +140,7 @@
                             @endforeach
                              
                             <div class="flex items-end">
-                                <a href="{{ route('guest.donations') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                                <a href="{{ route('donatur.donations.show') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                                     View More
                                     <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
                                 </a>
@@ -144,10 +149,10 @@
 
                         <div class="grid grid-cols-3 flex-row-reverse gap-6">
                             <div class="flex justify-end items-end ml-6">
-                                <a href="{{ route('guest.events') }}" class="flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                                <div class="logout-slide cursor-pointer flex justify-center items-center font-bold text-redb text-lg bg-creamcard border-redb border-2 rounded-lg w-48 h-auto p-2 hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                                     View More
                                     <img src="{{ asset('/assets/next-button.svg') }}" alt="" class="w-8 h-8">
-                                </a>
+                                </div>
                             </div>
                             
                             @foreach ($eventsVolunteers as $event)
@@ -193,11 +198,8 @@
                                             <div class="flex flex-col justify-center items-center mt-4 text-center">
                                                 @if ($loggedInUser) {{-- User is logged in but not as donatur --}}
                                                     <p class="text-redb text-xs mb-2">You are logged in, but not currently as a volunteer. Please login again with the 'volunteer' role to donate.</p>
-                                                    <form action="{{ route('logout') }}" method="POST" class="inline-block">
-                                                        @csrf
-                                                        <input type="hidden" name="intended_url_after_login" value="{{ route('volunteer.events.create', ['event' => $event->id]) }}">
-                                                        <button type="submit" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Login as Volunteer</button>
-                                                    </form>
+                                            
+                                                        <button type="submit" class="logout-slide px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Login as Volunteer</button>
                                                 @endif
                                             </div>
                                         @endif
@@ -215,7 +217,7 @@
                     <p class="font-bold text-redb text-xl p-6">Our Services</p>
 
                     <div class="flex flex-row gap-8 bg-greenbg rounded-lg w-auto h-auto p-12">
-                        <a href="{{ route('guest.events') }}" class="group relative flex flex-col justify-center items-center bg-creamcard w-[150px] h-[205px] p-6 rounded-lg shadow-quadrupleNonHover hover:bg-redb transition duration-300 ease-in-out">
+                        <div class="logout-form cursor-pointer group relative flex flex-col justify-center items-center bg-creamcard w-[150px] h-[205px] p-6 rounded-lg shadow-quadrupleNonHover hover:bg-redb transition duration-300 ease-in-out">
                             <img src="{{ asset('/assets/default-icon-community.svg') }}" alt="">
                             <p class="text-center text-redb font-bold text-base">Helping people with our energy</p>
 
@@ -223,9 +225,9 @@
                                 <p class="text-creamcard font-bold text-base">Join Volunteer Now!</p>
                                 <img src="{{ asset('/assets/next-button.svg') }}" alt="">
                             </div>
-                        </a>
+                        </div>
 
-                        <a href="{{ route('guest.donations') }}" class="group relative flex flex-col justify-center items-center bg-creamcard w-[150px] h-[205px] p-6 rounded-lg shadow-quadrupleNonHover hover:bg-redb transition duration-300 ease-in-out">
+                        <a href="{{ route('donatur.donations.show') }}" class="group relative flex flex-col justify-center items-center bg-creamcard w-[150px] h-[205px] p-6 rounded-lg shadow-quadrupleNonHover hover:bg-redb transition duration-300 ease-in-out">
                             <img src="{{ asset('/assets/default-icon-donations.svg') }}" alt="" >
                             <p class="text-center text-redb font-bold text-base">Giving people for helping</p>
 
@@ -235,7 +237,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('guest.partner') }}" class="group relative flex flex-col justify-center items-center bg-creamcard w-[150px] h-[205px] p-6 rounded-lg shadow-quadrupleNonHover hover:bg-redb transition duration-300 ease-in-out">
+                        <div class="logout-form cursor-pointer group relative flex flex-col justify-center items-center bg-creamcard w-[150px] h-[205px] p-6 rounded-lg shadow-quadrupleNonHover hover:bg-redb transition duration-300 ease-in-out">
                             <img src="{{ asset('/assets/default-icon-volunteer.svg') }}" alt="">
                             <p class="text-center text-redb font-bold text-base">Being home for people</p>
 
@@ -243,7 +245,7 @@
                                 <p class="text-creamcard font-bold text-base">Be Our Partner!</p>
                                 <img src="{{ asset('/assets/next-button.svg') }}" alt="">
                             </div>
-                        </a>
+                        </div>
                     </div>
                 </div>
 
@@ -312,6 +314,73 @@
             window.addEventListener('load', function () {
                 document.title = "HelpHunger: A Way to Help Others and Reduce Hunger";
             });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const logoutSlides = document.querySelectorAll('.logout-slide');
+                const logoutForm = document.getElementById('logout-form');
+                const csrfToken = logoutForm.querySelector('input[name="_token"]').value;
+
+                // Definisikan URL halaman login Anda
+                // Ganti '/login' jika route login Anda berbeda
+                const loginPageUrl = '/login'; // Sesuaikan ini dengan URL halaman login Anda
+
+                logoutSlides.forEach(slide => {
+                    slide.addEventListener('click', function(event) {
+                        if (this.tagName === 'A') {
+                            event.preventDefault();
+                        }
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You have to logout before accessing this content!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, Logout!',
+                            cancelButtonText: 'No, Stay Logged In'
+                            // SweetAlert2 default colors/styles from your override will apply
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Mencegah submit default dari form
+                                event.preventDefault();
+
+                                // Lakukan permintaan logout secara asinkron
+                                fetch(logoutForm.action, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        'X-CSRF-TOKEN': csrfToken // Kirim CSRF token
+                                    },
+                                    body: new URLSearchParams(new FormData(logoutForm))
+                                })
+                                .then(response => {
+                                    // Cek apakah respons menunjukkan keberhasilan logout (misal: status 200 OK)
+                                    // Perlu diingat: Laravel defaultnya akan redirect setelah logout.
+                                    // Jika ada redirect 302, fetch akan mengikutinya.
+                                    // Jika Anda tidak mengubah controller, fetch mungkin akan mendapatkan respon HTML dari halaman login.
+                                    // Yang penting adalah request logout ke server sudah dilakukan.
+                                    if (response.ok || response.redirected) {
+                                        // Logout berhasil atau sudah diarahkan oleh server
+                                        window.location.href = loginPageUrl; // Arahkan ke halaman login
+                                    } else {
+                                        // Tangani jika ada error pada proses logout
+                                        console.error('Logout failed:', response.statusText);
+                                        Swal.fire('Error!', 'Failed to logout. Please try again.', 'error');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error during logout:', error);
+                                    Swal.fire('Error!', 'An error occurred during logout. Please try again.', 'error');
+                                });
+                            }
+                        });
+                    });
+                });
+            });
+
+
+
+
+
         </script>
         @endpush
 

@@ -23,7 +23,19 @@
             <div class="bg-greenbg rounded-lg p-8 mb-8 ">
                 <div class="flex flex-row gap-x-4 mb-6">
                     <div>
-                        <img src="{{ asset($selectedEvent->image_path) }}" alt="" class="h-full">
+                        @php
+                            $imageUrl = '';
+                            if ($selectedEvent->image_path && str_starts_with($selectedEvent->image_path, 'assets/')) {
+                                $imageUrl = asset($selectedEvent->image_path);
+                            }
+                            else if ($selectedEvent->image_path) {
+                                $imageUrl = $Storage::url($selectedEvent->image_path);
+                            }
+                            else {
+                                $imageUrl = asset('/assets/default-icon-community.svg'); // Your default image
+                            }
+                        @endphp
+                        <img src="{{ $imageUrl }}" alt="Event Image" class="h-full">
                     </div>
 
                     <div class="flex flex-col">
