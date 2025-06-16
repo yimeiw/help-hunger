@@ -97,16 +97,18 @@ class AdminDashboardController extends Controller
 
     public function showNotifications(Request $request)
     {
-        $adminId = Auth::id(); // Dapatkan ID admin yang sedang login
-
-        // Ambil notifikasi yang ditujukan untuk admin ini
-        // Filter berdasarkan tipe notifikasi event submission jika diinginkan
+        $adminId = Auth::id();
+        $now = Carbon::now();
         $notifications = Notification::where('user_id', $adminId)
-                                    ->whereIn('type', ['event_submission_volunteer', 'event_submission_donation', 'event_status_update']) // Contoh tipe notifikasi
-                                    ->orderBy('created_at', 'desc')
-                                    ->paginate(10); // Notifikasi di-paginate
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        return view('admin.notification', compact('notifications'));
+        // Tandai semua notifikasi sebagai dibaca
+        Notification::where('user_id', $adminId)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return view('admin.notification', compact('notifications', 'now'));
     }
 
     public function markNotificationAsRead($id)
@@ -180,8 +182,9 @@ class AdminDashboardController extends Controller
     public function createVolunteerEvent()
     {
         $partners = Partner::all();
+        $provinces = Provinces::all();
         $locations = LocationVolunteers::all(); // Assuming a single Location model for both types
-        return view('admin.manage.event.addVolunteer', compact('partners', 'locations'));
+        return view('admin.manage.event.addVolunteer', compact('partners', 'locations', 'provinces'));
     }
 
     /**
@@ -194,25 +197,59 @@ class AdminDashboardController extends Controller
     {
         $validatedData = $request->validate([
             'event_name' => 'required|string|max:255',
-            'description' => 'required|string',
+            'event_description' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'current_needs' => 'required|string',
             'max_volunteers' => 'required|integer|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
-            'partner_id' => 'required|exists:partners,id',
-            'location_id' => 'required|exists:locations,id', // Assuming 'locations' table
+            'current_needs' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'partner_id' => 'required|exists:partner,id',
+
+            // New fields for creating a location
+            'location_name' => 'required|string|max:255',
+            'location_address' => 'required|string|max:255',
+            'location_zipcode' => 'required|digits:5', // Assuming 5-digit zipcode
+            'province_id' => 'required|exists:provinces,id',
+            'city_id' => 'required|exists:cities,id',
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
         ]);
+
+
+        // 1. Create the new LocationVolunteers entry
+        $location = LocationVolunteers::create([
+            'name' => $validatedData['location_name'],
+            'address' => $validatedData['location_address'],
+            'zipcode' => $validatedData['location_zipcode'],
+            'province_id' => $validatedData['province_id'],
+            'city_id' => $validatedData['city_id'],
+            'latitude' => $validatedData['latitude'],
+            'longitude' => $validatedData['longitude'],
+        ]);
+
+        // 2. Prepare event data
+        $eventData = [
+            'event_name' => $validatedData['event_name'],
+            'event_description' => $validatedData['event_description'],
+            'start_date' => $validatedData['start_date'],
+            'end_date' => $validatedData['end_date'],
+            'max_volunteers' => $validatedData['max_volunteers'],
+            'current_needs' => $validatedData['current_needs'],
+            'partner_id' => $validatedData['partner_id'],
+            'location_id' => $location->id, // Assign the newly created location's ID
+        ];
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('event_images/volunteer', 'public');
-            $validatedData['image'] = $imagePath;
+            $eventData['image_path'] = $imagePath;
         }
 
         // Admin menambahkan event, jadi status langsung 'accepted'
-        $validatedData['status'] = 'accepted';
+        $eventData['status'] = 'accepted';
 
-        EventsVolunteers::create($validatedData);
+        EventsVolunteers::create($eventData);
+
+        dd($eventData);
 
         return redirect()->route('admin.manage-event', ['type' => 'volunteer'])->with('success', 'Volunteer event added successfully!');
     }
@@ -225,8 +262,9 @@ class AdminDashboardController extends Controller
     public function createDonationEvent()
     {
         $partners = Partner::all();
+        $provinces = Provinces::all();
         $locations = LocationDonatur::all(); // Assuming a single Location model for both types
-        return view('admin.manage.event.addDonation', compact('partners', 'locations'));
+        return view('admin.manage.event.addDonation', compact('partners', 'locations', 'provinces'));
     }
 
     /**
@@ -239,25 +277,52 @@ class AdminDashboardController extends Controller
     {
         $validatedData = $request->validate([
             'event_name' => 'required|string|max:255',
-            'description' => 'required|string',
+            'event_description' => 'required|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'donation_target' => 'required|numeric|min:0',
+            'donation_target' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
-            'partner_id' => 'required|exists:partners,id',
-            'location_id' => 'required|exists:locations,id', // Assuming 'locations' table
+            'partner_id' => 'required|exists:partner,id',
+
+            'location_name' => 'required|string|max:255',
+            'location_address' => 'required|string|max:255',
+            'location_zipcode' => 'required|digits:5', // Assuming 5-digit zipcode
+            'province_id' => 'required|exists:provinces,id', // Validasi terhadap tabel provinces
+            'city_id' => 'required|exists:cities,id',       // Validasi terhadap tabel cities
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
         ]);
+
+        $location = LocationDonatur::create([
+            'name' => $validatedData['location_name'],
+            'address' => $validatedData['location_address'],
+            'zipcode' => $validatedData['location_zipcode'],
+            'province_id' => $validatedData['province_id'],
+            'city_id' => $validatedData['city_id'],
+            'latitude' => $validatedData['latitude'],
+            'longitude' => $validatedData['longitude'],
+        ]);
+
+        $eventData = [
+            'event_name' => $validatedData['event_name'],
+            'event_description' => $validatedData['event_description'],
+            'start_date' => $validatedData['start_date'],
+            'end_date' => $validatedData['end_date'],
+            'donation_target' => $validatedData['donation_target'],
+            'partner_id' => $validatedData['partner_id'],
+            'location_id' => $location->id, // Assign the newly created location's ID
+        ];
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('event_images/donation', 'public');
-            $validatedData['image'] = $imagePath;
+            $eventData['image_path'] = $imagePath;
         }
 
         // Admin menambahkan event, jadi status langsung 'accepted'
-        $validatedData['status'] = 'accepted';
+        $eventData['status'] = 'accepted';
         $partners = Partner::all();
 
-        EventsDonatur::create($validatedData);
+        EventsDonatur::create($eventData);
 
         return redirect()->route('admin.manage-event', ['type' => 'donation'])->with('success', 'Donation event added successfully!');
     }
@@ -371,7 +436,7 @@ class AdminDashboardController extends Controller
             'volunteer' => new LocationVolunteers,
             'donation' => new LocationDonation,
             'donatur' => new LocationDonatur,
-            default => new LocationVolunteer,
+            default => new LocationVolunteers,
         };
     }
 

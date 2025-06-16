@@ -15,7 +15,7 @@ class GuestController extends Controller
     {
         $eventsDonation = EventsDonatur::with(['partner', 'location', 'donations'])->take(2)->get();
         $eventsVolunteers = EventsVolunteers::with(['partner', 'location', 'volunteers'])->take(2)->get();
-        $eventsPartner = Partner::all();
+        $eventsPartner = Partner::take(9)->get();
         return view('guest-view.welcome', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner'));
     }
 

@@ -108,7 +108,7 @@
                 </div>
 
                 <div class="flex items-center">
-                    <input type="checkbox" id="terms" class="peer rounded bg-transparent border-greyCheck text-redb shadow-sm focus:ring-redb">
+                    <input type="checkbox" id="terms" class="peer rounded bg-transparent border-greyCheck text-redb shadow-sm focus:ring-redb" required>
                     <label for="terms" class="ms-2 text-xs text-creamhh peer-checked:text-redb">
                         {{ __('I Agree with the Terms and Condition') }}
                     </label>

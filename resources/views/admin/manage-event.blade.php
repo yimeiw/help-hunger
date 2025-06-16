@@ -118,7 +118,8 @@
                             <a href="{{ $eventType === 'volunteer'
                                 ? route('admin.manage.event.volunteer', $event->id)
                                 : route('admin.manage.event.donation', $event->id) }}"
-                                class="text-redb hover:underline text-xs">View Detail</a>
+                                class="text-redb hover:underline text-xs">View Detail
+                            </a>
                         </div>
                         <div class="mt-4">
                             <div class="flex justify-end items-center mt-2 space-x-3">

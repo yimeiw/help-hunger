@@ -96,7 +96,7 @@
                         @endphp
 
                         @if ($selectedEventDetailForDownload)
-                            <a href="{{ route('certifications.download', ['eventType' => 'volunteer', 'eventId' => $detail->event->id]) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                            <a href="{{ route('certifications.download', ['eventType' => 'volunteer', 'eventId' => $selectedEventDetailForDownload->event->id]) }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                                 Download Certificate
                             </a>
                         @else
@@ -114,7 +114,7 @@
                 {{-- Tombol Volunteer Now jika belum berpartisipasi atau sudah dibatalkan/belum diterima --}}
                 @else
                     <div class="flex justify-center items-center mt-10">
-                        <a href="{{ route('volunteer.events.create'}}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
+                        <a href="{{ route('volunteer.events.create') }}" class="px-6 py-2 bg-creamcard border-2 border-redb rounded-lg text-redb font-bold hover:text-greenbg hover:border-greenbg transition duration-300 ease-in-out">
                             Volunteer Now
                         </a>
                     </div>

@@ -15,6 +15,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\RegisterPartnerController;
 use App\Http\Controllers\LoginPartnerController; 
 use App\Http\Controllers\PartnerController; 
+use App\Http\Controllers\Rule;
 
 Route::get('/', function () {
     return redirect()->route('guest.welcome'); // Selalu redirect ke guest.welcome
@@ -35,7 +36,7 @@ Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah ti
     // Login Routes
     Route::get('/login', [LoginPartnerController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginPartnerController::class, 'login'])->name('login.attempt');
-    Route::post('/partner/logout', [ProfileController::class, 'logout'])->name('logout');
+    Route::post('/partner/logout', [LoginPartnerController::class, 'logout'])->name('logout');
 
     // Registration Routes for Partner
     // Perhatikan: Anda sudah di dalam prefix 'partner', jadi '/register/partner' akan menjadi '/partner/register/partner'.
@@ -74,7 +75,7 @@ Route::prefix('partner')->name('partner.')->group(function () { // <-- Tambah ti
         Route::get('/report', [PartnerController::class, 'report'])->name('report.show');
         Route::get('/notifications', [PartnerController::class, 'notifications'])->name('notifications.show');
         Route::get('/profile', [PartnerController::class, 'profile'])->name('profile.show');
-        Route::post('/partner/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::post('/partner/profile', [PartnerController::class, 'update'])->name('profile.update');
     });
 
 });
@@ -130,6 +131,7 @@ Route::middleware([
                 })->name('user');
                 
                 Route::get('/volunteer', [AdminDashboardController::class, 'manageVolunteer'])->name('volunteer');
+                
                 Route::get('/donatur', [AdminDashboardController::class, 'manageDonatur'])->name('donatur');
                 Route::get('/partner', [AdminDashboardController::class, 'managePartner'])->name('partner');
     
@@ -142,14 +144,17 @@ Route::middleware([
             Route::prefix('event')->name('event.')->group(function () {
                 
                 Route::get('/volunteer', [AdminDashboardController::class, 'manageEventVolunteer'])->name('volunteer');
+                Route::get('/donatur', [AdminDashboardController::class, 'manageEventDonation'])->name('donation');
                 Route::get('/donatur/add', function () {
                     return view('admin.manage.event.addDonation');
                 })->name('donation.add');
 
                 Route::get('/volunteer/add', [AdminDashboardController::class, 'createVolunteerEvent'])->name('volunteer.add');
+                Route::post('/volunteer/add', [AdminDashboardController::class, 'storeEventVolunteer'])->name('volunteer.add');
                 Route::delete('/volunteer/{id}', [AdminDashboardController::class, 'deleteEventVolunteer'])->name('volunteer.delete');
 
                 Route::get('/donatur/add', [AdminDashboardController::class, 'createDonationEvent'])->name('donation.add');
+                Route::post('/donatur/add', [AdminDashboardController::class, 'storeEventDonation'])->name('donation.add');
                 Route::delete('/donation/{id}', [AdminDashboardController::class, 'deleteEventDonation'])->name('donation.delete');
             });
         });
@@ -159,7 +164,6 @@ Route::middleware([
             Route::delete('/delete/{id}', [AdminDashboardController::class, 'deleteLocation'])->name('delete');
         });
     });
-
     // Volunteer ini yang diubah
     Route::prefix('volunteer')->name('volunteer.')->middleware('role:volunteer')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'volunteer'])->name('dashboard');

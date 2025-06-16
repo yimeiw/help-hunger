@@ -5,7 +5,7 @@
             {{ __('Admin Notifications') }}
         </h2>
     </x-slot>
-
+<!-- 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-greenbg shadow-xl sm:rounded-lg p-6">
@@ -23,47 +23,22 @@
 
                 <h3 class="text-lg font-semibold text-creamcard mb-4 px-4 py-2">Your Notifications</h3>
 
-                @if($notifications->isEmpty())
-                    <p class="text-blackAuth px-4 py-2">No new notifications.</p>
-                @else
-                    <div class="space-y-4">
-                        @foreach($notifications as $notification)
-                            <div class="p-4 rounded-lg shadow-sm {{ $notification->is_read ? 'bg-gray-100 text-gray-600' : 'bg-white text-gray-800 border border-redb' }}">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-semibold">{{ $notification->message }}</p>
-                                        <p class="text-xs text-gray-500 mt-1">
-                                            {{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}
-                                            ({{ \Carbon\Carbon::parse($notification->created_at)->format('d M Y H:i') }})
-                                        </p>
-                                    </div>
-                                    @unless($notification->is_read)
-                                        <form action="{{ route('admin.notification.mark-read', $notification->id) }}" method="POST">
-                                            @csrf
-                                            <x-secondary-button type="submit" class="text-xs py-1 px-2">
-                                                Mark as Read
-                                            </x-secondary-button>
-                                        </form>
-                                    @else
-                                        <span class="text-xs text-blackAuth">Read</span>
-                                    @endunless
-                                </div>
-                                @if($notification->type == 'event_submission_volunteer' || $notification->type == 'event_submission_donation')
-                                    <div class="mt-2 text-sm">
-                                        <a href="{{ route('admin.dashboard') }}" class="text-redb hover:underline font-medium">
-                                            View Pending Events
-                                        </a>
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <div class="mt-4">
-                        {{ $notifications->links('pagination::tailwind') }}
-                    </div>
-                @endif
             </div>
         </div>
-    </div>
+    </div> -->
+    @if($notifications->isEmpty())
+           <div class="flex justify-center items-center text-center m-12 mb-52">
+               <p class="text-redb font-bold text-lg">There is no notifcation for you.</p>
+           </div>
+
+       @else
+           @foreach($notifications as $notification)
+               <div class="text-redb mx-24 my-12">
+                   <p class="font-bold text-lg mb-2">{{ $notification->title }}</p>
+                   <p class="font-reguler text-sm mb-2">{{ $notification->message }}</p>
+                   <p class="font-reguler text-xs text-blackAuth mb-2">{{ $notification->created_at->diffForHumans()  }}</p>
+                   <hr class="border-t-2 border-redb w-full">
+               </div>
+           @endforeach
+   @endif
 </x-app-layout>

@@ -16,6 +16,7 @@
         {{-- TEMPORARY: Removed integrity and crossorigin for testing --}}
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
         <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+        
     </head>
     <body class="font-[poppins] bg-all text-creamhh">
 

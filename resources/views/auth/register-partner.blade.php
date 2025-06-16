@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-row gap-8 mt-4">
+            <div class="flex flex-row gap-8 mt-4 mb-4">
                 <div>
                     <x-label for="password" value="{{ __('Password') }}" />
                     <x-input id="password" class="block mt-1 w-48" type="password" name="password" required autocomplete="new-password" placeholder="Enter your password"/>
@@ -66,6 +66,57 @@
                     <x-input id="password_confirmation" class="block mt-1 w-48" type="password" name="password_confirmation" required autocomplete="new-password" placeholder="Confirm your password"/>
                 </div>
             </div>
+            
+            <div id="payment-fields-container">
+                <div class="flex flex-row mb-4 items-center gap-8 payment-field-row">
+                    <div class="w-1/2">
+                        <x-label for="rekening_type_0" value="Payment Type" />
+                        <div class="relative"> <select id="rekening_type_0" name="payment_methods[0][rekening_type]" class="appearance-none w-full pl-4 pr-10 py-3 bg-creamcard border border-gray-300 rounded-lg shadow-[4px_5px_0px_rgb(144,43,41,1)] focus:outline-none text-xs font-bold text-redb transition-all duration-200 cursor-pointer" required>
+                                <option value="">Select Payment Type</option>
+                                <option value="BCA">BCA</option>
+                                <option value="Master Card">Master Card</option>
+                                <option value="Link Aja">Link Aja</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                </div>
+                        </div> <x-input-error :messages="$errors->get('payment_methods.0.rekening_type')" class="mt-2" />
+                    </div>
+                    <div class="w-1/2">
+                        <x-label for="no_rekening_0" value="Rekening Number" />
+                        <x-input id="no_rekening_0" type="text" name="payment_methods[0][no_rekening]" class="block w-full mt-1" placeholder="e.g., 2702297731" required />
+                        <x-input-error :messages="$errors->get('payment_methods.0.no_rekening')" class="mt-2" />
+                    </div>
+                    <div>
+                        <img src="{{ asset('assets/add.svg') }}" alt="Add Payment" class="w-8 h-8 cursor-pointer add-payment-field mt-6">
+                    </div>
+                </div>
+            </div>
+
+            <template id="payment-field-template">
+                <div class="flex flex-row mb-4 items-center gap-4 payment-field-row">
+                    <div class="w-1/2">
+                        <x-label value="Payment Type" />
+                        <div class="relative">
+                            <select name="payment_methods[INDEX][rekening_type]"
+                                    class="appearance-none w-full pl-4 pr-10 py-3 bg-creamcard border-none rounded-lg shadow-[4px_5px_0px_rgb(144,43,41,1)] focus:outline-none text-sm font-bold text-redb transition-all duration-200 cursor-pointer">
+                                <option value="">Select Payment Type</option>
+                                <option value="BCA">BCA</option>
+                                <option value="Master Card">Master Card</option>
+                                <option value="Link Aja">Link Aja</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                </div>
+                        </div>
+                    </div>
+                    <div class="w-1/2">
+                        <x-label value="Rekening Number" />
+                        <x-input type="number" name="payment_methods[INDEX][no_rekening]" class="block w-full mt-1" placeholder="e.g., 2702297731" required />
+                    </div>
+                    <div>
+                        <img src="{{ asset('assets/remove.svg') }}" alt="Remove Payment" class="w-10 h-10 cursor-pointer remove-payment-field mt-6">
+                    </div>
+                </div>
+            </template>
 
             <!-- Provinces and Cities -->
             <div class="flex flex-row gap-8 mt-4">
@@ -249,6 +300,66 @@
             // Setelah mereset form, arahkan ke halaman guest.welcome
             window.location.href = "{{ route('guest.welcome') }}";
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('payment-fields-container');
+            const template = document.getElementById('payment-field-template');
+            let fieldIndex = 0; // Start index for new fields (initial 0 is often in HTML already)
+
+            // Handle adding new fields
+            container.addEventListener('click', function(event) {
+                if (event.target.classList.contains('add-payment-field')) {
+                    fieldIndex++; // Increment index for new field
+                    const newRow = template.content.cloneNode(true); // Clone the template content
+
+                    // Get all input AND select elements within the new row
+                    const formElements = newRow.querySelectorAll('.payment-field-row input, .payment-field-row select');
+
+                    // Update the names in the cloned row
+                    formElements.forEach(element => {
+                        const currentName = element.getAttribute('name');
+                        if (currentName && currentName.includes('[INDEX]')) { // Ensure it has the placeholder
+                            element.setAttribute('name', currentName.replace('INDEX', fieldIndex));
+                            // Update IDs for labels if you plan to link them dynamically
+                            element.setAttribute('id', `payment_${fieldIndex}_${currentName.split('[')[2].replace(']','')}`);
+                        }
+                    });
+
+                    // Set initial value for new input/select fields
+                    formElements.forEach(element => {
+                        if (element.tagName === 'INPUT') {
+                            element.value = ''; // Clear default value from template
+                        } else if (element.tagName === 'SELECT') {
+                            element.selectedIndex = 0; // Reset select to the first option (e.g., "Select Payment Type")
+                        }
+                    });
+
+                    // Append the new row
+                    container.appendChild(newRow);
+
+                    // Add focus to the first input/select of the newly added row
+                    newRow.querySelector('input, select').focus();
+                }
+            });
+
+            // Handle removing fields
+            container.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-payment-field')) {
+                    const rowToRemove = event.target.closest('.payment-field-row');
+                    if (rowToRemove) {
+                        rowToRemove.remove();
+                    }
+                }
+            });
+
+            // The initial add button setup line doesn't seem to have a functional impact
+            // given the image is directly embedded and not dynamically changed by this JS.
+            // You can safely remove it if it's not doing anything specific.
+            // const initialAddButton = container.querySelector('.add-payment-field');
+            // if (initialAddButton) {
+            //     initialAddButton.closest('.payment-field-row').querySelector('.add-payment-field').setAttribute('src', '{{ asset('assets/add.svg') }}');
+            // }
+        });
+
 
 
     </script>

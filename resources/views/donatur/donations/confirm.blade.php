@@ -12,7 +12,7 @@
         <div class="w-full sm:max-w-2xl m-8 shadow-md sm:rounded-xl border border-2 border-blackAuth">
             <div class="border border-2 border-redb rounded-lg p-0">
                 <div class="border border-2 px-11 py-10 h-auto border-creamhh bg-greenAuth rounded-lg">
-                    <h2 class="text-2xl font-bold text-creamcard mb-6 text-center">Konfirmasi Donasi Anda</h2>
+                    <h2 class="text-2xl font-bold text-creamcard mb-6 text-center">Confirm Your Donation</h2>
                     
                     @if (session('success'))
                         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
@@ -35,13 +35,13 @@
                     @endif
 
                     <div class="mb-6 border-b pb-4 p-4 bg-creamcard shadow-lg rounded-md">
-                        <p class="text-md font-medium text-redb">Event Donasi: <span class="font-bold text-redb">{{ $donation->event->event_name }}</span></p>
-                        <p class="text-md font-medium text-redb mt-2">Jumlah Donasi: <span class="text-redb font-bold">IDR {{ number_format($donation->amount, 0, ',', '.') }}</span></p>
+                        <p class="text-md font-medium text-redb">Donation Event: <span class="font-bold text-redb">{{ $donation->event->event_name }}</span></p>
+                        <p class="text-md font-medium text-redb mt-2">Total Donation: <span class="text-redb font-bold">IDR {{ number_format($donation->amount, 0, ',', '.') }}</span></p>
                         <p class="text-md font-medium text-redb mt-2">Metode Pembayaran: <span class="font-bold">{{ $donation->payment_method }}</span></p>
                     </div>
 
                     <div class="mb-6 bg-yellow-50 border-l-4 shadow-lg rounded-lg border-yellow-400 text-yellow-800 text-sm p-4" role="alert">
-                        <p class="font-bold">Penting:</p>
+                        <p class="font-bold">Important!</p>
                         <p>Silakan lakukan transfer ke detail rekening di bawah ini dan unggah bukti pembayaran Anda.</p>
                         <p>Donasi Anda akan berstatus <span class="font-bold">Pending</span> hingga verifikasi pembayaran selesai.</p>
                     </div>

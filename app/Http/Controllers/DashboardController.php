@@ -60,6 +60,11 @@ class DashboardController extends Controller
         // 4. Jumlah Partner
         $totalPartners = Partner::count();
 
+        // 5. Jumlah Donation
+        $totalDonation = Donation::count(); // Atau EventsDonatur::count() jika terpisah
+        $pendingDonation = Donation::where('payment_status', '==', 'pending')->count(); // Sesuaikan nama kolom tanggal
+        $acceptedDonation = Donation::where('payment_status', '==', 'accepted')->count(); // Sesuaikan nama kolom tanggal
+        $failedDonation = Donation::where('payment_status', '==', 'failed')->count(); // Sesuaikan nama kolom tanggal
         // Data yang akan dikirim ke view
         $statistics = [
             'totalDonationAmount' => $totalDonationAmount,
@@ -72,7 +77,12 @@ class DashboardController extends Controller
             'activeEvents' => $activeEvents,
             'completedEvents' => $completedEvents,
             'totalPartners' => $totalPartners,
+            'totalDonation' => $totalDonation,
+            'pendingDonation' => $pendingDonation,
+            'acceptedDonation' => $acceptedDonation,
+            'failedDonation' => $failedDonation,
         ];
+
 
         return view('admin.dashboard', compact('statistics'));
     }
@@ -86,7 +96,7 @@ class DashboardController extends Controller
 
         $eventsDonation = EventsDonatur::with(['partner', 'location', 'donations'])->take(2)->get();
         $eventsVolunteers = EventsVolunteers::with(['partner', 'location', 'volunteers'])->take(2)->get();
-        $eventsPartner = Partner::all();
+        $eventsPartner = Partner::take(9)->get();
         return view('volunteer.dashboard', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner', 'donaturUser'));
     }
 
@@ -99,7 +109,7 @@ class DashboardController extends Controller
 
         $eventsDonation = EventsDonatur::with(['partner', 'location', 'donations'])->take(2)->get();
         $eventsVolunteers = EventsVolunteers::with(['partner', 'location', 'volunteers'])->take(2)->get();
-        $eventsPartner = Partner::all();
+        $eventsPartner = Partner::take(9)->get();
         return view('donatur.dashboard', compact('eventsDonation', 'eventsVolunteers', 'eventsPartner', 'volunteerUser')); 
     }
 

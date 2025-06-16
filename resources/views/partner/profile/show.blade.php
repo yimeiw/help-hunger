@@ -1,7 +1,7 @@
 <x-app-layout>
 
     <div class="p-12 m-6">
-        <form method="POST" action="#" class="md:grid md:grid-cols-3 md:gap-8">
+        <form method="POST" action="{{ route('partner.profile.update') }}" class="md:grid md:grid-cols-3 md:gap-8">
          @csrf
             <!-- Left Column: Profile Information Text -->
             <div class="md:col-span-1 mb-6 md:mb-0">
@@ -40,11 +40,14 @@
         <hr class="my-8 border-t border-redb">
 
         <!-- Logout Section -->
-        <div class="flex justify-end">
-            <button class="inline-flex items-center px-6 py-3 border border-transparent text-xl font-bold rounded-md text-redb bg-creamcard shadow-quadrupleNonHover hover:shadow-quadrupleHover focus:outline-none transition ease-in-out duration-300">
-                Logout
-            </button>
-        </div>
+        <form action="{{ route('partner.logout') }}" method="post">
+            @csrf
+            <div class="flex justify-end">
+                <button class="inline-flex items-center px-6 py-3 border border-transparent text-xl font-bold rounded-md text-redb bg-creamcard shadow-quadrupleNonHover hover:shadow-quadrupleHover focus:outline-none transition ease-in-out duration-300">
+                    Logout
+                </button>
+            </div>
+        </form>
     </div>
 
 </x-app-layout>

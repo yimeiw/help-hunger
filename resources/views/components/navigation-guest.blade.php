@@ -14,7 +14,7 @@
 
         </a>
 
-        <div class="flex items-center gap-24 md:gap-8 lg:gap-20 xl:gap-28 w-auto">
+        <div class="flex items-center gap-24 md:gap-8 lg:gap-24 xl:gap-28 w-auto">
             <a href="{{ route('guest.about') }}">
                 <p class="font-bold transition duration-300 ease-out text-sm md:text-xs lg:text-sm xl:text-base
                         {{ request()->routeIs('guest.about') ? 'text-redb' : 'text-creamhh hover:underline hover:text-redb' }}">
@@ -69,10 +69,10 @@
             </div>
         </div>
 
-        <div class="flex justify-end gap-4">
+        <div class="flex ms-8">
             <a
                 href="{{ route('register') }}"
-                class="flex items-center justify-center font-bold text-base text-redb border-redb bg-creamhh w-20 h-10 md:w-20 md:text-xs lg:w-20 xl:text-sm xl:w-32 border rounded-lg hover:border-greenbg hover:text-greenbg transition duration-300 ease-in-out">
+                class="flex items-center justify-center font-bold text-base text-redb border-redb bg-creamhh w-24 h-10 md:w-20 md:text-xs lg:w-24 xl:text-sm xl:w-32 border rounded-lg hover:border-greenbg hover:text-greenbg transition duration-300 ease-in-out">
                 Register
             </a>
         </div>

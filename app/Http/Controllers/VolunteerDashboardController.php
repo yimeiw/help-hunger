@@ -130,6 +130,7 @@ class VolunteerDashboardController extends Controller
             foreach ($adminUsers as $admin) {
                 Notification::create([
                     'user_id' => $admin->id,
+                    'partner_id' => null, // Assuming you want to link the notification to the partner
                     'title' => 'New Volunteer Registered',
                     'message' => 'Volunteer ' . $authenticatedUser->username . ' has registered for event: ' . $event->event_name,
                     'is_read' => false,
@@ -141,6 +142,7 @@ class VolunteerDashboardController extends Controller
             // Notifikasi untuk volunteer
             Notification::create([
                 'user_id' => $authenticatedUser->id,
+                'partner_id' => null, // Assuming you want to link the notification to the partner
                 'title' => 'Registration Confirmed for ' . $event->event_name,
                 'message' => 'You have successfully registered as a volunteer for the ' . $event->event_name . ' event on ' . $event->start_date->format('d F Y') . ' until ' . $event->end_date->format('d F Y') . '.',
                 'is_read' => false,

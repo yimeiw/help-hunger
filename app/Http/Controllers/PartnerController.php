@@ -169,6 +169,7 @@ class PartnerController extends Controller
         foreach ($adminUsers as $admin) {
             Notification::create([
                 'user_id' => $admin->id,
+                'partner_id' => null,
                 'title' => 'New Volunteer Event Created',
                 'message' => 'Partner ' . Auth::guard('partner')->user()->partner_name . ' has created a new volunteer event: ' . $eventData['event_name'] . '. Please review for approval.',
                 'is_read' => false,
@@ -176,12 +177,16 @@ class PartnerController extends Controller
         }
 
         // Juga bisa menambahkan notifikasi untuk partner itu sendiri
-        Notification::create([
-            'user_id' => Auth::guard('partner')->user()->id, // Asumsi partner juga ada di tabel users atau sesuaikan
+        $notificationData = [
+            'user_id' => null, 
+            'partner_id' => Auth::guard('partner')->id(), // <-- Use partner_id here!
             'title' => 'Volunteer Event Successfully Created',
             'message' => 'Your Volunteer Event  "' . $eventData['event_name'] . '" successfully created and waiting for admin approval.',
             'is_read' => false,
-        ]);
+        ];
+
+        // dd($notificationData); // Tambahkan dd() di sini untuk melihat isinya
+        Notification::create($notificationData); 
 
 
         return redirect()->route('partner.program.show', ['type' => 'volunteer'])->with('success', 'Volunteer event added successfully!');
@@ -205,6 +210,7 @@ class PartnerController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'donation_target' => 'required|numeric|min:1000',
+            // disini harus ada payment type dan no rekening
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
             // New fields for creating a location for donation events
@@ -249,6 +255,28 @@ class PartnerController extends Controller
         // 3. Create the event
         // Pastikan model EventsDonatur memiliki $fillable yang sesuai
         EventsDonatur::create($eventData);
+
+        // Create notification for admin about new volunteer event
+        $adminUsers = User::where('role', 'admin')->get(); // Asumsi ada kolom 'role' di tabel users
+        
+        foreach ($adminUsers as $admin) {
+            Notification::create([
+                'user_id' => $admin->id,
+                'partner_id' => null,
+                'title' => 'New Donation Event Created',
+                'message' => 'Partner ' . Auth::guard('partner')->user()->partner_name . ' has created a new donation event: ' . $eventData['event_name'] . '. Please review for approval.',
+                'is_read' => false,
+            ]);
+        }
+
+        // Juga bisa menambahkan notifikasi untuk partner itu sendiri
+        Notification::create([
+            'partner_id' => Auth::guard('partner')->id(), // <-- Use partner_id here!
+            'user_id' => null, 
+            'title' => 'Donation Event Successfully Created',
+            'message' => 'Your Donation Event  "' . $eventData['event_name'] . '" successfully created and waiting for admin approval.',
+            'is_read' => false,
+        ]);
 
         return redirect()->route('partner.program.show', ['type' => 'donation'])->with('success', 'Donation event added successfully!');
     }
@@ -569,24 +597,5 @@ class PartnerController extends Controller
         return redirect()->route('partner.profile.show')->with('status', 'Profile updated successfully!');
     }
 
-    /**
-     * Melakukan logout pengguna dari guard 'partner'.
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function logout(Request $request)
-    {
-        // Melakukan logout khusus untuk guard 'partner'
-        Auth::guard('partner')->logout();
-
-        // Menginvalidasi sesi
-        $request->session()->invalidate();
-
-        // Meregenerasi token CSRF
-        $request->session()->regenerateToken();
-
-        // Mengarahkan pengguna ke halaman login partner
-        return redirect('/partner/login'); // Sesuaikan dengan route login partner Anda
-    }
 
 }

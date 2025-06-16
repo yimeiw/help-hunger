@@ -1,62 +1,110 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# HelpHunger
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel)
+![SQLite](https://img.shields.io/badge/Database-SQLite-07405E?style=for-the-badge&logo=sqlite)
+![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Deskripsi Proyek
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Indonesia, meskipun mengalami penurunan skor Indeks Kelaparan Global (GHI) setiap delapan tahun, masih menghadapi tantangan serius dalam mencapai ketahanan pangan dan nutrisi. Dengan skor GHI 16.9, Indonesia menduduki peringkat ketiga di Asia Tenggara dengan tingkat kelaparan tertinggi, di bawah Timor Leste (27) dan Laos (19.8). Daerah seperti Papua dan NTT secara khusus dikenal menghadapi kendala signifikan dalam hal ini.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**HelpHunger** adalah sebuah platform web yang dibangun untuk berkontribusi pada pencapaian Tujuan Pembangunan Berkelanjutan (SDG) kedua, yaitu mengakhiri kelaparan, mencapai ketahanan pangan, dan memperbaiki nutrisi. Aplikasi ini bertujuan untuk membantu daerah-daerah yang dilanda kemiskinan di Indonesia melalui pengiriman *volunteer* dan penyaluran donasi.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Fitur Utama
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* **Pendaftaran Volunteer:** Memungkinkan individu untuk mendaftar sebagai *volunteer* dan berkontribusi langsung di lapangan.
+* **Donasi Makanan:** Memfasilitasi proses donasi makanan dari individu atau organisasi kepada mereka yang membutuhkan.
+* **Peta Lokasi Bantuan Makanan:** Menyediakan visualisasi lokasi distribusi bantuan makanan untuk efisiensi penyaluran.
+* **Notifikasi Real-time:** Memberikan pembaruan instan kepada *volunteer* dan donatur mengenai status kegiatan dan donasi.
+* **Integrasi dengan Lembaga Sosial:** Membangun koneksi dan pelaporan donasi yang transparan dengan lembaga-lembaga sosial terkait.
+* **Profil dan Riwayat Donasi:** Pengguna dapat melihat riwayat donasi dan aktivitas *volunteer* mereka.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Teknologi
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Proyek ini dikembangkan menggunakan teknologi-teknologi berikut:
 
-### Premium Partners
+* **Laravel 11:** Framework PHP yang tangguh untuk pengembangan *back-end*.
+* **SQLite:** Basis data ringan dan tanpa *server* yang cocok untuk pengembangan dan skala proyek awal.
+* **HTML, CSS, JavaScript:** Untuk pengembangan antarmuka pengguna.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## Instalasi dan Pengaturan Proyek
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Untuk menjalankan proyek ini secara lokal, ikuti langkah-langkah di bawah ini:
 
-## Code of Conduct
+### Prasyarat
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Pastikan Anda telah menginstal yang berikut di sistem Anda:
 
-## Security Vulnerabilities
+* **PHP** (versi 8.2 atau lebih tinggi, sesuai dengan Laravel 11)
+* **Composer**
+* **Node.js & NPM** (opsional, jika ada aset *frontend* yang memerlukan kompilasi)
+* **Git**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Langkah-langkah Instalasi
 
-## License
+1.  **Klon Repositori:**
+    ```bash
+    git clone [https://github.com/yimeiw/help-hunger.git](https://github.com/yimeiw/help-hunger.git)
+    cd help-hunger
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# help-hunger
+2.  **Instal Dependensi Composer:**
+    ```bash
+    composer install
+    ```
+
+3.  **Buat File `.env`:**
+    Salin file `.env.example` dan ubah namanya menjadi `.env`:
+    ```bash
+    cp .env.example .env
+    ```
+
+4.  **Konfigurasi Basis Data SQLite:**
+    Pastikan baris `DB_CONNECTION` di file `.env` Anda disetel ke `sqlite`. Anda bisa menghapus atau mengomentari baris `DB_DATABASE`, `DB_USERNAME`, atau `DB_PASSWORD` karena SQLite tidak memerlukannya.
+
+    ```env
+    DB_CONNECTION=sqlite
+    # DB_HOST=127.0.0.1
+    # DB_PORT=3306
+    # DB_DATABASE=laravel
+    # DB_USERNAME=root
+    # DB_PASSWORD=
+    ```
+    Buat file `database.sqlite` di direktori `database/`:
+    ```bash
+    touch database/database.sqlite
+    ```
+
+5.  **Buat Kunci Aplikasi:**
+    ```bash
+    php artisan key:generate
+    ```
+
+6.  **Jalankan Migrasi Basis Data:**
+    Ini akan membuat tabel yang diperlukan di basis data SQLite Anda.
+    ```bash
+    php artisan migrate
+    ```
+
+7.  **Jalankan Server Pengembangan:**
+    ```bash
+    php artisan serve
+    ```
+
+    Aplikasi akan tersedia di `http://127.0.0.1:8000`.
+
+### Instalasi Dependensi Frontend (Opsional, jika ada file JS/CSS yang perlu dikompilasi)
+
+Jika proyek Anda menggunakan Vite (bawaan Laravel 11) atau Mix, Anda mungkin perlu menginstal dependensi NPM dan mengompilasi aset:
+
+```bash
+npm install
+npm run dev # atau npm run build untuk produksi

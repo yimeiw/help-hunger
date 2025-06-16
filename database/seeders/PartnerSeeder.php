@@ -28,7 +28,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $zeroWaste->id,
                 'rekening_type' => 'BCA',
@@ -52,7 +52,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
         $foodCycle = Partner::create([
             'province_id' => 6,
@@ -66,7 +66,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $foodCycle->id,
                 'rekening_type' => 'BCA',
@@ -89,7 +89,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
 
         $wastePower = Partner::create([
@@ -104,7 +104,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $wastePower->id,
                 'rekening_type' => 'BCA',
@@ -127,7 +127,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
         // NGO
 
@@ -143,7 +143,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $yayasanKarina->id,
                 'rekening_type' => 'BCA',
@@ -167,7 +167,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
         $arthaGraha = Partner::create([
             'province_id' => 6,
@@ -181,7 +181,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $arthaGraha->id,
                 'rekening_type' => 'BCA',
@@ -205,7 +205,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
 
         $mizanAmanah = Partner::create([
@@ -220,7 +220,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $mizanAmanah->id,
                 'rekening_type' => 'BCA',
@@ -244,7 +244,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
 
         // Orphanage
@@ -261,7 +261,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $anakSurga->id,
                 'rekening_type' => 'BCA',
@@ -285,7 +285,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
 
         $kasihAnugerah = Partner::create([
@@ -300,7 +300,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        PartnerAccounts::insert(
+        PartnerAccounts::insert([
             [
                 'partner_id' => $kasihAnugerah->id,
                 'rekening_type' => 'BCA',
@@ -324,7 +324,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
         $mamreGKPI = Partner::create([
             'province_id' => 5,
@@ -338,7 +338,7 @@ class PartnerSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-         PartnerAccounts::insert(
+         PartnerAccounts::insert([
             [
                 'partner_id' => $mamreGKPI->id,
                 'rekening_type' => 'BCA',
@@ -362,7 +362,7 @@ class PartnerSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
-        );
+        ]);
 
         
     }

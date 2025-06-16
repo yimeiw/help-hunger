@@ -18,29 +18,6 @@
             @csrf
 
             <div class="flex flex-col px-20">
-                <div x-data="{
-                    email: '',
-                    role: '',
-                    roleOptions: ['volunteer', 'donatur'],
-                    errorMessage: '',
-                    checkEmailRoleCompatibility() {
-                        if (this.email.endsWith('@admin.com')) {
-                            this.errorMessage = '';
-                            return;
-                        }
-
-                        if (!this.email || !this.role) {
-                            return;
-                        }
-
-                        // Lakukan AJAX request untuk validasi
-                        fetch('/api/check-email-role?email=' + encodeURIComponent(this.email) + '&role=' + this.role)
-                            .then(response => response.json())
-                            .then(data => {
-                                this.errorMessage = data.valid ? '' : data.message;
-                            });
-                    }
-                }">
                 <div>
                     <x-label for="email" value="{{ __('Email') }}" />
                     <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
@@ -79,6 +56,14 @@
                                     @click="selectedRole = 'Donatur'; $refs.roleInput.value = 'donatur'; open = false"
                                 >
                                     Donatur
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="px-4 py-2 text-left text-redb text-xs cursor-pointer"
+                                    @click="selectedRole = 'Admin'; $refs.roleInput.value = 'admin'; open = false"
+                                >
+                                    Admin
                                 </button>
                             </div>
                         </div>

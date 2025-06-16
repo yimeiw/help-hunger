@@ -127,7 +127,7 @@
                                     </div>
  
                                     <div class="flex justify-center items-center mt-4">
-                                        <a href="{{ route('register') }}" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
+                                        <a href="{{ route('guest.donations') }}" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Donate</a>
                                     </div>
                                 </div>
                             @endforeach

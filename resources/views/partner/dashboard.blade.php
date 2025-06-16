@@ -223,11 +223,8 @@
                                                 <div class="flex flex-col justify-center items-center mt-4 text-center">
                                                     @if ($loggedInUser) {{-- User is logged in but not as donatur --}}
                                                         <p class="text-redb text-xs mb-2">You are logged in, but not currently as a volunteer. Please login again with the 'volunteer' role to donate.</p>
-                                                        <form action="{{ route('partner.logout') }}" method="POST" class="inline-block">
-                                                            @csrf
-                                                            <input type="hidden" name="intended_url_after_login" value="{{ route('volunteer.events.create', ['event' => $event->id]) }}">
-                                                            <button type="submit" class="px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Login as Volunteer</button>
-                                                        </form>
+                                                        
+                                                            <button type="submit" class="logout-slide px-2 py-2 rounded-lg font-bold text-redb bg-creamhh shadow-quadrupleNonHover hover:text-greenbg hover:shadow-quadrupleHover transition duration-300 ease-in-out">Login as Volunteer</button>
                                                     @endif
                                                 </div>
                                             @endif

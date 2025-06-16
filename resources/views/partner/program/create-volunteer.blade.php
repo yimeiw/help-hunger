@@ -34,14 +34,14 @@
 
             <div class="flex flex-row gap-4">
                 <div class="mb-4 w-1/2">
-                    <x-label for="start_date" value="Start Date" />
-                    <x-input id="start_date" type="date" name="start_date" class="block w-full mt-1" :value="old('start_date')" required />
+                    <x-label for="start_datetime" value="Start Date and Time" />
+                    <x-input id="start_datetime" type="datetime-local" name="start_date" class="block w-full mt-1" :value="old('start_date')" required />
                     <x-input-error :messages="$errors->get('start_date')" class="mt-2" />
                 </div>
 
                 <div class="mb-4 w-1/2">
-                    <x-label for="end_date" value="End Date" />
-                    <x-input id="end_date" type="date" name="end_date" class="block w-full mt-1" :value="old('end_date')" required />
+                    <x-label for="end_datetime" value="End Date and Time" />
+                    <x-input id="end_datetime" type="datetime-local" name="end_date" class="block w-full mt-1" :value="old('end_date')" required />
                     <x-input-error :messages="$errors->get('end_date')" class="mt-2" />
                 </div>
             </div>
@@ -93,14 +93,14 @@
                 // Note: The hidden input name is now 'province_id' to match validation
                 $oldProvinceId = old('province_id'); // <--- Changed from 'province'
                 $oldProvinceName = 'Select Province'; // Default text
-
+                
                 if ($oldProvinceId && isset($provinces)) {
                     $foundOldProvince = $provinces->firstWhere('id', $oldProvinceId);
                     if ($foundOldProvince) {
                         $oldProvinceName = $foundOldProvince->province_name;
                     }
                 }
-
+                
                 // --- Logic for Old City Value ---
                 // Note: The hidden input name is now 'city_id' to match validation
                 $oldCityId = old('city_id'); // <--- Changed from 'city'
@@ -108,57 +108,59 @@
                 // JS will handle loading and displaying the old city name based on oldCityId if present
             @endphp
 
-            {{-- BAGIAN DROPDOWN PROVINSI --}}
-            <div class="mb-4 relative">
-                <x-label for="province" value="{{ __('Province') }}"/>
-                <x-dropdown-register align="left">
-                    <x-slot name="trigger">
-                        <div class="relative">
-                            <button id="province-trigger" type="button" class="relative w-full inline-flex items-center px-4 py-2 bg-creamcard shadow-quadrupleNonHover rounded-md text-xs font-bold text-redb leading-5 text-blackAuth pr-10">
-                                <span id="province-text">{{ $oldProvinceName }}</span>
-                                <img src="{{ asset('/assets/arrow-down.svg') }}" alt="" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 pointer-events-none">
-                            </button>
-                        </div>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        {{-- Input tersembunyi harus menyimpan ID provinsi --}}
-                        <input type="hidden" name="province_id" id="province-input" value="{{ $oldProvinceId }}"> {{-- <--- Changed name --}}
-                        <div class="w-full max-h-28 overflow-y-auto flex flex-col space-y-1 text-xs text-redb font-bold bg-creamcard shadow-quadrupleNonHover rounded-lg" id="province-list">
-                            @foreach ($provinces as $province)
-                                <button type="button" class="px-4 py-2 text-left province-btn" data-id="{{ $province->id }}">
-                                    {{ $province->province_name }}
+            <div class="flex flex-row justify-between">
+                {{-- BAGIAN DROPDOWN PROVINSI --}}
+                <div class="mb-4 relative">
+                    <x-label for="province" value="{{ __('Province') }}"/>
+                    <x-dropdown-register align="left">
+                        <x-slot name="trigger">
+                            <div class="relative">
+                                <button id="province-trigger" type="button" class="relative w-48 inline-flex items-center px-4 py-2 bg-creamcard shadow-quadrupleNonHover rounded-md text-xs font-bold text-redb leading-5 text-blackAuth pr-10">
+                                    <span id="province-text">{{ $oldProvinceName }}</span>
+                                    <img src="{{ asset('/assets/arrow-down.svg') }}" alt="" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 pointer-events-none">
                                 </button>
-                            @endforeach
-                        </div>
-                    </x-slot>
-                </x-dropdown-register>
-                <x-input-error :messages="$errors->get('province_id')" class="mt-2" /> {{-- Added error display --}}
-            </div>
-
-            {{-- BAGIAN DROPDOWN KOTA --}}
-            <div class="mb-4 relative">
-                <x-label for="city" value="{{ __('City') }}"/>
-                <x-dropdown-register align="left">
-                    <x-slot name="trigger">
-                        <div class="relative">
-                            <button id="city-trigger" type="button" class="relative w-full inline-flex items-center px-4 py-2 bg-creamcard shadow-quadrupleNonHover rounded-md text-xs font-bold text-redb leading-5 text-blackAuth pr-10">
-                                <span id="city-text">{{ $oldCityName }}</span>
-                                <img src="{{ asset('/assets/arrow-down.svg') }}" alt="" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 pointer-events-none">
-                            </button>
-                        </div>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        {{-- Input tersembunyi harus menyimpan ID kota --}}
-                        <input type="hidden" name="city_id" id="city-input" value="{{ $oldCityId }}"> {{-- <--- Changed name --}}
-                        <div class="w-full max-h-28 overflow-y-auto flex flex-col space-y-1 text-xs text-redb font-bold bg-creamcard shadow-quadrupleNonHover rounded-lg" id="city-list">
                             </div>
-                    </x-slot>
-                </x-dropdown-register>
-                <x-input-error :messages="$errors->get('city_id')" class="mt-2" /> {{-- Added error display --}}
-            </div>
+                        </x-slot>
 
+                        <x-slot name="content">
+                            {{-- Input tersembunyi harus menyimpan ID provinsi --}}
+                            <input type="hidden" name="province_id" id="province-input" value="{{ $oldProvinceId }}"> {{-- <--- Changed name --}}
+                            <div class="w-48 max-h-28 overflow-y-auto flex flex-col space-y-1 text-xs text-redb font-bold bg-creamcard shadow-quadrupleNonHover rounded-lg" id="province-list">
+                                @foreach ($provinces as $province)
+                                    <button type="button" class="px-4 py-2 text-left province-btn" data-id="{{ $province->id }}">
+                                        {{ $province->province_name }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </x-slot>
+                    </x-dropdown-register>
+                    <x-input-error :messages="$errors->get('province_id')" class="mt-2" /> {{-- Added error display --}}
+                </div>
+
+                {{-- BAGIAN DROPDOWN KOTA --}}
+                <div class="mb-4 relative">
+                    <x-label for="city" value="{{ __('City') }}"/>
+                    <x-dropdown-register align="left">
+                        <x-slot name="trigger">
+                            <div class="relative">
+                                <button id="city-trigger" type="button" class="relative w-48 inline-flex items-center px-4 py-2 bg-creamcard shadow-quadrupleNonHover rounded-md text-xs font-bold text-redb leading-5 text-blackAuth pr-10">
+                                    <span id="city-text">{{ $oldCityName }}</span>
+                                    <img src="{{ asset('/assets/arrow-down.svg') }}" alt="" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-6 h-6 pointer-events-none">
+                                </button>
+                            </div>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            {{-- Input tersembunyi harus menyimpan ID kota --}}
+                            <input type="hidden" name="city_id" id="city-input" value="{{ $oldCityId }}"> {{-- <--- Changed name --}}
+                            <div class="w-48 max-h-28 overflow-y-auto flex flex-col space-y-1 text-xs text-redb font-bold bg-creamcard shadow-quadrupleNonHover rounded-lg" id="city-list">
+                                </div>
+                        </x-slot>
+                    </x-dropdown-register>
+                    <x-input-error :messages="$errors->get('city_id')" class="mt-2" /> {{-- Added error display --}}
+                </div>
+            </div>
+                
             <div class="mb-4">
                 <x-label for="image" value="Event Image"/>
                 <div class="flex items-center mt-1">
